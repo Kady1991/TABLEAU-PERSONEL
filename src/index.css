@@ -1,0 +1,46 @@
+/* index.css */
+.container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #e5e6e5;
+  width: 80%;
+  margin: 0 auto; /* Pour centrer horizontalement */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Pour centrer verticalement */
+  align-items: center; /* Pour centrer horizontalement */
+  height: 80vh; /* Ajuster la hauteur du conteneur */
+  margin-top: 4rem;
+}
+
+.title {
+  font-size: 30px;
+  color: #333;
+}
+
+.data-grid {
+  height: 190vh; /* Ajuster la hauteur du tableau */
+  width: 80%;
+}
+
+.btn-csv {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #8bc34a; /* Vert doux */
+  color: #ffffff;
+  cursor: pointer; /* Curseur pointeur */
+  transition: background-color 0.3s; /* Transition douce de la couleur de fond */
+}
+
+.white-icon {
+  color: white;
+  border: solid #ffffff;
+  border-radius: 50%;
+}
+
+.btn-csv:hover {
+  background-color: #689f38; /* Nouvelle couleur au survol */
+}
