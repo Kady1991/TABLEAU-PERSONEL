@@ -1,46 +1,34 @@
-/* index.css */
+
+body {
+  background: linear-gradient(to bottom, #2980b9, #ffffff); /* Dégradé de bleu à blanc */
+  margin: 0; /* Supprime les marges par défaut du body */
+  padding: 0; /* Supprime les rembourrages par défaut du body */
+  height: 100vh; /* Assure que le dégradé s'étend sur toute la hauteur de la fenêtre */
+  overflow: hidden;
+}
+
 .container {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background: #e5e6e5;
-  width: 80%;
-  margin: 0 auto; /* Pour centrer horizontalement */
   display: flex;
-  flex-direction: column;
-  justify-content: center; /* Pour centrer verticalement */
-  align-items: center; /* Pour centrer horizontalement */
-  height: 80vh; /* Ajuster la hauteur du conteneur */
-  margin-top: 4rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Centrer verticalement */
+  margin: 0 auto;
+ 
+  
+}
+
+.data-grid-container {
+  width: 90%; /* Largeur du tableau */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Centrer verticalement */
+  margin: 0 auto;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,1)); /* Dégradé de blanc légèrement transparent à blanc */
+  border-radius: 0.5rem;
 }
 
 .title {
-  font-size: 30px;
-  color: #333;
-}
-
-.data-grid {
-  height: 190vh; /* Ajuster la hauteur du tableau */
-  width: 80%;
-}
-
-.btn-csv {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #8bc34a; /* Vert doux */
-  color: #ffffff;
-  cursor: pointer; /* Curseur pointeur */
-  transition: background-color 0.3s; /* Transition douce de la couleur de fond */
-}
-
-.white-icon {
-  color: white;
-  border: solid #ffffff;
-  border-radius: 50%;
-}
-
-.btn-csv:hover {
-  background-color: #689f38; /* Nouvelle couleur au survol */
+  text-align: center;
+  color : #add8e6 ;
 }
