@@ -1,9 +1,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { IconButton } from '@mui/material';
+import { IconButton, Fab } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+
 
 const VISIBLE_FIELDS = [
     'id',
@@ -12,12 +14,16 @@ const VISIBLE_FIELDS = [
     'role',
     'email',
     'entreeService',
+    'gradeNL',
     'grade',
+    'affectationNL',
     'affectation',
+    'localisationNL',
     'localisation',
     'chefServiceNom',
     'chefServicePrenom',
     'chefServiceEmail',
+    'departementNL',
     'departement',
     'chefDepartementNom',
     'chefDepartementPrenom',
@@ -28,20 +34,14 @@ const VISIBLE_FIELDS = [
     'etage',
     'batimentNL',
 ];
-
 export default function Membre() {
-
-  const rows = [
-    { id: 1, nom: 'Dupont', prenom: 'Jean', role: 'Manager', email: 'jean.dupont@example.com', entreeService: '01/01/2022', grade: 'Grade A', affectation: 'Service A', localisation: 'Paris', chefServiceNom: 'Chef A', chefServicePrenom: 'Jeanne', chefServiceEmail: 'jeanne.chef@example.com', departement: 'Département A', chefDepartementNom: 'Directeur A', chefDepartementPrenom: 'David', chefDepartementEmail: 'david.directeur@example.com', pension: 'Oui', tel: '0123456789', batiment: 'Tour A', etage: '1', batimentNL: 'Building A' },
-    { id: 2, nom: 'Martin', prenom: 'Marie', role: 'Superviseur', email: 'marie.martin@example.com', entreeService: '02/02/2022', grade: 'Grade B', affectation: 'Service B', localisation: 'Lyon', chefServiceNom:'Chef B', chefServicePrenom: 'Michel', chefServiceEmail: 'michel.chef@example.com', departement: 'Département B', chefDepartementNom: 'Directeur B', chefDepartementPrenom: 'Sophie', chefDepartementEmail: 'sophie.directeur@example.com', pension: 'Non', tel: '9876543210', batiment: 'Tour B', etage: '2', batimentNL: 'Building B' },
-    { id: 3, nom: 'Durand', prenom: 'Pierre', role: 'Ingénieur', email: 'pierre.durand@example.com', entreeService: '03/03/2022', grade: 'Grade C', affectation: 'Service C', localisation: 'Marseille', chefServiceNom: 'Chef C', chefServicePrenom: 'Isabelle', chefServiceEmail: 'isabelle.chef@example.com', departement: 'Département C', chefDepartementNom: 'Directeur C', chefDepartementPrenom: 'Julie', chefDepartementEmail: 'julie.directeur@example.com', pension: 'Oui', tel: '1234567890', batiment: 'Tour C', etage: '3', batimentNL: 'Building C' },
-    { id: 4, nom: 'Lefebvre', prenom: 'Sophie', role: 'Analyste', email: 'sophie.lefebvre@example.com', entreeService: '04/04/2022', grade: 'Grade D', affectation: 'Service D', localisation: 'Toulouse', chefServiceNom: 'Chef D', chefServicePrenom: 'Patrick', chefServiceEmail: 'patrick.chef@example.com', departement: 'Département D', chefDepartementNom: 'Directeur D', chefDepartementPrenom: 'Maxime', chefDepartementEmail: 'maxime.directeur@example.com', pension: 'Non', tel: '5432167890', batiment: 'Tour D', etage: '4', batimentNL: 'Building D' },
-    { id: 5, nom: 'Leroy', prenom: 'Thomas', role: 'Chef de projet', email: 'thomas.leroy@example.com', entreeService: '06/06/2022', grade: 'Grade F', affectation: 'Service F', localisation: 'Lille', chefServiceNom: 'Chef F', chefServicePrenom: 'Catherine', chefServiceEmail: 'catherine.chef@example.com', departement: 'Département F', chefDepartementNom: 'Directeur F', chefDepartementPrenom: 'Sophie', chefDepartementEmail: 'sophie.directeur@example.com', pension: 'Non', tel: '8901234567', batiment: 'Tour F', etage: '6', batimentNL: 'Building F' },
-    { id: 6, nom: 'Gauthier', prenom: 'Laura', role: 'Consultant', email: 'laura.gauthier@example.com', entreeService: '07/07/2022', grade: 'Grade G', affectation: 'Service G', localisation: 'Strasbourg', chefServiceNom: 'Chef G', chefServicePrenom: 'François', chefServiceEmail: 'francois.chef@example.com', departement: 'Département G', chefDepartementNom: 'Directeur G', chefDepartementPrenom: 'Thomas', chefDepartementEmail: 'thomas.directeur@example.com', pension: 'Oui', tel: '5678901234', batiment: 'Tour G', etage: '7', batimentNL: 'Building G' },
-    { id: 7, nom: 'Robert', prenom: 'Lucas', role: 'Développeur', email: 'lucas.robert@example.com', entreeService: '08/08/2022', grade: 'Grade H', affectation: 'Service H', localisation: 'Nantes', chefServiceNom: 'Chef H', chefServicePrenom: 'Émilie', chefServiceEmail: 'emilie.chef@example.com', departement: 'Département H', chefDepartementNom: 'Directeur H', chefDepartementPrenom: 'Antoine', chefDepartementEmail: 'antoine.directeur@example.com', pension: 'Non', tel: '2345678901', batiment: 'Tour H', etage: '8', batimentNL: 'Building H' },
-    { id: 8, nom: 'Garcia', prenom: 'Léa', role: 'Engineer', email: 'lea.garcia@example.com', entreeService: '09/09/2022', grade: 'Grade I', affectation: 'Service I', localisation: 'Nice', chefServiceNom: 'Chef I', chefServicePrenom: 'Vincent', chefServiceEmail: 'vincent.chef@example.com', departement: 'Département I', chefDepartementNom: 'Directeur I', chefDepartementPrenom: 'Sylvie', chefDepartementEmail: 'sylvie.directeur@example.com', pension: 'Oui', tel: '4567890123', batiment: 'Tour I', etage: '9', batimentNL: 'Building I' },
-    { id: 9, nom: 'Moreau', prenom: 'Émilie', role: 'Designer', email: 'emilie.moreau@example.com', entreeService: '10/10/2022', grade: 'Grade J', affectation: 'Service J', localisation: 'Rennes', chefServiceNom: 'Chef J', chefServicePrenom: 'Gilles', chefServiceEmail: 'gilles.chef@example.com', departement: 'Département J', chefDepartementNom: 'Directeur J', chefDepartementPrenom: 'Marion', chefDepartementEmail: 'marion.directeur@example.com', pension: 'Non', tel: '6789012345', batiment: 'Tour J', etage: '10', batimentNL: 'Building J' }
-  ];
+  const [rows, setRows] = React.useState([
+    { id: 1, nom: 'Dupont', prenom: 'Jean', role: 'Manager', email: 'jean.dupont@example.com', entreeService: '01/01/2022', gradeNL: 'Grade A', grade: 'Grade A', affectationNL: 'Service A', affectation: 'Service A', localisationNL: 'Paris', localisation: 'Paris', chefServiceNom: 'Chef A', chefServicePrenom: 'Jeanne', chefServiceEmail: 'jeanne.chef@example.com', departementNL: 'Département A', departement: 'Département A', chefDepartementNom: 'Directeur A', chefDepartementPrenom: 'David', chefDepartementEmail: 'david.directeur@example.com', pension: 'Oui', tel: '0123456789', batiment: 'Tour A', etage: ' Etage 1', etageNL: 'Verdieping 1', batimentNL: 'Building A' },
+    { id: 2, nom: 'Martin', prenom: 'Marie', role: 'Superviseur', email: 'marie.martin@example.com', entreeService: '02/02/2022', gradeNL: 'Grade B', grade: 'Grade B', affectationNL: 'Service B', affectation: 'Service B', localisationNL: 'Lyon', localisation: 'Lyon', chefServiceNom:'Chef B', chefServicePrenom: 'Michel', chefServiceEmail: 'michel.chef@example.com', departementNL: 'Département B', departement: 'Département B', chefDepartementNom: 'Directeur B', chefDepartementPrenom: 'Sophie', chefDepartementEmail: 'sophie.directeur@example.com', pension: 'Non', tel: '9876543210', batiment: 'Tour B', etage: 'Etage2', etageNL: 'Verdieping 2', batimentNL: 'Building B' },
+    { id: 3, nom: 'Durand', prenom: 'Pierre', role: 'Ingénieur', email: 'pierre.durand@example.com', entreeService: '03/03/2022', gradeNL: 'Grade C', grade: 'Grade C', affectationNL: 'Service C', affectation: 'Service C', localisationNL: 'Marseille', localisation: 'Marseille', chefServiceNom: 'Chef C', chefServicePrenom: 'Isabelle', chefServiceEmail: 'isabelle.chef@example.com', departementNL: 'Département C', departement: 'Département C', chefDepartementNom: 'Directeur C', chefDepartementPrenom: 'Julie', chefDepartementEmail: 'julie.directeur@example.com', pension: 'Oui', tel: '1234567890', batiment: 'Tour C', etage: 'Etage3', etageNL: 'Verdieping 3', batimentNL: 'Building C' },
+    { id: 4, nom: 'Lefebvre', prenom: 'Sophie', role: 'Analyste', email: 'sophie.lefebvre@example.com', entreeService: '04/04/2022', gradeNL: 'Grade D', grade: 'Grade D', affectationNL: 'Service D', affectation: 'Service D', localisationNL: 'Toulouse', localisation: 'Toulouse', chefServiceNom: 'Chef D', chefServicePrenom: 'Patrick', chefServiceEmail: 'patrick.chef@example.com', departementNL: 'Département D', departement: 'Département D', chefDepartementNom: 'Directeur D', chefDepartementPrenom: 'Maxime', chefDepartementEmail: 'maxime.directeur@example.com', pension: 'Non', tel: '5432167890', batiment: 'Tour D', etage: 'Etage 4', etageNL: 'Verdieping 4', batimentNL: 'Building D' },
+    { id: 5, nom: 'Leroy', prenom: 'Thomas', role: 'Chef de projet', email: 'thomas.leroy@example.com', entreeService: '06/06/2022', gradeNL: 'Grade F', grade: 'Grade F', affectationNL: 'Service F', affectation: 'Service F', localisationNL: 'Lille', localisation: 'Lille', chefServiceNom: 'Chef F', chefServicePrenom: 'Catherine', chefServiceEmail: 'catherine.chef@example.com', departementNL: 'Département F', departement: 'Département F', chefDepartementNom: 'Directeur F', chefDepartementPrenom: 'Sophie', chefDepartementEmail: 'sophie.directeur@example.com', pension: 'Non', tel: '8901234567', batiment: 'Tour F', etage: 'Etage 6', etageNL: 'Verdieping 6', batimentNL: 'Building F' },
+  ]);
 
   const columns = React.useMemo(
     () => [
@@ -51,12 +51,16 @@ export default function Membre() {
       { field: 'role', headerName: 'RÔLE', width: 150 },
       { field: 'email', headerName: 'E-mail', width: 200 },
       { field: 'entreeService', headerName: 'ENTRÉE SERVICE', width: 200 },
+      { field: 'gradeNL', headerName: 'GRADE (NL)', width: 150, hide: true },
       { field: 'grade', headerName: 'GRADE', width: 150 },
+      { field: 'affectationNL', headerName: 'AFFECTATION (NL)', width: 200, hide: true },
       { field: 'affectation', headerName: 'AFFECTATION', width: 200 },
+      { field: 'localisationNL', headerName: 'LOCALISATION (NL)', width: 200, hide: true },
       { field: 'localisation', headerName: 'LOCALISATION', width: 200 },
       { field: 'chefServiceNom', headerName: 'NOM CHEF DU SERVICE', width: 200 },
       { field: 'chefServicePrenom', headerName: 'PRÉNOM CHEF DU SERVICE', width: 200 },
       { field: 'chefServiceEmail', headerName: 'E-MAIL CHEF DU SERVICE', width: 200 },
+      { field: 'departementNL', headerName: 'DÉPARTEMENT (NL)', width: 200, hide: true },
       { field: 'departement', headerName: 'DÉPARTEMENT', width: 200 },
       { field: 'chefDepartementNom', headerName: 'NOM CHEF DE DÉPARTEMENT', width: 200 },
       { field: 'chefDepartementPrenom', headerName: 'PRÉNOM CHEF DE DÉPARTEMENT', width: 200 },
@@ -64,12 +68,13 @@ export default function Membre() {
       { field: 'pension', headerName: 'P+C: PENSION', width: 150 },
       { field: 'tel', headerName: 'TEL', width: 150 },
       { field: 'batiment', headerName: 'BÂTIMENT', width: 150 },
+      { field: 'batimentNL', headerName: 'BÂTIMENT (NL)', width: 200, hide: true },
       { field: 'etage', headerName: 'ÉTAGE', width: 150 },
-      { field: 'batimentNL', headerName: 'BÂTIMENT (NL)', width: 200 },
+      { field: 'etageNL', headerName: 'ÉTAGE (NL)', width: 150, hide: true },
       {
         field: 'actions',
         headerName: 'Actions',
-        width: 120,
+        width: 100,
         renderCell: (params) => (
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <IconButton onClick={() => handleEdit(params.row.id)} style={{ color: '#2196f3' }} title="Modifier">
@@ -93,9 +98,42 @@ export default function Membre() {
     console.log(`Modification du membre avec l'ID : ${id}`);
   };
 
+  const handleAdd = () => {
+    console.log(`Ajout d'un nouveau membre`);
+    const newId = Math.max(...rows.map((row) => row.id)) + 1;
+    const newMember = {
+      id: newId,
+      nom: 'Kady',
+      prenom: 'Prenom',
+      role: 'Ingénieur',
+      email: 'kady@example.com',
+      entreeService: '01/04/2024',
+      gradeNL: 'Grade C',
+      grade: 'Grade C',
+      affectationNL: 'Service IT',
+      affectation: 'Service IT',
+      localisationNL: 'Localisation',
+      localisation: 'Localisation',
+      chefServiceNom: 'Chef IT',
+      chefServicePrenom: 'Chef IT',
+      chefServiceEmail: 'chefit@example.com',
+      departementNL: 'Département IT',
+      departement: 'Département IT',
+      chefDepartementNom: 'Directeur IT',
+      chefDepartementPrenom: 'Directeur IT',
+      chefDepartementEmail: 'directeurit@example.com',
+      pension: 'Non',
+      tel: '0123456789',
+      batiment: 'Bâtiment',
+      batimentNL: 'Bâtiment (NL)',
+      etage: 'Étage',
+      etageNL: 'Étage (NL)'
+    };
+    setRows([...rows, newMember]);
+  };
+
   return (
-    <Box className="data-grid-container" >
-      
+    <Box className="data-grid-container">
       <DataGrid
         rows={rows}
         columns={columns}
@@ -105,18 +143,23 @@ export default function Membre() {
         disableColumnFilter
         disableColumnSelector
         disableDensitySelector
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
         components={{
-          headerCell: ({ className, ...rest }) => {
-            return <div className={className} style={{ fontWeight: 'bold' }} {...rest} />;
-          },
+          Toolbar: GridToolbar,
         }}
+        toolbarOptions={{
+          showQuickFilter: true,
+          densitySelectorIcon: null,
+          columnsButtonIcon: null,
+          exportButtonIcon: null,
+          filterButtonIcon: null,
+          importbuttonicon: null,
+        }}
+        fileName="export.csv"
+        charset="UTF-8"
       />
+      <Fab color="primary" aria-label="add" onClick={handleAdd} style={{ position: 'fixed', bottom: '16px', right: '16px' }}>
+        <AddIcon />
+      </Fab>
     </Box>
   );
 }
