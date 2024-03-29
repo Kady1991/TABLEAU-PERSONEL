@@ -1,13 +1,9 @@
-import React from 'react';
-import Membre from './components/Membre';
+import React from 'react'
 
-function App() {
+const App = () => {
   return (
-    <div>
-      <Membre />
-    </div>
-  );
+    <div>App</div>
+  )
 }
 
-export default App;
-
+export default App
