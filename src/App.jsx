@@ -1,18 +1,13 @@
-import React from "react";
-import Membre from "./components/Membre";
-import './index.css'; // Assurez-vous que le chemin est correct vers votre fichier index.css
+import React from 'react';
+import Membre from './components/Membre';
 
 function App() {
   return (
-    <div className="App">
-      <h1 className="title">
-        LES MEMBRES DU PERSONEL UCCLE
-      </h1>
+    <div>
       <Membre />
     </div>
   );
 }
 
 export default App;
-
 
