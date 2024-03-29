@@ -1,9 +1,13 @@
-import React from 'react'
 
-const App = () => {
+import React from 'react';
+import Tableau from './components/Tableau'; // Assurez-vous que le chemin est correct
+
+function App() {
   return (
-    <div>App</div>
-  )
+    <div>
+      <Tableau />
+    </div>
+  );
 }
 
-export default App
+export default App;
