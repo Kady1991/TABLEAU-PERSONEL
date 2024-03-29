@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from '@mui/material';
+import '../index.css'; // Importation du fichier CSS externe
 
 const Tableau = () => {
   const [membres, setMembres] = useState([]);
@@ -10,27 +11,27 @@ const Tableau = () => {
     setRecherche(value);
     // Vous pouvez mettre ici votre logique pour récupérer les données depuis une API
     // Par exemple, si vous utilisez axios pour faire une requête GET
-    axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne')
-      .then(response => {
-        // Mettez à jour l'état des membres avec les données de l'API
-        setMembres(response.data);
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des données depuis l\'API :', error);
-      });
+    // axios.get('votre_url_de_l_api')
+    //   .then(response => {
+    //     // Mettez à jour l'état des membres avec les données de l'API
+    //     setMembres(response.data);
+    //   })
+    //   .catch(error => {
+    //     console.error('Erreur lors de la récupération des données depuis l\'API :', error);
+    //   });
   };
 
   return (
-    <div>
+    <div className="container gradient-background">
       <TextField
         id="search"
         label="Rechercher"
         variant="outlined"
-        fullWidth
+        Width= "80%"
         margin="normal"
         onChange={handleSearch}
       />
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className="table-container">
         <Table>
           <TableHead>
             <TableRow>
@@ -43,7 +44,7 @@ const Tableau = () => {
               <TableCell>Grade</TableCell>
               <TableCell>Affectation</TableCell>
               <TableCell>Localisation</TableCell>
-              <TableCell>N°</TableCell>
+              {/* <TableCell>N°</TableCell>
               <TableCell>Nom Chef du Service</TableCell>
               <TableCell>Prénom Chef du Service</TableCell>
               <TableCell>E-mail Chef Service</TableCell>
@@ -54,7 +55,7 @@ const Tableau = () => {
               <TableCell>P+C:UENSION</TableCell>
               <TableCell>TEL</TableCell>
               <TableCell>Bâtiment</TableCell>
-              <TableCell>Étage</TableCell>
+              <TableCell>Étage</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -69,7 +70,7 @@ const Tableau = () => {
                 <TableCell>{membre.grade}</TableCell>
                 <TableCell>{membre.affectation}</TableCell>
                 <TableCell>{membre.localisation}</TableCell>
-                <TableCell>{membre.numero}</TableCell>
+                {/* <TableCell>{membre.numero}</TableCell>
                 <TableCell>{membre.nomChefService}</TableCell>
                 <TableCell>{membre.prenomChefService}</TableCell>
                 <TableCell>{membre.emailChefService}</TableCell>
@@ -80,7 +81,7 @@ const Tableau = () => {
                 <TableCell>{membre.pcuension}</TableCell>
                 <TableCell>{membre.tel}</TableCell>
                 <TableCell>{membre.batiment}</TableCell>
-                <TableCell>{membre.etage}</TableCell>
+                <TableCell>{membre.etage}</TableCell> */}
               </TableRow>
             ))}
           </TableBody>

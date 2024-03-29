@@ -1,1 +1,42 @@
 
+/* Styles pour le corps */
+/* Styles pour le corps */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  /* Dégradé bleu et blanc */
+    display: flex; /* Utilisation de flexbox */
+    justify-content: center; /* Centrage horizontal */
+    align-items: center;
+    background: #b5b7b8;
+  }
+  
+  /* Styles pour le conteneur du tableau */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Styles pour le tableau */
+.table-container{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow-x: auto;
+  }
+   
+  
+  /* Styles pour le fond du tableau */
+  .gradient-background {
+    background-color: rgb(118, 121, 128); /* Fond blanc */
+  }
+  
+  /* Styles pour le conteneur du tableau */
+  /* .table-container {
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+   */
