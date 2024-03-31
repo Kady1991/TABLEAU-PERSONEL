@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid'; // Importer DataGrid depuis @mui/x-data-grid
 import '../index.css'; // Importer le fichier CSS
 
+
+
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -37,10 +40,13 @@ function Tableau() {
           etage: personne.Etage
         }));
         setPersonnes(personnesData);
+        setLoading(false); // Mettre loading à false une fois les données chargées
       })
       .catch(error => {
         console.error('Une erreur est survenue lors de la récupération des données :', error);
+        setLoading(false); // Mettre loading à false en cas d'erreur de chargement
       });
+      
   };
   
   const columns = [
@@ -68,18 +74,27 @@ function Tableau() {
   ];
 
   return (
-    <div className="container"> {/* Ajouter la classe de conteneur */}
-      <div style={{ height: 600, width: '100%' }}> {/* Définir la hauteur et la largeur du DataGrid */}
+    <div style={{ position: 'relative', height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <h1 style={{ position: 'absolute', top: '50px',color:'white' }}>MEMBRE DU PERSONEL</h1>
+      <div style={{ height: '600px', width: '80%', backgroundColor:'white'}}>
         <DataGrid
           rows={personnes}
           columns={columns}
-          pageSize={10} // Nombre d'éléments par page
-          checkboxSelection // Ajouter une case à cocher pour la sélection
-          disableSelectionOnClick // Désactiver la sélection au clic sur une ligne
+          pageSize={10}
+          loading={loading}
+          checkboxSelection
+          disableSelectionOnClick
+          components={{
+            Toolbar: () => (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <BoutonAdd /> {/* Utilisation du composant Bouton-Add */}
+              </div>
+            ),
+          }}
         />
       </div>
     </div>
   );
-}
+};
 
 export default Tableau;
