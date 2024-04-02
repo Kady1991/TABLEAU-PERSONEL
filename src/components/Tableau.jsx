@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid'; // Importer DataGrid depuis @mui/x-data-grid
 import '../index.css'; // Importer le fichier CSS
+import React, { useState, useEffect } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 
@@ -14,31 +14,41 @@ function Tableau() {
 
   const fetchData = () => {
     fetch('https://server-iis.uccle.intra/API_Personne/api/Personne')
-      .then(response => response.json())
+      .then(response => response.text()) // Utiliser .text() pour récupérer le texte brut de la réponse
       .then(data => {
-        const personnesData = data.map(personne => ({
-          id: personne.ID,
-          nom: personne.NOM,
-          prenom: personne.PRENOM,
-          role: personne.ROLE,
-          email: personne['E-mail'],
-          entreeService: personne['ENTREE SERVICE'],
-          grade: personne.GRADE,
-          affectation: personne.AFFECTATION,
-          localisation: personne.LOCALISATION,
-          numero: personne['N°'],
-          nomChefService: personne['NOM CHEF DU SERVICE'],
-          prenomChefService: personne['PRENOM CHEF DU SERVICE'],
-          emailChefService: personne['E-MAIL CHEF SERVICE'],
-          departements: personne.DEPARTEMENTS,
-          nomChefDepartement: personne['NOM CHEF DEPARTEMENT'],
-          prenomChefDepartement: personne['PRENOM CHEF DEPARTEMENT'],
-          emailChefDepartement: personne['E-MAIL CHEF DEPARTEMENT'],
-          pcuension: personne['P+C:UENSION'],
-          tel: personne.TEL,
-          batiment: personne.Batiment,
-          etage: personne.Etage
+        // Utiliser un parseur XML pour traiter les données XML
+        const parser = new DOMParser();
+        const xmlData = parser.parseFromString(data, 'text/xml');
+
+        // Extraire les données de l'XML et les formater comme nécessaire
+        const personnesData = Array.from(xmlData.querySelectorAll('personne')).map(personne => ({
+          id: personne.querySelector('ID').textContent,
+          nom: personne.querySelector('NOM').textContent,
+          prenom: personne.querySelector('PRENOM').textContent,
+          role: personne.querySelector('RÔLE').textContent,
+          email: personne.querySelector('E-mail').textContent,
+          entreeService: personne.querySelector('ENTREE_SERVICE').textContent,
+          grade_nl: personne.querySelector('GRADE(nl)').textContent,
+          grade: personne.querySelector('GRADE').textContent,
+          affectation_nl: personne.querySelector('AFFECTATION(nl)').textContent,
+          affectation: personne.querySelector('AFFECTATION').textContent,
+          localisation_nl: personne.querySelector('LOCALISATION(nl)').textContent,
+          localisation: personne.querySelector('LOCALISATION').textContent,
+          numero: personne.querySelector('N°').textContent,
+          nomChefService: personne.querySelector('NOM_CHEF_DU_SERVICE').textContent,
+          prenomChefService: personne.querySelector('PRENOM_CHEF_DU_SERVICE').textContent,
+          emailChefService: personne.querySelector('E-MAIL_CHEF_SERVICE').textContent,
+          departements_nl: personne.querySelector('DEPARTEMENT(nl)').textContent,
+          departements: personne.querySelector('DEPARTEMENT').textContent,
+          nomChefDepartement: personne.querySelector('NOM_CHEF_DEPARTEMENT').textContent,
+          prenomChefDepartement: personne.querySelector('PRENOM_CHEF_DEPARTEMENT').textContent,
+          emailChefDepartement: personne.querySelector('E-MAIL_CHEF_DEPARTEMENT').textContent,
+          pcuension: personne.querySelector('P+C:UENSION').textContent,
+          tel: personne.querySelector('TEL').textContent,
+          batiment: personne.querySelector('Batiment').textContent,
+          etage: personne.querySelector('Etage').textContent
         }));
+        
         setPersonnes(personnesData);
         setLoading(false); // Mettre loading à false une fois les données chargées
       })
@@ -56,22 +66,21 @@ function Tableau() {
     { field: 'role', headerName: 'Rôle', width: 150 },
     { field: 'email', headerName: 'E-mail', width: 200 },
     { field: 'entreeService', headerName: 'Entrée Service', width: 200 },
+    { field: 'grade_nl', headerName: 'Grade (NL)', width: 150 },
     { field: 'grade', headerName: 'Grade', width: 150 },
+    { field: 'affectation_nl', headerName: 'Affectation (NL)', width: 150 },
     { field: 'affectation', headerName: 'Affectation', width: 150 },
+    { field: 'localisation_nl', headerName: 'Localisation (NL)', width: 150 },
     { field: 'localisation', headerName: 'Localisation', width: 150 },
     { field: 'numero', headerName: 'N°', width: 100 },
     { field: 'nomChefService', headerName: 'Nom Chef du Service', width: 200 },
     { field: 'prenomChefService', headerName: 'Prénom Chef du Service', width: 200 },
     { field: 'emailChefService', headerName: 'E-mail Chef du Service', width: 200 },
+    { field: 'departements_nl', headerName: 'Départements (NL)', width: 150 },
     { field: 'departements', headerName: 'Départements', width: 150 },
-    { field: 'nomChefDepartement', headerName: 'Nom Chef de Département', width: 200 },
-    { field: 'prenomChefDepartement', headerName: 'Prénom Chef de Département', width: 200 },
-    { field: 'emailChefDepartement', headerName: 'E-mail Chef de Département', width: 200 },
-    { field: 'pcuension', headerName: 'P+C:UENSION', width: 150 },
-    { field: 'tel', headerName: 'Tel', width: 150 },
-    { field: 'batiment', headerName: 'Bâtiment', width: 150 },
-    { field: 'etage', headerName: 'Étage', width: 100 }
   ];
+  
+  
 
   return (
     <div style={{ position: 'relative', height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
