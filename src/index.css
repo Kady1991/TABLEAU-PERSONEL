@@ -16,7 +16,23 @@ body {
   
 }
 
-.custom-header {
-  color: white; /* Couleur du texte pour l'en-tête du tableau */
+/* buttonStyles.css */
 
+/* index.css */
+
+.bouton-export {
+  margin: 5rem; /* Ajoute une marge autour du bouton */
+  padding: 10rem ; /* Ajoute un rembourrage à l'intérieur du bouton */
+  font-size: 20px; /* Définit la taille de la police */
 }
+
+.bouton-export:hover {
+ color: rgb(8, 91, 119); /* Change la couleur de fond au survol */
+ /* Change la couleur du texte au survol */
+}
+
+.recherche-right{ 
+  margin: 5rem; /* Ajoute une marge autour du bouton */
+  padding: 10rem ; /* Ajoute un rembourrage à l'intérieur du bouton */
+  font-size: 20px; /* Définit la taille de la police */
+};
