@@ -2,32 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import ButtonExport from '../layout/ButtonExport'; // Importez le composant ButtonExport
-import Recherche from '../layout/Recherche';
+
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredPersonnes, setFilteredPersonnes] = useState([]);
+  
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  // logique d'export
-
-  useEffect(() => {
-    setFilteredPersonnes(personnes); // Initialize filtered data with all data
-  }, [personnes]);
-
-  const handleSearch = (term) => {
-    const filteredData = personnes.filter((personne) =>
-      Object.values(personne).some((value) =>
-        value.toString().toLowerCase().includes(term.toLowerCase())
-      )
-    );
-    setFilteredPersonnes(filteredData);
-  };
-
+  
 
   const fetchData = () => {
     fetch('https://server-iis.uccle.intra/API_Personne_nat/api/Personne')
@@ -76,16 +62,11 @@ function Tableau() {
 
       <h1 style={{ color: 'white' }}>MEMBRE DU PERSONNEL</h1>
 
-
-      <div style={{ height: '75px', width: '80%', backgroundColor: 'white', position: 'relative', borderRadius: "0.4rem", display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ margin: '0.5rem' }}>
-          <ButtonExport personnes={personnes} className="bouton-export" />
+        <div style={{ height: '75px', width: '80%', backgroundColor: 'white', position: 'relative', borderRadius: "0.4rem", display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ margin: '1rem'}}>
+            <ButtonExport personnes={personnes} columns={columns} className="bouton-export" />
+          </div>
         </div>
-        <div style={{ margin: '3rem', width: '10rem' }}>
-           <Recherche handleSearch={handleSearch} className="recherche-right" /> 
-        </div>
-      </div>
-      
 
       <div style={{ height: '600px', width: '80%', backgroundColor: 'white', position: 'relative', marginTop: '2rem', borderRadius: "0.5rem" }}>
         <DataGrid
