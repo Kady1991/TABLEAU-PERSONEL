@@ -1,0 +1,55 @@
+{
+  "hash": "383c2b8b",
+  "configHash": "c67a63c5",
+  "lockfileHash": "af01064e",
+  "browserHash": "d72b6d23",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "d8187217",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "a0de1c18",
+      "needsInterop": true
+    },
+    "@mui/x-data-grid": {
+      "src": "../../node_modules/@mui/x-data-grid/index.js",
+      "file": "@mui_x-data-grid.js",
+      "fileHash": "3fdac9ae",
+      "needsInterop": false
+    },
+    "@mui/material/TextField": {
+      "src": "../../node_modules/@mui/material/TextField/index.js",
+      "file": "@mui_material_TextField.js",
+      "fileHash": "9aa51b60",
+      "needsInterop": false
+    },
+    "@mui/material/Button": {
+      "src": "../../node_modules/@mui/material/Button/index.js",
+      "file": "@mui_material_Button.js",
+      "fileHash": "2b3e4752",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-VMOETUJW": {
+      "file": "chunk-VMOETUJW.js"
+    },
+    "chunk-DESOYGI5": {
+      "file": "chunk-DESOYGI5.js"
+    },
+    "chunk-UAYMBOTX": {
+      "file": "chunk-UAYMBOTX.js"
+    },
+    "chunk-KJUJBIHA": {
+      "file": "chunk-KJUJBIHA.js"
+    },
+    "chunk-W4VDMLRG": {
+      "file": "chunk-W4VDMLRG.js"
+    }
+  }
+}

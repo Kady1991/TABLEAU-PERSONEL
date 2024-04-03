@@ -1,0 +1,41 @@
+import * as React from 'react';
+import clsx from 'clsx';
+import { unstable_composeClasses as composeClasses } from '@mui/utils';
+import { getDataGridUtilityClass, gridClasses, useGridSelector } from '@mui/x-data-grid';
+import { gridPinnedRowsSelector, gridRenderContextSelector, useGridPrivateApiContext } from '@mui/x-data-grid/internals';
+import { jsx as _jsx } from "react/jsx-runtime";
+const useUtilityClasses = () => {
+  const slots = {
+    root: ['pinnedRows']
+  };
+  return composeClasses(slots, getDataGridUtilityClass, {});
+};
+export function GridPinnedRows({
+  position,
+  virtualScroller
+}) {
+  const classes = useUtilityClasses();
+  const apiRef = useGridPrivateApiContext();
+  const renderContext = useGridSelector(apiRef, gridRenderContextSelector);
+  const pinnedRowsData = useGridSelector(apiRef, gridPinnedRowsSelector);
+  const rows = pinnedRowsData[position];
+  const pinnedRenderContext = React.useMemo(() => ({
+    firstRowIndex: 0,
+    lastRowIndex: rows.length,
+    firstColumnIndex: renderContext.firstColumnIndex,
+    lastColumnIndex: renderContext.lastColumnIndex
+  }), [rows, renderContext.firstColumnIndex, renderContext.lastColumnIndex]);
+  if (rows.length === 0) {
+    return null;
+  }
+  const pinnedRows = virtualScroller.getRows({
+    position,
+    rows,
+    renderContext: pinnedRenderContext
+  });
+  return /*#__PURE__*/_jsx("div", {
+    className: clsx(classes.root, gridClasses[`pinnedRows--${position}`]),
+    role: "presentation",
+    children: pinnedRows
+  });
+}
