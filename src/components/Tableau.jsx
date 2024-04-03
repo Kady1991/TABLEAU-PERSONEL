@@ -7,10 +7,27 @@ import Recherche from '../layout/Recherche';
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filteredPersonnes, setFilteredPersonnes] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // logique d'export
+
+  useEffect(() => {
+    setFilteredPersonnes(personnes); // Initialize filtered data with all data
+  }, [personnes]);
+
+  const handleSearch = (term) => {
+    const filteredData = personnes.filter((personne) =>
+      Object.values(personne).some((value) =>
+        value.toString().toLowerCase().includes(term.toLowerCase())
+      )
+    );
+    setFilteredPersonnes(filteredData);
+  };
+
 
   const fetchData = () => {
     fetch('https://server-iis.uccle.intra/API_Personne_nat/api/Personne')
@@ -65,7 +82,7 @@ function Tableau() {
           <ButtonExport personnes={personnes} className="bouton-export" />
         </div>
         <div style={{ margin: '3rem', width: '10rem' }}>
-          <Recherche className="recherche-right" />
+           <Recherche handleSearch={handleSearch} className="recherche-right" /> 
         </div>
       </div>
       
