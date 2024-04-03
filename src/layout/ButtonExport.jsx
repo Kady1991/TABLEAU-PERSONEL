@@ -6,7 +6,7 @@ import '../index.css'; // Importez le fichier CSS
 const ButtonExport = ({ personnes, className }) => {
   const generateCsvData = () => {
     const columns = [
-      // { field: 'IDPersonne', headerName: 'ID', width: 100 },
+      // { field: 'IDPersonne', headerName: 'ID', width: 100 }, PAS BESOIND DE ID DANS L'EXPORT
       { field: 'NomPersonne', headerName: 'NOM', width: 150 },
       { field: 'PrenomPersonne', headerName: 'PRENOM', width: 150 },
       { field: 'SiFrancais', headerName: 'RÔLE', width: 150 },
@@ -35,7 +35,8 @@ const ButtonExport = ({ personnes, className }) => {
     ];
 
     const headers = columns.map(column => column.headerName).join(',') + '\n';
-    const filteredRows = personnes.filter(personne => personne.archives !== true);
+    const filteredRows = personnes.filter(personne => personne.archives === false || personne.archives === undefined);
+
     const rows = filteredRows.map(item =>
       columns.map(column => `"${item[column.field]}"`).join(',')
     ).join('\n');
