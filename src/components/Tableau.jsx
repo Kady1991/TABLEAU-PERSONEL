@@ -36,7 +36,7 @@ function Tableau() {
 
 
   const columns = [
-    
+
     { field: 'IDPersonne', headerName: 'ID', width: 100 },
     { field: 'NomPersonne', headerName: 'NOM', width: 150 },
     { field: 'PrenomPersonne', headerName: 'PRENOM', width: 150 },
