@@ -36,24 +36,35 @@ function Tableau() {
 
 
   const columns = [
+    
     { field: 'IDPersonne', headerName: 'ID', width: 100 },
-    { field: 'NomPersonne', headerName: 'Nom', width: 150 },
-    { field: 'PrenomPersonne', headerName: 'Prénom', width: 150 },
-    { field: 'TelPro', headerName: 'Tel', width: 150 },
+    { field: 'NomPersonne', headerName: 'NOM', width: 150 },
+    { field: 'PrenomPersonne', headerName: 'PRENOM', width: 150 },
+    { field: 'SiFrancais', headerName: 'RÔLE', width: 150  },
     { field: 'Email', headerName: 'E-mail', width: 200 },
-    { field: 'DateEntree', headerName: 'Entrée Service', width: 200 },
-    { field: 'NomWWGradeNl', headerName: 'Grade (NL)', width: 150 },
-    { field: 'NomWWGradeFr', headerName: 'Grade', width: 150 },
-    { field: 'NomServiceNl', headerName: 'Affectation (NL)', width: 150 },
-    { field: 'NomServiceFr', headerName: 'Affectation', width: 150 },
-    { field: 'NomRueNl', headerName: 'Localisation (NL)', width: 150 },
-    { field: 'NomRueFr', headerName: 'Localisation', width: 150 },
+    { field: 'DateEntree', headerName: 'ENTREE SERVICE', width: 200 },
+    { field: 'NomWWGradeNl', headerName: 'GRADE(nl)', width: 150 },
+    { field: 'NomWWGradeFr', headerName: 'GRADE', width: 150 },
+    { field: 'NomServiceNl', headerName: 'AFFECTATION (nl)', width: 150 },
+    { field: 'NomServiceFr', headerName: 'AFFECTATION', width: 150 },
+    { field: 'NomRueNl', headerName: 'LOCALISATION(nl)', width: 150 },
+    { field: 'NomRueFr', headerName: 'LOCALISATION', width: 150 },
     { field: 'Numero', headerName: 'N°', width: 100 },
-    { field: 'NomChefService', headerName: 'Nom Chef du Service', width: 200 },
-    { field: 'PrenomChefService', headerName: 'Prénom Chef du Service', width: 200 },
-    { field: 'EmailChefService', headerName: 'E-mail Chef du Service', width: 200 },
-    { field: 'NomDepartementNl', headerName: 'Départements (NL)', width: 150 },
-    { field: 'NomDepartementFr', headerName: 'Départements', width: 150 },
+    { field: 'NomChefService', headerName: 'NOM CHEF DU SERVICE', width: 200 },
+    { field: 'PrenomChefService', headerName: 'PRENOM CHEF DU SERVICE', width: 200 },
+    { field: 'EmailChefService', headerName: 'E-MAIL CHEF DU SERVICE', width: 200 },
+    { field: 'NomDepartementNl', headerName: 'DEPARTEMENT(nl)', width: 150 },
+    { field: 'NomDepartementFr', headerName: 'DEPARTEMENTS', width: 150 },
+    { field: 'NomChefDepartement', headerName: 'NOM CHEF DEPARTEMENT', width: 200 },
+    { field: 'PrenomChefDepartement', headerName: 'PRENOM CHEF DEPARTEMENT', width: 200},
+    { field: 'EmailChefDepartement', headerName: 'E-MAIL CHEF DEPARTEMENT', width: 200},
+    { field: 'P+C:UENSION', headerName: 'P+C:UENSION', width: 150},
+    { field: 'TelPro', headerName: 'TEL', width: 150 },
+    { field: 'Batiment', headerName: 'Batiment', width: 150 },
+    { field: 'Etage', headerName: 'Etage', width: 150 },
+    { field: 'BatimentNl', headerName: 'Batiment(nl)', width: 150 },
+
+
   ];
 
 

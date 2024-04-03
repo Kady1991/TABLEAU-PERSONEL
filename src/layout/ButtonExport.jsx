@@ -3,11 +3,11 @@ import Button from '@mui/material/Button'; // Importez le bouton MUI
 
 import '../index.css'; // Importez le fichier CSS
 
-const ButtonExport = ({ personnes, columns, className }) => {
+const ButtonExport = ({ personnes, className }) => {
   const generateCsvData = () => {
-    const headers = columns.map(column => column.headerName.toUpperCase()).join(',') + '\n';
+    const headers = Object.keys(personnes[0]).join(',') + '\n';
     const rows = personnes.map(item =>
-      columns.map(column => `"${item[column.field]}"`).join(',')
+      Object.values(item).map(value => `"${value}"`).join(',')
     ).join('\n');
     return headers + rows;
   };
@@ -26,8 +26,8 @@ const ButtonExport = ({ personnes, columns, className }) => {
 
   return (
     <Button className={`bouton-export ${className}`} onClick={handleExportCsv}>
-      Exporter
-    </Button>
+            Exporter
+        </Button>
   );
 }
 
