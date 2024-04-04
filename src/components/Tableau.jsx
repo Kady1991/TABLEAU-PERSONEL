@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import ButtonExport from '../layout/ButtonExport'; // Importez le composant ButtonExport
+import Add from "../layout/Add";
 
 
 function Tableau() {
@@ -73,12 +74,15 @@ function Tableau() {
 
       <h1 style={{ color: 'white' }}>MEMBRE DU PERSONNEL</h1>
 
-        <div style={{ height: '75px', width: '80%', backgroundColor: 'white', position: 'relative', borderRadius: "0.4rem", display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ margin: '1rem'}}>
-            <ButtonExport personnes={personnes} columns={columns} className="bouton-export" />
-          </div>
-        </div>
-
+      <div style={{ height: '75px', width: '80%', backgroundColor: 'white', position: 'relative', borderRadius: "0.4rem", display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div>
+        <ButtonExport personnes={personnes} columns={columns} className="bouton-export" />
+      </div>
+      <div style={{ margin: '5rem'}}>
+        {/* Bouton Add */}
+        <Add/>
+      </div>
+    </div>
       <div style={{ height: '600px', width: '80%', backgroundColor: 'white', position: 'relative', marginTop: '2rem', borderRadius: "0.5rem" }}>
         <DataGrid
           rows={personnes}
