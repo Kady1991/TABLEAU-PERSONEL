@@ -1,0 +1,56 @@
+.formulaire {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 60%; /* Hauteur du formulaire */
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Diviser en deux colonnes */
+  grid-row-gap: 10px; /* Espacement vertical entre les lignes */
+}
+
+.formulaire .ant-form-item {
+  display: flex;
+  margin: 0 auto;
+  flex-direction: column; /* Aligner les éléments en colonne */
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: center;
+  align-items: stretch;
+  width: 80%;
+  height: auto;
+}
+
+.formulaire .ant-form-item-label {
+  text-align: left;
+  margin-right: 1rem;
+  width: 100%; /* Largeur des libellés */
+}
+
+.formulaire .ant-form-item-label label {
+  font-weight: bold;
+}
+
+.formulaire .ant-btn {
+  width: 100%; /* Largeur maximale du bouton */
+  height: 2.5rem;
+  justify-self: center; /* Centrer horizontalement */
+  grid-column: 1 / -1; /* Placer le bouton sur toute la largeur du formulaire */
+  grid-column: 1 / -1; /* Placer le bouton sur toute la largeur du formulaire */
+  grid-row: 4; /* Placer le bouton sur la 4ème ligne */
+}
+
+.formulaire .ant-input {
+  max-width: 50rem; /* Largeur maximale autorisée */
+}
+
+button{
+  display: flex;
+}
