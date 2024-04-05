@@ -16,6 +16,8 @@ const FormulaireAjout = ({ onSubmit }) => {
   const [nomRueFr, setNomRueFr] = useState('');
   const [showSecondService, setShowSecondService] = useState(false);
   const [secondServiceSelected, setSecondServiceSelected] = useState('');
+  const [telPro, setTelPro] = useState('');
+  
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -88,6 +90,23 @@ const FormulaireAjout = ({ onSubmit }) => {
             placeholder="Date d'entrée"
           />
         </Form.Item>
+
+        <Form.Item label="Adresse">
+          <Input
+            value={nomRueFr}
+            onChange={(e) => setNomRueFr(e.target.value)}
+            placeholder="Adresse"
+          />
+        </Form.Item>
+
+        <Form.Item label="Telephone">
+          <Input
+            value={telPro}
+            onChange={(e) => setTelPro(e.target.value)}
+            placeholder="Telephone"
+          />
+        </Form.Item>
+        
         <Form.Item label="Langue">
           <Checkbox.Group
             options={[
@@ -98,16 +117,10 @@ const FormulaireAjout = ({ onSubmit }) => {
             onChange={(values) => setSiFrancais(values)}
           />
         </Form.Item>
-        <Form.Item label="Adresse">
-          <Input
-            value={nomRueFr}
-            onChange={(e) => setNomRueFr(e.target.value)}
-            placeholder="Adresse"
-          />
-        </Form.Item>
+       
         <Form.Item label="Service">
           <Select
-            placeholder="Sélectionner un service"
+            placeholder="Sélectionner "
             style={{ width: '100%' }}
             value={selectedService}
             onChange={(value) => setSelectedService(value)}
@@ -124,6 +137,8 @@ const FormulaireAjout = ({ onSubmit }) => {
           </Checkbox>
 
         </Form.Item>
+
+
 
         <Form.Item>
           <Button type="primary" onClick={handleSubmit}>Valider</Button>
