@@ -52,6 +52,9 @@ const FormulaireAjout = ({ onSubmit }) => {
 
   const handleAutreServiceChange = (e) => {
     setShowSecondService(e.target.checked);
+    if (!e.target.checked) {
+      setSecondServiceSelected(''); // Effacer la sélection du deuxième service si non cochée
+    }
   };
 
   return (
@@ -113,29 +116,15 @@ const FormulaireAjout = ({ onSubmit }) => {
               <Option key={service} value={service}>{service}</Option>
             ))}
           </Select>
-        </Form.Item>
-        <Form.Item label="Autres services">
           <Checkbox
             checked={showSecondService}
             onChange={handleAutreServiceChange}
           >
-            A un autre service
+            + Autre service
           </Checkbox>
+
         </Form.Item>
-        {showSecondService && (
-          <Form.Item >
-            <Select
-              placeholder="Sélectionner un service pour le second service"
-              style={{ width: '100%' }}
-              value={secondServiceSelected}
-              onChange={(value) => setSecondServiceSelected(value)}
-            >
-              {services.map((service) => (
-                <Option key={service} value={service}>{service}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
+
         <Form.Item>
           <Button type="primary" onClick={handleSubmit}>Valider</Button>
         </Form.Item>
