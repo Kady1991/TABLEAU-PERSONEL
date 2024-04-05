@@ -1,56 +1,70 @@
+
+
+table {
+  position: relative;
+  z-index: 0; /* Assure que le tableau est en dessous du formulaire */
+}
+
 .formulaire {
-  position: fixed;
+  position: absolute;
+  width: 70%;
+  height: 25rem;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
-  height: 60%; /* Hauteur du formulaire */
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  margin: auto;
+  background: #e7eaec;
   z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Diviser en deux colonnes */
-  grid-row-gap: 10px; /* Espacement vertical entre les lignes */
+  margin-top: 12rem;
+  border-radius: 10px;
+ 
 }
+.formulaire .ant-form{
+  width: 95%;
+  display:-moz-inline-box;
+  margin-top: 2rem;
+ 
+  
+}
+
 
 .formulaire .ant-form-item {
-  display: flex;
+  
+  width: 40%; 
+  box-sizing: border-box; /* Inclure le padding et la bordure dans la largeur */
+  float: left; /* Pour forcer chaque élément à se placer sur une nouvelle ligne */
   margin: 0 auto;
-  flex-direction: column; /* Aligner les éléments en colonne */
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-content: center;
-  align-items: stretch;
-  width: 80%;
-  height: auto;
+  margin-top: 1rem;
+  margin-left: 5rem;
+  
 }
 
+ /* Pour commencer une nouvelle ligne pour chaque élément impair */
+.formulaire .ant-form-item:nth-child(odd) {
+  clear: both;
+}
+
+/* forcer les element a passer sur la ligne suivante */
 .formulaire .ant-form-item-label {
   text-align: left;
-  margin-right: 1rem;
-  width: 100%; /* Largeur des libellés */
 }
 
 .formulaire .ant-form-item-label label {
   font-weight: bold;
+  font-size: 1rem;
+  font-family: sans-serif;
+  margin-left:5px;
+  margin: 6px;
 }
 
+/* bouton valider */
+.formulaire .ant-form-item:last-child {
+  margin-top: 3rem;
+}
+
+ /* Largeur maximale du bouton */ 
 .formulaire .ant-btn {
-  width: 100%; /* Largeur maximale du bouton */
+  width: 90%; 
   height: 2.5rem;
-  justify-self: center; /* Centrer horizontalement */
-  grid-column: 1 / -1; /* Placer le bouton sur toute la largeur du formulaire */
-  grid-column: 1 / -1; /* Placer le bouton sur toute la largeur du formulaire */
-  grid-row: 4; /* Placer le bouton sur la 4ème ligne */
-}
-
-.formulaire .ant-input {
-  max-width: 50rem; /* Largeur maximale autorisée */
-}
-
-button{
-  display: flex;
+  margin-left: 15rem;
 }
