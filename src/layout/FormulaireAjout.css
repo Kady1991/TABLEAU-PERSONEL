@@ -46,12 +46,15 @@ table {
 
 /* forcer les element a passer sur la ligne suivante */
 .formulaire .ant-form-item-label {
-  text-align: left;
+  display:block;
+    width:8rem;
+    float:left;
+    white-space: nowrap;
 }
 
 .formulaire .ant-form-item-label label {
   font-weight:100;
-  font-size: 1.2rem;
+  font-size: 1rem;
   /* background-color: #000; */
   width: 9rem;
   
