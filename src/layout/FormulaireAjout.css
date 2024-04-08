@@ -6,37 +6,42 @@ table {
 }
 
 .formulaire {
-  position: absolute;
-  width: 80%;
-  height: 25rem;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 50vw;
+  height:50vh;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: auto;
-  background: #777c80;
+  background: #c6c8ca;
   z-index: 1;
-  margin-top: 12rem;
   border-radius: 10px;
  
 }
 .formulaire .ant-form{
-  width: 95%;
-  display:-moz-inline-box;
-  margin-top: 2rem;
- 
+  display: grid;
+  width: 100%;
+  height: auto;
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  justify-content:center;
+  align-items: center;
+  /* background: #d47777; */
   
 }
 
 
 .formulaire .ant-form-item {
-  
-  width: 40%; 
-  box-sizing: border-box; /* Inclure le padding et la bordure dans la largeur */
-  float: left; /* Pour forcer chaque élément à se placer sur une nouvelle ligne */
+  display: grid;
+  justify-content:center;
+  align-items: center;
+  width: 100%; 
   margin: 0 auto;
   margin-top: 1rem;
-  margin-left: 5rem;
-  
+  /* background-color: brown; */
 }
 
  /* Pour commencer une nouvelle ligne pour chaque élément impair */
@@ -47,55 +52,64 @@ table {
 /* forcer les element a passer sur la ligne suivante */
 .formulaire .ant-form-item-label {
   display:block;
-    width:8rem;
-    float:left;
-    white-space: nowrap;
+  align-items: center;
+  justify-content: center;
+  width:8rem;
+    
 }
 
 .formulaire .ant-form-item-label label {
   font-weight:100;
-  font-size: 1rem;
+  font-size:medium;
   /* background-color: #000; */
-  width: 9rem;
-  
+  width: 4rem;
+
 }
 
 .formulaire .ant-form-item-control-input-content {
-  font-size: 1.2rem;
-  font-weight: 100;
-  font-family: sans-serif;
-  /* background: #000; */
-  width: 10rem;
-  
+ 
 }
 
 .ant-input{
-  /* background: #000; */
-  width: 100%;
-  margin-left:1rem ;
+  display: grid;
+  /* background: #3a71c4; */
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  width: 15rem;
+  border-radius: 2px;
+  border: none;
+  font-size:medium;
+  font-weight: 200;
+  font-family: sans-serif;
+  color: #fff;
+  padding: 0 1rem;
+  margin: 0 1.5rem;
 
 }
 
 .ant-checkbox{
 
   /* background: #000; */
-  display: block;
+  
 }
 
 /* bouton valider */
 .formulaire .ant-form-item:last-child {
-  margin-top: 5rem;
+  
 }
 
  /* Largeur maximale du bouton */ 
 .formulaire .ant-btn {
-  width: 50%; 
-  height: 2.4rem;
-  margin-top: 2rem;
-  display: flex;
+  display: grid;
   justify-content: center;
   align-items: center;
+  align-content: center;
+  width: 200px; 
+  font-size:medium;
+  height: auto;
+  margin: 0 auto;
+  
+  
 
- 
- 
 }
