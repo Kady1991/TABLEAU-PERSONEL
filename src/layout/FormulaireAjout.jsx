@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Checkbox, Select } from 'antd';
 import axios from 'axios';
 import './FormulaireAjout.css';
+import { DatePicker } from 'antd/es';
+
 
 const { Option } = Select;
 
@@ -84,12 +86,12 @@ const FormulaireAjout = ({ onSubmit }) => {
           />
         </Form.Item>
         <Form.Item label="Date d'entrée">
-          <Input
-            value={dateEntree}
-            onChange={(e) => setDateEntree(e.target.value)}
-            placeholder="Date d'entrée"
-          />
-        </Form.Item>
+  <DatePicker 
+    value={dateEntree} 
+    onChange={(date, dateString) => setDateEntree(dateString)} 
+    placeholder="Date d'entrée" 
+  />
+</Form.Item>
 
         <Form.Item label="Adresse">
           <Input
