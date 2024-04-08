@@ -123,7 +123,7 @@ const FormulaireAjout = ({ onSubmit }) => {
         </Form.Item>
 
         {/* Afficher le deuxième menu déroulant si la case à cocher "Autre service" est cochée */}
-        <Form.Item style={{ display: showSecondService ? 'block' : 'none' }}>
+        {/* <Form.Item style={{ display: showSecondService ? 'block' : 'none' }}>
           <Select
             placeholder="Sélectionner"
             style={{ width: '40%' }}
@@ -141,7 +141,7 @@ const FormulaireAjout = ({ onSubmit }) => {
           >
             + Un autre service 
           </Checkbox>
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item>
           <Button type="primary" onClick={handleSubmit}>Valider</Button>
         </Form.Item>
