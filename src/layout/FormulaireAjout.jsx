@@ -4,7 +4,6 @@ import axios from 'axios';
 import './FormulaireAjout.css';
 import { DatePicker } from 'antd/es';
 
-
 const { Option } = Select;
 
 const FormulaireAjout = ({ onSubmit }) => {
@@ -19,7 +18,6 @@ const FormulaireAjout = ({ onSubmit }) => {
   const [showSecondService, setShowSecondService] = useState(false);
   const [secondServiceSelected, setSecondServiceSelected] = useState('');
   const [telPro, setTelPro] = useState('');
-  
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -54,13 +52,6 @@ const FormulaireAjout = ({ onSubmit }) => {
     onSubmit(nouveauMembre);
   };
 
-  const handleAutreServiceChange = (e) => {
-    setShowSecondService(e.target.checked);
-    if (!e.target.checked) {
-      setSecondServiceSelected(''); // Effacer la sélection du deuxième service si non cochée
-    }
-  };
-
   return (
     <div className="formulaire">
       <Form>
@@ -86,13 +77,13 @@ const FormulaireAjout = ({ onSubmit }) => {
           />
         </Form.Item>
         <Form.Item label="Date d'entrée">
-  <DatePicker 
-    value={dateEntree} 
-    onChange={(date, dateString) => setDateEntree(dateString)} 
-    placeholder="Date d'entrée" 
-  />
-</Form.Item>
-
+          <DatePicker 
+            value={dateEntree} 
+            onChange={(date, dateString) => setDateEntree(dateString)} 
+            placeholder="Date d'entrée" 
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
         <Form.Item label="Adresse">
           <Input
             value={nomRueFr}
@@ -100,7 +91,6 @@ const FormulaireAjout = ({ onSubmit }) => {
             placeholder="Adresse"
           />
         </Form.Item>
-
         <Form.Item label="Telephone">
           <Input
             value={telPro}
@@ -108,9 +98,9 @@ const FormulaireAjout = ({ onSubmit }) => {
             placeholder="Telephone"
           />
         </Form.Item>
-        
         <Form.Item label="Langue">
           <Checkbox.Group
+          style={{ display: 'block',width:'3rem', margin:'1rem',margintop:'1rem' }}
             options={[
               { label: 'Français', value: 'FR' },
               { label: 'Néerlandais', value: 'NL' }
@@ -119,10 +109,9 @@ const FormulaireAjout = ({ onSubmit }) => {
             onChange={(values) => setSiFrancais(values)}
           />
         </Form.Item>
-       
         <Form.Item label="Service">
           <Select
-            placeholder="Sélectionner "
+            placeholder="Sélectionner"
             style={{ width: '100%' }}
             value={selectedService}
             onChange={(value) => setSelectedService(value)}
@@ -131,17 +120,28 @@ const FormulaireAjout = ({ onSubmit }) => {
               <Option key={service} value={service}>{service}</Option>
             ))}
           </Select>
-          <Checkbox
-            checked={showSecondService}
-            onChange={handleAutreServiceChange}
-          >
-            + Autre service
-          </Checkbox>
-
         </Form.Item>
 
-
-
+        {/* Afficher le deuxième menu déroulant si la case à cocher "Autre service" est cochée */}
+        <Form.Item style={{ display: showSecondService ? 'block' : 'none' }}>
+          <Select
+            placeholder="Sélectionner"
+            style={{ width: '40%' }}
+            value={secondServiceSelected}
+            onChange={(value) => setSecondServiceSelected(value)}
+          >
+            {services.map((service) => (
+              <Option key={service} value={service}>{service}</Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item>
+          <Checkbox
+            onChange={(e) => setShowSecondService(e.target.checked)}
+          >
+            + Un autre service 
+          </Checkbox>
+        </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={handleSubmit}>Valider</Button>
         </Form.Item>

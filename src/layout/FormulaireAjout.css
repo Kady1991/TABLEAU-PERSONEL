@@ -7,7 +7,7 @@ table {
 
 .formulaire {
   position: absolute;
-  width: 70%;
+  width: 80%;
   height: 25rem;
   top: 50%;
   left: 50%;
@@ -40,9 +40,9 @@ table {
 }
 
  /* Pour commencer une nouvelle ligne pour chaque élément impair */
-.formulaire .ant-form-item:nth-child(odd) {
+/* .formulaire .ant-form-item:nth-child(odd) {
   clear: both;
-}
+} */
 
 /* forcer les element a passer sur la ligne suivante */
 .formulaire .ant-form-item-label {
@@ -84,13 +84,18 @@ table {
 
 /* bouton valider */
 .formulaire .ant-form-item:last-child {
-  margin-top: 3rem;
+  margin-top: 5rem;
 }
 
  /* Largeur maximale du bouton */ 
 .formulaire .ant-btn {
-  width: 90%; 
-  height: 2.5rem;
-  margin-left: 15rem;
+  width: 50%; 
+  height: 2.4rem;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+ 
  
 }
