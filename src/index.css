@@ -8,7 +8,8 @@ body {
 }
 
 .container {
-  width: 100%;
+ 
+  width: 90%;
   height: 100vh; /* Pour centrer verticalement */
   display: flex;
   justify-content: center; /* Pour centrer horizontalement */
@@ -19,4 +20,8 @@ body {
 .custom-header {
   color: white; /* Couleur du texte pour l'en-tête du tableau */
 
+}
+
+table {
+ z-index: 0;
 }

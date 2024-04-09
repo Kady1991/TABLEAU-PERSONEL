@@ -1,6 +1,9 @@
 import '../index.css'; // Importer le fichier CSS
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import Export from '../layout/Export'; // Importez le composant ButtonExport
+import Add from "../layout/Add";
+
 
 
 
@@ -13,7 +16,7 @@ function Tableau() {
   }, []);
 
   const fetchData = () => {
-    fetch('https://server-iis.uccle.intra/API_Personne/api/Personne')
+    fetch('https://server-iis.uccle.intra/API_Personne_NAT/api/Personne')
       .then(response => response.text()) // Utiliser .text() pour récupérer le texte brut de la réponse
       .then(data => {
         // Utiliser un parseur XML pour traiter les données XML
@@ -82,6 +85,8 @@ function Tableau() {
     <div style={{ position: 'relative', height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <h1 style={{ position: 'absolute', top: '50px',color:'white' }}>MEMBRE DU PERSONEL</h1>
       <div style={{ height: '600px', width: '80%', backgroundColor:'white'}}>
+        <Export/> {/* Utilisation du composant Export */}
+        <Add/>
         <DataGrid
           rows={personnes}
           columns={columns}

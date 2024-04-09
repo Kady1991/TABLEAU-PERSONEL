@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Radio, Select } from 'antd';
+import { TextField, Button, RadioGroup, FormControlLabel, Radio, Select, MenuItem } from '@mui/material';
+import { DatePicker } from '@mui/lab';
+import { AccountCircle, AlternateEmail, LocationOn, Phone } from '@mui/icons-material';
 import axios from 'axios';
 import './FormulaireAjout.css';
-import { DatePicker } from 'antd/es';
-import { AccountCircle, AlternateEmail, LocationOn, Phone } from '@mui/icons-material'; // Import des icônes MUI
-
-const { Option } = Select;
 
 const FormulaireAjout = ({ onSubmit }) => {
   const [services, setServices] = useState([]);
@@ -13,15 +11,19 @@ const FormulaireAjout = ({ onSubmit }) => {
   const [nomPersonne, setNomPersonne] = useState('');
   const [prenomPersonne, setPrenomPersonne] = useState('');
   const [email, setEmail] = useState('');
-  const [dateEntree, setDateEntree] = useState('');
+  const [dateEntree, setDateEntree] = useState(null);
   const [siFrancais, setSiFrancais] = useState('');
   const [nomRueFr, setNomRueFr] = useState('');
   const [telPro, setTelPro] = useState('');
+  const [numeroNational, setNumeroNational] = useState('');
+  const [typePersonnel, setTypePersonnel] = useState(''); // Valeur initiale à définir
+  const [grades, setGrades] = useState([]); // Liste des grades récupérés depuis l'API
+  const [selectedGrade, setSelectedGrade] = useState(''); // Grade sélectionné dans le menu déroulant
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
+        const response = await axios.get('https://server-iis.uccle.intra/API_Personne_nat/api/Personne');
         const data = response.data;
         if (Array.isArray(data)) {
           const serviceNames = data.map(item => item.NomServiceFr);
@@ -35,7 +37,19 @@ const FormulaireAjout = ({ onSubmit }) => {
       }
     };
 
+    const fetchGrades = async () => {
+      try {
+        // Remplacer l'URL par celle de l'API des grades
+        const response = await axios.get('https://exemple.com/api/grades');
+        const data = response.data;
+        setGrades(data); // Mettre à jour la liste des grades avec les données de l'API
+      } catch (error) {
+        console.error('Erreur lors de la récupération des grades:', error);
+      }
+    };
+
     fetchServices();
+    fetchGrades();
   }, []);
 
   const handleSubmit = () => {
@@ -46,100 +60,85 @@ const FormulaireAjout = ({ onSubmit }) => {
       dateEntree,
       adresse: nomRueFr,
       service: selectedService,
-      secondService: secondServiceSelected,
+      numeroNational,
+      typePersonnel,
+      grade: selectedGrade,
     };
     onSubmit(nouveauMembre);
   };
 
-  const [startDate, setStartDate] = useState(new Date());
-
   return (
     <div className="formulaire">
-      <Form>
-        <Form.Item label="Nom">
-          <Input
-            value={nomPersonne}
-            onChange={(e) => setNomPersonne(e.target.value)}
-            prefix={<AccountCircle />} // Icône MUI pour le nom
-
-          />
-        </Form.Item>
-        <Form.Item label="Prénom">
-          <Input
-            value={prenomPersonne}
-            onChange={(e) => setPrenomPersonne(e.target.value)}
-            prefix={<AccountCircle />} // Icône MUI pour le prénom
-
-          />
-        </Form.Item>
-        <Form.Item label="E-mail">
-          <Input
-          
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            prefix={<AlternateEmail />} // Icône MUI pour l'email
-
-          />
-        </Form.Item>
-
-        <Form.Item label="Date d'entrée" >
-          <DatePicker
-          style={{width:"24rem", height:"2.5rem"}}
-            showIcon
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            icon="fa fa-calendar"
-            format="DD/MM/YYYY" // Format de date 
-
-          />
-        </Form.Item>
-
-        <Form.Item label="Adresse">
-          <Input
-            value={nomRueFr}
-            onChange={(e) => setNomRueFr(e.target.value)}
-            prefix={<LocationOn />} // Icône MUI pour l'adresse
-
-          />
-        </Form.Item>
-        <Form.Item label="Telephone">
-          <Input
-            value={telPro}
-            onChange={(e) => setTelPro(e.target.value)}
-            prefix={<Phone />} // Icône MUI pour le téléphone
-
-          />
-        </Form.Item>
-        <Form.Item label="Langue" style={{ marginLeft: "-8.7rem" }}>
-          <Radio.Group
-
-            value={siFrancais}
-            onChange={(e) => setSiFrancais(e.target.value)}
-          >
-            <Radio className='radio' name="langue" value="FR">FR</Radio>
-            <Radio className='radio' name="langue" value="NL">NL</Radio>
-
-
-          </Radio.Group>
-        </Form.Item>
-
-        <Form.Item label="Service">
-          <Select
-           style={{width:"24rem", height:"2.5rem"}}
-            value={selectedService}
-            onChange={(value) => setSelectedService(value)}
-          >
-            {services.map((service) => (
-              <Option key={service} value={service}>{service}</Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" style={{width:"15rem", height:"2.5rem", display:'flex', justifyContent:'center', alignItems:"center", fontSize:"1rem"}} 
-          onClick={handleSubmit}>Valider</Button> 
-        </Form.Item>
-      </Form>
+      <form>
+        <TextField
+          label="Nom"
+          value={nomPersonne}
+          onChange={(e) => setNomPersonne(e.target.value)}
+          InputProps={{
+            startAdornment: <AccountCircle />,
+          }}
+        />
+        <TextField
+          label="Prénom"
+          value={prenomPersonne}
+          onChange={(e) => setPrenomPersonne(e.target.value)}
+          InputProps={{
+            startAdornment: <AccountCircle />,
+          }}
+        />
+        <TextField
+          label="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          InputProps={{
+            startAdornment: <AlternateEmail />,
+          }}
+        />
+        <DatePicker
+          label="Date d'entrée"
+          value={dateEntree}
+          onChange={(date) => setDateEntree(date)}
+          renderInput={(params) => <TextField {...params} />}
+        />
+        <TextField
+          label="Adresse"
+          value={nomRueFr}
+          onChange={(e) => setNomRueFr(e.target.value)}
+          InputProps={{
+            startAdornment: <LocationOn />,
+          }}
+        />
+        <TextField
+          label="Telephone"
+          value={telPro}
+          onChange={(e) => setTelPro(e.target.value)}
+          InputProps={{
+            startAdornment: <Phone />,
+          }}
+        />
+        <TextField
+          label="N° National"
+          value={numeroNational}
+          onChange={(e) => setNumeroNational(e.target.value)}
+        />
+        <RadioGroup
+          value={typePersonnel}
+          onChange={(e) => setTypePersonnel(e.target.value)}
+        >
+          <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
+          <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
+        </RadioGroup>
+        <Select
+          label="Grade"
+          value={selectedGrade}
+          onChange={(e) => setSelectedGrade(e.target.value)}
+        >
+          {grades.map((grade) => (
+            <MenuItem key={grade.id} value={grade.id}>{grade.name}</MenuItem>
+          ))}
+        </Select>
+        <Button variant="contained" onClick={handleSubmit}>Valider</Button>
+      </form>
     </div>
   );
 };
