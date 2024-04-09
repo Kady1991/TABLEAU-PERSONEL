@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Select } from 'antd';
+import { Form, Input, Button, Radio, Select } from 'antd';
 import axios from 'axios';
 import './FormulaireAjout.css';
 import { DatePicker } from 'antd/es';
+import moment from 'moment';
+
+
 
 const { Option } = Select;
 
@@ -76,14 +79,17 @@ const FormulaireAjout = ({ onSubmit }) => {
             placeholder="E-mail"
           />
         </Form.Item>
-        <Form.Item label="Date d'entrée">
-          <DatePicker 
-            value={dateEntree} 
-            onChange={(date, dateString) => setDateEntree(dateString)} 
-            placeholder="Date d'entrée" 
-            style={{ width: '100%' }}
+       
+        <Form.Item label="Date d'entrée" style={{ marginLeft: '-1.6rem' }}>
+          <DatePicker
+            style={{ width: '15rem', marginLeft: '3.1rem' }}
+            value={moment(dateEntree)} // Utilisez moment() pour formater la date dans le format désiré
+            onChange={(date, dateString) => setDateEntree(dateString)}
+            placeholder="Date d'entrée"
+            defaultValue={moment()} // Utilisez moment() pour obtenir la date actuelle
           />
         </Form.Item>
+
         <Form.Item label="Adresse">
           <Input
             value={nomRueFr}
@@ -99,20 +105,22 @@ const FormulaireAjout = ({ onSubmit }) => {
           />
         </Form.Item>
         <Form.Item label="Langue">
-          <Checkbox.Group
-          style={{ display: 'block',width:'3rem', margin:'1rem',margintop:'1rem' }}
-            options={[
-              { label: 'Français', value: 'FR' },
-              { label: 'Néerlandais', value: 'NL' }
-            ]}
+          <Radio.Group
+            // style={{ display: 'block', width: '2rem', margin: '1rem', marginTop: '1rem' }}
             value={siFrancais}
-            onChange={(values) => setSiFrancais(values)}
-          />
+            onChange={(e) => setSiFrancais(e.target.value)}
+          >
+            <Radio className='radio' value="FR">FR</Radio>
+            <Radio className='radio' value="NL">NL</Radio>
+           
+            
+          </Radio.Group>
         </Form.Item>
+
         <Form.Item label="Service">
           <Select
             placeholder="Sélectionner"
-            style={{ width: '100%' }}
+            style={{ width: '15rem' }}
             value={selectedService}
             onChange={(value) => setSelectedService(value)}
           >

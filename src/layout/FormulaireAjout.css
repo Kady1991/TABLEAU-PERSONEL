@@ -10,7 +10,7 @@ table {
   justify-content: center;
   align-items: center;
   position: fixed;
-  width: 50vw;
+  width: 60vw;
   height:50vh;
   top: 50%;
   left: 50%;
@@ -66,18 +66,18 @@ table {
 
 }
 
-.formulaire .ant-form-item-control-input-content {
+/* .formulaire .ant-form-item-control-input-content {
  
-}
+} */
 
 .ant-input{
   display: grid;
   /* background: #3a71c4; */
   align-items: center;
   justify-content: center;
-  height: auto;
+  height: 2rem;
   width: 15rem;
-  border-radius: 2px;
+  border-radius: 5px;
   border: none;
   font-size:medium;
   font-weight: 200;
@@ -86,18 +86,17 @@ table {
   padding: 0 1rem;
   margin: 0 1.5rem;
 
+
 }
 
-.ant-checkbox{
-
-  /* background: #000; */
+/* .ant-checkbox{
   
-}
+} */
 
 /* bouton valider */
-.formulaire .ant-form-item:last-child {
+/* .formulaire .ant-form-item:last-child {
   
-}
+} */
 
  /* Largeur maximale du bouton */ 
 .formulaire .ant-btn {
@@ -110,6 +109,10 @@ table {
   height: auto;
   margin: 0 auto;
   
+}
+
+.radio{
+  display: block;
   
 
 }
