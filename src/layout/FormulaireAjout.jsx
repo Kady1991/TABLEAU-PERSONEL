@@ -56,7 +56,8 @@ const FormulaireAjout = ({ onSubmit }) => {
         // Remplacer l'URL par celle de l'API des adresses
         const response = await axios.get('https://exemple.com/api/adresses');
         const data = response.data;
-        setAdresses(data.sort()); // Tri alphabétique des adresses
+        const uniqueAdresses = [...new Set(data)].sort(); // Tri alphabétique des adresses
+        setAdresses(uniqueAdresses);
       } catch (error) {
         console.error('Erreur lors de la récupération des adresses:', error);
       }
@@ -79,7 +80,7 @@ const FormulaireAjout = ({ onSubmit }) => {
       typePersonnel,
       grade: selectedGrade,
       langue,
-      adresse: selectedAdresse,
+      selectedAdresse, // Utilisation de selectedAdresse à la place de nomRueFr
     };
     onSubmit(nouveauMembre);
   };
@@ -117,14 +118,7 @@ const FormulaireAjout = ({ onSubmit }) => {
           onChange={(date) => setDateEntree(date)}
           renderInput={(params) => <TextField {...params} />}
         />
-        <TextField
-          label="Adresse"
-          value={nomRueFr}
-          onChange={(e) => setNomRueFr(e.target.value)}
-          InputProps={{
-            startAdornment: <LocationOn />,
-          }}
-        />
+
         <TextField
           label="Telephone"
           value={telPro}
@@ -138,7 +132,16 @@ const FormulaireAjout = ({ onSubmit }) => {
           value={numeroNational}
           onChange={(e) => setNumeroNational(e.target.value)}
         />
-       
+      
+        <Select
+          label="Adresse"
+          value={selectedAdresse}
+          onChange={(e) => setSelectedAdresse(e.target.value)}
+        >
+          {adresses.map((adresse) => (
+            <MenuItem key={adresse} value={adresse}>{adresse}</MenuItem>
+          ))}
+        </Select>
         <Select
           label="Service"
           value={selectedService}
@@ -158,26 +161,29 @@ const FormulaireAjout = ({ onSubmit }) => {
           ))}
         </Select>
         <div className="radio-group">
-      <p>Type de personnel :</p>
-      <RadioGroup
-        value={typePersonnel}
-        onChange={(e) => setTypePersonnel(e.target.value)}
-      >
-        <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
-        <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
-      </RadioGroup>
-    </div>
-    <div className="radio-group">
-      <p>Langue :</p>
-      <RadioGroup
-        value={langue}
-        onChange={(e) => setLangue(e.target.value)}
-      >
-        <FormControlLabel value="fr" control={<Radio />} label="Français" />
-        <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
-      </RadioGroup>
-    </div>
-        <Button variant="contained" onClick={handleSubmit}>Valider</Button>
+          <p>Type de personnel :</p>
+          <RadioGroup
+            value={typePersonnel}
+            onChange={(e) => setTypePersonnel(e.target.value)}
+          >
+            <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
+            <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
+          </RadioGroup>
+        </div>
+        <div className="radio-group">
+          <p>Langue :</p>
+          <RadioGroup
+            value={langue}
+            onChange={(e) => setLangue(e.target.value)}
+          >
+            <FormControlLabel value="fr" control={<Radio />} label="Français" />
+            <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
+          </RadioGroup>
+        </div>
+        {/* Bouton Valider */}
+        <div className="valider-button">
+          <Button variant="contained" onClick={handleSubmit}>Valider</Button>
+        </div>
       </form>
     </div>
   );

@@ -6,9 +6,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%; /* Largeur du formulaire */
+  width: 100%; /* Augmentation de la largeur */
   max-width: 1000px; /* Limiter la largeur maximale du formulaire */
-  height: auto; /* Hauteur automatique pour s'adapter au contenu */
+  height: 60vh; /* Augmentation de la hauteur */
+  max-height: 60vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
   z-index: 1;
   background: #f0f1f3;
@@ -16,6 +17,10 @@
 }
 
 .formulaire form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: grid;
   grid-template-columns: 1fr 1fr;
   height: 50vh;
@@ -56,4 +61,12 @@
 
 .formulaire form .MuiTypography-body1 {
   font-size: 0.875rem;
+}
+
+.valider-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px; /* Ajoutez une marge au-dessus du bouton si nécessaire */
+
 }

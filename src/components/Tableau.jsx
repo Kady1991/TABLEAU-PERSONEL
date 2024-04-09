@@ -4,9 +4,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import Export from '../layout/Export'; // Importez le composant ButtonExport
 import Add from "../layout/Add";
 
-
-
-
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,8 +50,7 @@ function Tableau() {
       .catch(error => {
         console.error('Une erreur est survenue lors de la récupération des données :', error);
         setLoading(false); // Mettre loading à false en cas d'erreur de chargement
-      });
-      
+      });  
   };
   
   const columns = [
@@ -84,9 +80,11 @@ function Tableau() {
   return (
     <div style={{ position: 'relative', height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <h1 style={{ position: 'absolute', top: '50px',color:'white' }}>MEMBRE DU PERSONEL</h1>
-      <div style={{ height: '600px', width: '80%', backgroundColor:'white'}}>
-        <Export/> {/* Utilisation du composant Export */}
-        <Add/>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px', padding: '10px', backgroundColor: 'white', width: '80%' }}>
+        <Export style={{ margin: '5px', padding: '8px', fontSize: '1.2em' }} /> {/* Utilisation du composant Export */}
+        <Add style={{ margin: '5px', padding: '8px', fontSize: '1.2em' }} />
+      </div>
+      <div style={{ height: '60vh', width: '81%', backgroundColor:'white'}}>
         <DataGrid
           rows={personnes}
           columns={columns}
@@ -97,7 +95,7 @@ function Tableau() {
           components={{
             Toolbar: () => (
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <BoutonAdd /> {/* Utilisation du composant Bouton-Add */}
+                {/* <BoutonAdd /> Utilisation du composant Bouton-Add */}
               </div>
             ),
           }}
