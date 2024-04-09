@@ -1,0 +1,22 @@
+/* index.css */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #246fc0, #8db5d6); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
+  font-family: Arial, sans-serif; /* Choix d'une police de caractères sans-serif */
+  height: 100vh; /* Hauteur à 100% de la fenêtre visible */
+}
+
+.container {
+  width: 100%;
+  height: 100vh; /* Pour centrer verticalement */
+  display: flex;
+  justify-content: center; /* Pour centrer horizontalement */
+  align-items: center; /* Pour centrer verticalement */
+  
+}
+
+.custom-header {
+  color: white; /* Couleur du texte pour l'en-tête du tableau */
+
+}

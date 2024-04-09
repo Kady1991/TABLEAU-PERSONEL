@@ -1,0 +1,93 @@
+
+
+table {
+  position: relative;
+  z-index: 0; /* Assure que le tableau est en dessous du formulaire */
+}
+
+.formulaire {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 70vw;
+  height:70vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
+  background: #bbc6d1;
+  z-index: 1;
+  border-radius: 10px;
+ 
+}
+.formulaire .ant-form{
+  display: grid;
+  width: 100%;
+  height: 50vh;
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  justify-content:center;
+  align-items: center;
+  border-radius: 1rem;
+  /* background: #d47777; */
+  
+}
+
+
+/* .formulaire .ant-form-item {
+  display: grid;
+  justify-content:center;
+  align-items: center;
+  width: 100%; 
+  margin: 0 auto;
+  margin-top: 1rem;
+  background-color: brown;
+} */
+
+ /* Pour commencer une nouvelle ligne pour chaque élément impair */
+/* .formulaire .ant-form-item:nth-child(odd) {
+  clear: both;
+} */
+
+/* forcer les element a passer sur la ligne suivante */
+.formulaire .ant-form-item-label {
+  display:block;
+  align-items: center;
+  justify-content: center;
+  width:8rem;
+    
+}
+
+.formulaire .ant-form-item-label label {
+  display: block;
+  align-items:center;
+  justify-content: center;
+  font-weight:100;
+  font-size:medium;
+  /* background-color: #000; */
+  /* border: solid; */
+ 
+
+}
+.ant-input{
+  display: grid;
+  /* background: #3a71c4; */
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 15rem;
+  border-radius: 5px;
+  border: none;
+  font-size:medium;
+  font-weight: 200;
+  font-family: sans-serif;
+  color: #fff;
+  padding: 0 1.5rem;
+  margin: 0 3rem;
+}
+.radio{
+  display: block;
+  margin:0 10rem;
+
+}
