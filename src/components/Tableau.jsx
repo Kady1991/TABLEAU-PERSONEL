@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid'; // Importer DataGrid depuis @mui/x-data-grid
 import '../index.css'; // Importer le fichier CSS
+import React, { useState, useEffect } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 
@@ -14,9 +14,14 @@ function Tableau() {
 
   const fetchData = () => {
     fetch('https://server-iis.uccle.intra/API_Personne/api/Personne')
-      .then(response => response.json())
+      .then(response => response.text()) // Utiliser .text() pour récupérer le texte brut de la réponse
       .then(data => {
-        const personnesData = data.map(personne => ({
+        // Utiliser un parseur XML pour traiter les données XML
+        const parser = new DOMParser();
+        const xmlData = parser.parseFromString(data, 'text/xml');
+
+        // Extraire les données de l'XML et les formater comme nécessaire
+        const personnesData = Array.from(xmlData.querySelectorAll('personne')).map(personne => ({
           id: personne.ID,
           nom: personne.NOM,
           prenom: personne.PRENOM,
