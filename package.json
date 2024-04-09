@@ -17,7 +17,6 @@
     "@mui/material": "^5.15.14",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@mui/x-data-grid": "^7.1.0",
-    "@mui/x-data-grid-pro": "^7.1.0",
     "axios": "^1.6.8",
     "file-saver": "^2.0.5",
     "notistack": "^3.0.1",
@@ -25,7 +24,6 @@
     "react-dom": "^18.2.0",
     "stream-browserify": "^3.0.0",
     "styled-components": "^6.1.8",
-    "xml-js": "^1.6.11",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
