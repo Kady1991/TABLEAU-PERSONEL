@@ -19,6 +19,9 @@ const FormulaireAjout = ({ onSubmit }) => {
   const [typePersonnel, setTypePersonnel] = useState(''); // Valeur initiale à définir
   const [grades, setGrades] = useState([]); // Liste des grades récupérés depuis l'API
   const [selectedGrade, setSelectedGrade] = useState(''); // Grade sélectionné dans le menu déroulant
+  const [langue, setLangue] = useState('fr'); // Langue par défaut
+  const [adresses, setAdresses] = useState([]); // Liste des adresses récupérées depuis l'API
+  const [selectedAdresse, setSelectedAdresse] = useState(''); // Adresse sélectionnée dans le menu déroulant
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -27,7 +30,7 @@ const FormulaireAjout = ({ onSubmit }) => {
         const data = response.data;
         if (Array.isArray(data)) {
           const serviceNames = data.map(item => item.NomServiceFr);
-          const uniqueServiceNames = [...new Set(serviceNames)];
+          const uniqueServiceNames = [...new Set(serviceNames)].sort(); // Tri alphabétique des noms de service
           setServices(uniqueServiceNames);
         } else {
           console.error('La réponse de l\'API n\'est pas un tableau:', data);
@@ -48,8 +51,20 @@ const FormulaireAjout = ({ onSubmit }) => {
       }
     };
 
+    const fetchAdresses = async () => {
+      try {
+        // Remplacer l'URL par celle de l'API des adresses
+        const response = await axios.get('https://exemple.com/api/adresses');
+        const data = response.data;
+        setAdresses(data.sort()); // Tri alphabétique des adresses
+      } catch (error) {
+        console.error('Erreur lors de la récupération des adresses:', error);
+      }
+    };
+
     fetchServices();
     fetchGrades();
+    fetchAdresses();
   }, []);
 
   const handleSubmit = () => {
@@ -63,6 +78,8 @@ const FormulaireAjout = ({ onSubmit }) => {
       numeroNational,
       typePersonnel,
       grade: selectedGrade,
+      langue,
+      adresse: selectedAdresse,
     };
     onSubmit(nouveauMembre);
   };
@@ -121,22 +138,45 @@ const FormulaireAjout = ({ onSubmit }) => {
           value={numeroNational}
           onChange={(e) => setNumeroNational(e.target.value)}
         />
-        <RadioGroup
-          value={typePersonnel}
-          onChange={(e) => setTypePersonnel(e.target.value)}
-        >
-          <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
-          <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
-        </RadioGroup>
+       
         <Select
-          label="Grade"
-          value={selectedGrade}
-          onChange={(e) => setSelectedGrade(e.target.value)}
+          label="Service"
+          value={selectedService}
+          onChange={(e) => setSelectedService(e.target.value)}
         >
-          {grades.map((grade) => (
-            <MenuItem key={grade.id} value={grade.id}>{grade.name}</MenuItem>
+          {services.map((service) => (
+            <MenuItem key={service} value={service}>{service}</MenuItem>
           ))}
         </Select>
+        <Select
+          label="Adresse"
+          value={selectedAdresse}
+          onChange={(e) => setSelectedAdresse(e.target.value)}
+        >
+          {adresses.map((adresse) => (
+            <MenuItem key={adresse} value={adresse}>{adresse}</MenuItem>
+          ))}
+        </Select>
+        <div className="radio-group">
+      <p>Type de personnel :</p>
+      <RadioGroup
+        value={typePersonnel}
+        onChange={(e) => setTypePersonnel(e.target.value)}
+      >
+        <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
+        <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
+      </RadioGroup>
+    </div>
+    <div className="radio-group">
+      <p>Langue :</p>
+      <RadioGroup
+        value={langue}
+        onChange={(e) => setLangue(e.target.value)}
+      >
+        <FormControlLabel value="fr" control={<Radio />} label="Français" />
+        <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
+      </RadioGroup>
+    </div>
         <Button variant="contained" onClick={handleSubmit}>Valider</Button>
       </form>
     </div>

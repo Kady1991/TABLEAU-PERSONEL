@@ -1,19 +1,34 @@
 .formulaire {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
- 
-  
-  }
+  width: 100%; /* Largeur du formulaire */
+  max-width: 1000px; /* Limiter la largeur maximale du formulaire */
+  height: auto; /* Hauteur automatique pour s'adapter au contenu */
+  padding: 20px; /* Espacement intérieur */
+  z-index: 1;
+  background: #f0f1f3;
+  border-radius: 5px;
+}
 
 .formulaire form {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  height: 50vh;
   gap: 20px;
-  background-color: black;
- 
+  width: 90%;
+  align-items: center; /* Centrer verticalement les éléments */
 }
+
+.formulaire form .MuiButton-root {
+  width: 100%;
+  justify-self: center; /* Centrer horizontalement le bouton */
+}
+
 
 .formulaire form label {
   font-weight: bold;
@@ -22,11 +37,9 @@
 
 .formulaire form .MuiTextField-root {
   width: 100%;
+  /* background-color: white; */
 }
 
-.formulaire form .MuiButton-root {
-  width: 100%;
-}
 
 .formulaire form .MuiFormControl-root {
   width: 100%;
