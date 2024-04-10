@@ -67,7 +67,7 @@ const Export = ({ personnes, className }) => {
 
     const rows = filteredRows
       .map((item) =>
-        columns.map((column) => `"${item[column.field]}"`).join(",")
+        columns.map((column) => item[column.field]).join(";")
       )
       .join("\n");
 
