@@ -6,14 +6,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%; /* Augmentation de la largeur */
-  max-width: 1000px; /* Limiter la largeur maximale du formulaire */
-  height: 50vh; /* Augmentation de la hauteur */
-  max-height: 50vh; /* Limiter la hauteur maximale */
+  width: 150%; /* Augmentation de la largeur */
+  max-width: 1200px; /* Limiter la largeur maximale du formulaire */
+  height: 60vh; /* Augmentation de la hauteur */
+  max-height: 60vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
   z-index: 1;
-  background: #f0f1f3;
+  background: #e4e6e7;
   border-radius: 5px;
+  
 }
 
 .formulaire form {
@@ -23,31 +24,36 @@
   transform: translate(-50%, -50%);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: 40vh;
+  height: 50vh;
   gap: 20px;
-  width: 80%;
+  width: 90%;
   align-items: center; /* Centrer verticalement les éléments */
+  color:rgb(0, 0, 0);
+  
 }
 
 .formulaire form .MuiButton-root {
-  width: 100%;
+  width: 90%;
   justify-self: center; /* Centrer horizontalement le bouton */
 }
 
 
 .formulaire form label {
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: lighter;
+  margin-bottom: 0px;
+  font-size: 15px;
+  
 }
 
 .formulaire form .MuiTextField-root {
   width: 100%;
-  /* background-color: white; */
+
 }
 
 
 .formulaire form .MuiFormControl-root {
   width: 100%;
+  
 }
 
 .formulaire form .MuiSelect-root {
@@ -55,19 +61,22 @@
 }
 
 .formulaire form .MuiRadio-root {
-  padding: 0;
-  margin-right: 5px;
+  padding: 0 5px;
+  margin-left: 3rem;
+  
 }
 
 .formulaire form .MuiTypography-body1 {
-  font-size: 0.875rem;
+  font-size: 0.775rem;
+  
 }
 
 .valider-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px; /* Ajoutez une marge au-dessus du bouton si nécessaire */
+  margin-top: 20px; /* Ajoutez une marge au-dessus du bouton si nécessaire */
 
 }
+
 
