@@ -26,7 +26,7 @@ const FormulaireAjout = ({ onSubmit }) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('https://server-iis.uccle.intra/API_Personne_nat/api/Personne');
+        const response = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
         const data = response.data;
         if (Array.isArray(data)) {
           const serviceNames = data.map(item => item.NomServiceFr);
@@ -43,7 +43,7 @@ const FormulaireAjout = ({ onSubmit }) => {
     const fetchGrades = async () => {
       try {
         // Remplacer l'URL par celle de l'API des grades
-        const response = await axios.get('https://exemple.com/api/grades');
+        const response = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
         const data = response.data;
         setGrades(data); // Mettre à jour la liste des grades avec les données de l'API
       } catch (error) {
@@ -54,7 +54,7 @@ const FormulaireAjout = ({ onSubmit }) => {
     const fetchAdresses = async () => {
       try {
         // Remplacer l'URL par celle de l'API des adresses
-        const response = await axios.get('https://exemple.com/api/adresses');
+        const response = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
         const data = response.data;
         const uniqueAdresses = [...new Set(data)].sort(); // Tri alphabétique des adresses
         setAdresses(uniqueAdresses);

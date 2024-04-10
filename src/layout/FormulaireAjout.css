@@ -23,9 +23,9 @@
   transform: translate(-50%, -50%);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: 50vh;
+  height: 40vh;
   gap: 20px;
-  width: 90%;
+  width: 80%;
   align-items: center; /* Centrer verticalement les éléments */
 }
 
