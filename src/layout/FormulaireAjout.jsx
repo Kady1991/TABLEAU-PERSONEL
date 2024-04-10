@@ -109,15 +109,31 @@ const FormulaireAjout = ({ onSubmit }) => {
           label="Adresse"
           value={selectedAdresse}
           onChange={(e) => setSelectedAdresse(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width: 100, 
+              marginTop: -20, // Déplacement vers le haut
+            },
+          }}
         >
           {adresses.map((adresse, index) => (
             <MenuItem key={index} value={adresse}>{adresse}</MenuItem>
           ))}
         </Select>
+
         <Select
           label="Service"
           value={selectedService}
           onChange={(e) => setSelectedService(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width: 100,
+              marginTop: -100, // Déplacement vers le haut
+              marginRight:-100
+            },
+          }}
         >
           {services.map((service, index) => (
             <MenuItem key={index} value={service}>{service}</MenuItem>
@@ -127,6 +143,13 @@ const FormulaireAjout = ({ onSubmit }) => {
           label="Grade"
           value={selectedGrade}
           onChange={(e) => setSelectedGrade(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width:100,
+              marginTop: -20, // Déplacement vers le haut
+            },
+          }}
         >
           {grades.map((grade, index) => (
             <MenuItem key={index} value={grade}>{grade}</MenuItem>
@@ -138,8 +161,8 @@ const FormulaireAjout = ({ onSubmit }) => {
             value={typePersonnel}
             onChange={(e) => setTypePersonnel(e.target.value)}
           >
-            <FormControlLabel value="Type 1" control={<Radio />} label="Type 1" />
-            <FormControlLabel value="Type 2" control={<Radio />} label="Type 2" />
+            <FormControlLabel value="Oui" control={<Radio />} label="Oui" />
+            <FormControlLabel value="Non" control={<Radio />} label="Non" />
           </RadioGroup>
         </div>
         <div className="radio-group">
