@@ -1,7 +1,6 @@
-import '../index.css'; // Importer le fichier CSS
-import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import Export from '../layout/Export'; // Importez le composant ButtonExport
+import React, { useState, useEffect } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import ButtonExport from "../layout/Export"; // Importez le composant ButtonExport
 import Add from "../layout/Add";
 
 function Tableau() {
@@ -13,78 +12,126 @@ function Tableau() {
   }, []);
 
   const fetchData = () => {
-    fetch('https://server-iis.uccle.intra/API_Personne_NAT/api/Personne')
-      .then(response => response.text()) // Utiliser .text() pour récupérer le texte brut de la réponse
-      .then(data => {
-        // Utiliser un parseur XML pour traiter les données XML
-        const parser = new DOMParser();
-        const xmlData = parser.parseFromString(data, 'text/xml');
-
-        // Extraire les données de l'XML et les formater comme nécessaire
-        const personnesData = Array.from(xmlData.querySelectorAll('personne')).map(personne => ({
-          id: personne.ID,
-          nom: personne.NOM,
-          prenom: personne.PRENOM,
-          role: personne.ROLE,
-          email: personne['E-mail'],
-          entreeService: personne['ENTREE SERVICE'],
-          grade: personne.GRADE,
-          affectation: personne.AFFECTATION,
-          localisation: personne.LOCALISATION,
-          numero: personne['N°'],
-          nomChefService: personne['NOM CHEF DU SERVICE'],
-          prenomChefService: personne['PRENOM CHEF DU SERVICE'],
-          emailChefService: personne['E-MAIL CHEF SERVICE'],
-          departements: personne.DEPARTEMENTS,
-          nomChefDepartement: personne['NOM CHEF DEPARTEMENT'],
-          prenomChefDepartement: personne['PRENOM CHEF DEPARTEMENT'],
-          emailChefDepartement: personne['E-MAIL CHEF DEPARTEMENT'],
-          pcuension: personne['P+C:UENSION'],
-          tel: personne.TEL,
-          batiment: personne.Batiment,
-          etage: personne.Etage
+    fetch("https://server-iis.uccle.intra/API_Personne/api/Personne")
+      .then((response) => response.json())
+      .then((data) => {
+        const personnesData = data.map((personne) => ({
+          ...personne,
+          id: personne.IDPersonne, // Utilisez une propriété unique comme IDPersonne
         }));
+
         setPersonnes(personnesData);
-        setLoading(false); // Mettre loading à false une fois les données chargées
+        setLoading(false);
       })
-      .catch(error => {
-        console.error('Une erreur est survenue lors de la récupération des données :', error);
-        setLoading(false); // Mettre loading à false en cas d'erreur de chargement
-      });  
+      .catch((error) => {
+        console.error(
+          "Une erreur est survenue lors de la récupération des données :",
+          error
+        );
+        setLoading(false);
+      });
   };
-  
+
   const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'nom', headerName: 'Nom', width: 150 },
-    { field: 'prenom', headerName: 'Prénom', width: 150 },
-    { field: 'role', headerName: 'Rôle', width: 150 },
-    { field: 'email', headerName: 'E-mail', width: 200 },
-    { field: 'entreeService', headerName: 'Entrée Service', width: 200 },
-    { field: 'grade', headerName: 'Grade', width: 150 },
-    { field: 'affectation', headerName: 'Affectation', width: 150 },
-    { field: 'localisation', headerName: 'Localisation', width: 150 },
-    { field: 'numero', headerName: 'N°', width: 100 },
-    { field: 'nomChefService', headerName: 'Nom Chef du Service', width: 200 },
-    { field: 'prenomChefService', headerName: 'Prénom Chef du Service', width: 200 },
-    { field: 'emailChefService', headerName: 'E-mail Chef du Service', width: 200 },
-    { field: 'departements', headerName: 'Départements', width: 150 },
-    { field: 'nomChefDepartement', headerName: 'Nom Chef de Département', width: 200 },
-    { field: 'prenomChefDepartement', headerName: 'Prénom Chef de Département', width: 200 },
-    { field: 'emailChefDepartement', headerName: 'E-mail Chef de Département', width: 200 },
-    { field: 'pcuension', headerName: 'P+C:UENSION', width: 150 },
-    { field: 'tel', headerName: 'Tel', width: 150 },
-    { field: 'batiment', headerName: 'Bâtiment', width: 150 },
-    { field: 'etage', headerName: 'Étage', width: 100 }
+    { field: "IDPersonne", headerName: "ID", width: 100 },
+    { field: "NomPersonne", headerName: "NOM", width: 150 },
+    { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
+    { field: "SiFrancais", headerName: "RÔLE", width: 150 },
+    { field: "Email", headerName: "E-mail", width: 200 },
+    { field: "DateEntree", headerName: "ENTREE SERVICE", width: 200 },
+    { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 150 },
+    { field: "NomWWGradeFr", headerName: "GRADE", width: 150 },
+    { field: "NomServiceNl", headerName: "AFFECTATION (nl)", width: 150 },
+    { field: "NomServiceFr", headerName: "AFFECTATION", width: 150 },
+    { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 150 },
+    { field: "NomRueFr", headerName: "LOCALISATION", width: 150 },
+    { field: "Numero", headerName: "N°", width: 100 },
+    { field: "NomChefService", headerName: "NOM CHEF DU SERVICE", width: 200 },
+    {
+      field: "PrenomChefService",
+      headerName: "PRENOM CHEF DU SERVICE",
+      width: 200,
+    },
+    {
+      field: "EmailChefService",
+      headerName: "E-MAIL CHEF DU SERVICE",
+      width: 200,
+    },
+    { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 150 },
+    { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 150 },
+    {
+      field: "NomChefDepartement",
+      headerName: "NOM CHEF DEPARTEMENT",
+      width: 200,
+    },
+    {
+      field: "PrenomChefDepartement",
+      headerName: "PRENOM CHEF DEPARTEMENT",
+      width: 200,
+    },
+    {
+      field: "EmailChefDepartement",
+      headerName: "E-MAIL CHEF DEPARTEMENT",
+      width: 200,
+    },
+    { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
+    { field: "TelPro", headerName: "TEL", width: 150 },
+    { field: "Batiment", headerName: "Batiment", width: 150 },
+    { field: "Etage", headerName: "Etage", width: 150 },
+    { field: "BatimentNl", headerName: "Batiment(nl)", width: 150 },
   ];
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <h1 style={{ position: 'absolute', top: '50px',color:'white' }}>MEMBRE DU PERSONEL</h1>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px', padding: '10px', backgroundColor: 'white', width: '80%' }}>
-        <Export style={{ margin: '5px', padding: '8px', fontSize: '1.2em' }} /> {/* Utilisation du composant Export */}
-        <Add style={{ margin: '5px', padding: '8px', fontSize: '1.2em' }} />
+    <div
+      style={{
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        height: "80vh",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
+
+      <div
+        style={{
+          height: "75px",
+          width: "80%",
+          backgroundColor: "white",
+          position: "relative",
+          borderRadius: "0.4rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <ButtonExport
+            personnes={personnes}
+            columns={columns}
+            className="bouton-export"
+          />
+        </div>
+        <div style={{ margin: "5rem" }}>
+          {/* Bouton Add */}
+          <Add />
+        </div>
       </div>
-      <div style={{ height: '60vh', width: '81%', backgroundColor:'white'}}>
+      <div
+        style={{
+          height: "600px",
+          width: "80%",
+          backgroundColor: "white",
+          position: "relative",
+          marginTop: "2rem",
+          borderRadius: "0.5rem",
+        }}
+      >
         <DataGrid
           rows={personnes}
           columns={columns}
@@ -92,17 +139,10 @@ function Tableau() {
           loading={loading}
           checkboxSelection
           disableSelectionOnClick
-          components={{
-            Toolbar: () => (
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {/* <BoutonAdd /> Utilisation du composant Bouton-Add */}
-              </div>
-            ),
-          }}
         />
       </div>
     </div>
   );
-};
+}
 
 export default Tableau;
