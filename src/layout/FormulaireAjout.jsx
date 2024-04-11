@@ -161,25 +161,20 @@ const FormulaireAjout = ({ onSubmit }) => {
         </Select>
 
         <div className="radio-group">
-          <p>Type de personnel :</p>
-          <RadioGroup
-            value={typePersonnel}
-            onChange={(e) => setTypePersonnel(e.target.value)}
-          >
-            <FormControlLabel value="Oui" control={<Radio />} label="Oui" />
-            <FormControlLabel value="Non" control={<Radio />} label="Non" />
-          </RadioGroup>
-        </div>
-        <div className="radio-group">
-          <p>Langue :</p>
-          <RadioGroup
-            value={langue}
-            onChange={(e) => setLangue(e.target.value)}
-          >
-            <FormControlLabel value="fr" control={<Radio />} label="Français" />
-            <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
-          </RadioGroup>
-        </div>
+  <p>Type de personnel :</p>
+  <div className="radio-item">
+    <FormControlLabel value="Oui" control={<Radio />} label="Oui" />
+    <FormControlLabel value="Non" control={<Radio />} label="Non" />
+  </div>
+</div>
+<div className="radio-group">
+  <p>Langue :</p>
+  <div className="radio-item">
+    <FormControlLabel value="fr" control={<Radio />} label="Français" />
+    <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
+  </div>
+</div>
+
         <div className="valider-button">
 
           <Button className='valider' variant="contained" onClick={handleSubmit}>Valider</Button>
