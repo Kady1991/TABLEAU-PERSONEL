@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, RadioGroup, FormControlLabel, Radio, Select, MenuItem } from '@mui/material';
-import { AccountCircle, AlternateEmail, LocationOn, Phone } from '@mui/icons-material';
+import { AccountCircle, AlternateEmail, LocationOn, Phone, CreditCard } from '@mui/icons-material';
 import axios from 'axios';
 import './FormulaireAjout.css';
 
@@ -104,57 +104,61 @@ const FormulaireAjout = ({ onSubmit }) => {
           label="N° National"
           value={numeroNational}
           onChange={(e) => setNumeroNational(e.target.value)}
+          InputProps={{
+            startAdornment: <CreditCard />, // Utilisation de l'icône CreditCard pour le numéro national
+          }}
         />
-<Select
-  label="Adresse"
-  value={selectedAdresse}
-  onChange={(e) => setSelectedAdresse(e.target.value)}
-  MenuProps={{
-    style: {
-      maxHeight: 450, // Hauteur maximale du menu déroulant
-      width: 50, // Largeur du menu déroulant
-      marginTop: -20, // Déplacement vers le haut
-    },
-  }}
->
-  {adresses.map((adresse, index) => (
-    <MenuItem key={index} value={adresse}>{adresse}</MenuItem>
-  ))}
-</Select>
 
-<Select
-  label="Service"
-  value={selectedService}
-  onChange={(e) => setSelectedService(e.target.value)}
-  MenuProps={{
-    style: {
-      maxHeight: 450, // Hauteur maximale du menu déroulant
-      width: 50, // Largeur du menu déroulant
-      marginTop: -20, // Déplacement vers le haut
-    },
-  }}
->
-  {services.map((service, index) => (
-    <MenuItem key={index} value={service}>{service}</MenuItem>
-  ))}
-</Select>
+        <Select
+          label="Adresse"
+          value={selectedAdresse}
+          onChange={(e) => setSelectedAdresse(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width: 50, // Largeur du menu déroulant
+              marginTop: -20, // Déplacement vers le haut
+            },
+          }}
+        >
+          {adresses.map((adresse, index) => (
+            <MenuItem key={index} value={adresse}>{adresse}</MenuItem>
+          ))}
+        </Select>
 
-<Select
-  label="Grade"
-  value={selectedGrade}
-  onChange={(e) => setSelectedGrade(e.target.value)}
-  MenuProps={{
-    style: {
-      maxHeight: 450, // Hauteur maximale du menu déroulant
-      width: 50, // Largeur du menu déroulant
-      marginTop: -20, // Déplacement vers le haut
-    },
-  }}
->
-  {grades.map((grade, index) => (
-    <MenuItem key={index} value={grade}>{grade}</MenuItem>
-  ))}
-</Select>
+        <Select
+          label="Service"
+          value={selectedService}
+          onChange={(e) => setSelectedService(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width: 50, // Largeur du menu déroulant
+              marginTop: -20, // Déplacement vers le haut
+            },
+          }}
+        >
+          {services.map((service, index) => (
+            <MenuItem key={index} value={service}>{service}</MenuItem>
+          ))}
+        </Select>
+
+        <Select
+          label="Grade"
+          value={selectedGrade}
+          onChange={(e) => setSelectedGrade(e.target.value)}
+          MenuProps={{
+            style: {
+              maxHeight: 450, // Hauteur maximale du menu déroulant
+              width: 50, // Largeur du menu déroulant
+              marginTop: -20, // Déplacement vers le haut
+            },
+          }}
+        >
+          {grades.map((grade, index) => (
+            <MenuItem key={index} value={grade}>{grade}</MenuItem>
+          ))}
+        </Select>
 
         <div className="radio-group">
           <p>Type de personnel :</p>
@@ -177,6 +181,7 @@ const FormulaireAjout = ({ onSubmit }) => {
           </RadioGroup>
         </div>
         <div className="valider-button">
+
           <Button className='valider' variant="contained" onClick={handleSubmit}>Valider</Button>
         </div>
       </form>

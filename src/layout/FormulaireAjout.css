@@ -11,8 +11,8 @@
   height: 60vh; /* Augmentation de la hauteur */
   max-height: 60vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
-  z-index: 1;
-  background: #e4e6e7;
+  z-index: 2;
+  background: #4a82bd;
   border-radius: 5px;
   
 }
@@ -38,45 +38,76 @@
 }
 
 
-.formulaire form label {
-  font-weight: lighter;
-  margin-bottom: 0px;
-  font-size: 15px;
-  
-}
 
 .formulaire form .MuiTextField-root {
   width: 100%;
-
 }
-
 
 .formulaire form .MuiFormControl-root {
   width: 100%;
-  
+  height: auto;
 }
 
 .formulaire form .MuiSelect-root {
-  width: 100%;
+  width: 90%;
 }
 
 .formulaire form .MuiRadio-root {
   padding: 0 5px;
-  margin-left: 3rem;
+  margin-left: 4rem;
+  color: rgb(255, 255, 255);
   
 }
 
 .formulaire form .MuiTypography-body1 {
-  font-size: 0.775rem;
+  font-size: 0.875rem;
   
 }
 
 .valider-button {
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
   margin-top: 20px; /* Ajoutez une marge au-dessus du bouton si nécessaire */
 
 }
 
+.MuiSvgIcon-root {
+  font-size: 5rem;
+}
+
+/* .formulaire form label, */
+/* .formulaire form .MuiSelect-root, */
+
+/* .formulaire form .MuiInputBase-root{
+  background-color: white;
+} */
+
+.formulaire form .MuiFormControl-root,
+.formulaire form .MuiInputBase-root {
+  background-color: rgb(247, 247, 247);
+  border-radius: 5px;
+}
+
+.radio-group{
+
+  width: 50%;
+  
+}
+
+.radio-group p{
+  color: rgb(15, 15, 15);
+  font-size: 0.975rem;
+  margin: 0.2rem;
+  width: 30%;
+}
+
+
+.formulaire form label {
+  font-weight: lighter;
+  margin-top: 1.8rem;
+  margin-left: 2.3rem;
+  opacity: 0.5;
+  font-size: 1.2rem; /* Augmenter la taille des labels */
+}
 
