@@ -10,7 +10,7 @@
   flex-direction: column;
   align-items: center;
   width: 150%; /* Augmentation de la largeur */
-  max-width: 1200px; /* Limiter la largeur maximale du formulaire */
+  max-width: 1000px; /* Limiter la largeur maximale du formulaire */
   height: 50vh; /* Augmentation de la hauteur */
   max-height: 50vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, RadioGroup, FormControlLabel, Radio, Select, MenuItem } from '@mui/material';
-import { AccountCircle, AlternateEmail, LocationOn, Phone, CreditCard } from '@mui/icons-material';
+import { AccountCircle, AlternateEmail, LocationOn, Phone } from '@mui/icons-material';
 import axios from 'axios';
 import './FormulaireAjout.css';
 
@@ -104,19 +104,15 @@ const FormulaireAjout = ({ onSubmit }) => {
           label="N° National"
           value={numeroNational}
           onChange={(e) => setNumeroNational(e.target.value)}
-          InputProps={{
-            startAdornment: <CreditCard />, // Utilisation de l'icône CreditCard pour le numéro national
-          }}
         />
-
 <Select
   label="Adresse"
   value={selectedAdresse}
   onChange={(e) => setSelectedAdresse(e.target.value)}
   MenuProps={{
     style: {
-      maxHeight: 350, // Hauteur maximale du menu déroulant
-      maxWidth: 50, // Largeur du menu déroulant à la moitié
+      maxHeight: 450, // Hauteur maximale du menu déroulant
+      width: 50, // Largeur du menu déroulant
       marginTop: -20, // Déplacement vers le haut
     },
   }}
@@ -132,8 +128,8 @@ const FormulaireAjout = ({ onSubmit }) => {
   onChange={(e) => setSelectedService(e.target.value)}
   MenuProps={{
     style: {
-      maxHeight: 350, // Hauteur maximale du menu déroulant
-      maxWidth: 50, // Largeur du menu déroulant à la moitié
+      maxHeight: 450, // Hauteur maximale du menu déroulant
+      width: 50, // Largeur du menu déroulant
       marginTop: -20, // Déplacement vers le haut
     },
   }}
@@ -149,8 +145,8 @@ const FormulaireAjout = ({ onSubmit }) => {
   onChange={(e) => setSelectedGrade(e.target.value)}
   MenuProps={{
     style: {
-      maxHeight: 350, // Hauteur maximale du menu déroulant
-      width: 0, // Largeur du menu déroulant à la moitié
+      maxHeight: 450, // Hauteur maximale du menu déroulant
+      width: 50, // Largeur du menu déroulant
       marginTop: -20, // Déplacement vers le haut
     },
   }}
@@ -160,24 +156,27 @@ const FormulaireAjout = ({ onSubmit }) => {
   ))}
 </Select>
 
-
-       <div className="radio-group">
-  <p>Type de personnel :</p>
-  <div className="radio-item">
-    <FormControlLabel value="Oui" control={<Radio />} label="Oui" />
-    <FormControlLabel value="Non" control={<Radio />} label="Non" />
-  </div>
-</div>
-<div className="radio-group">
-  <p>Langue :</p>
-  <div className="radio-item">
-    <FormControlLabel value="fr" control={<Radio />} label="Français" />
-    <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
-  </div>
-</div>
-
+        <div className="radio-group">
+          <p>Type de personnel :</p>
+          <RadioGroup
+            value={typePersonnel}
+            onChange={(e) => setTypePersonnel(e.target.value)}
+          >
+            <FormControlLabel value="Oui" control={<Radio />} label="Oui" />
+            <FormControlLabel value="Non" control={<Radio />} label="Non" />
+          </RadioGroup>
+        </div>
+        <div className="radio-group">
+          <p>Langue :</p>
+          <RadioGroup
+            value={langue}
+            onChange={(e) => setLangue(e.target.value)}
+          >
+            <FormControlLabel value="fr" control={<Radio />} label="Français" />
+            <FormControlLabel value="nl" control={<Radio />} label="Néerlandais" />
+          </RadioGroup>
+        </div>
         <div className="valider-button">
-
           <Button className='valider' variant="contained" onClick={handleSubmit}>Valider</Button>
         </div>
       </form>
