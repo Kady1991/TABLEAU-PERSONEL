@@ -11,8 +11,8 @@
   align-items: center;
   width: 150%; /* Augmentation de la largeur */
   max-width: 1000px; /* Limiter la largeur maximale du formulaire */
-  height: 50vh; /* Augmentation de la hauteur */
-  max-height: 50vh; /* Limiter la hauteur maximale */
+  height: 60vh; /* Augmentation de la hauteur */
+  max-height: 60vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
   z-index: 1;
   background: rgb(180, 181, 182);
@@ -58,7 +58,7 @@
 }
 
 .formulaire form .MuiSelect-root {
-  width: 90%;
+  width: 100%;
 }
 
 .formulaire form .MuiRadio-root {
@@ -90,7 +90,7 @@
 .formulaire form .MuiInputBase-root {
   background-color: rgb(247, 247, 247);
   border-radius: 5px;
-  width: 70%;
+  width: 100%;
   
 }
 
