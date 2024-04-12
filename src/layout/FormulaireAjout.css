@@ -1,3 +1,6 @@
+
+
+
 .formulaire {
   position: fixed;
   top: 50%;
@@ -8,13 +11,19 @@
   align-items: center;
   width: 150%; /* Augmentation de la largeur */
   max-width: 1200px; /* Limiter la largeur maximale du formulaire */
-  height: 60vh; /* Augmentation de la hauteur */
-  max-height: 60vh; /* Limiter la hauteur maximale */
+  height: 50vh; /* Augmentation de la hauteur */
+  max-height: 50vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
-  z-index: 2;
+  z-index: 1;
   background: #94b8d4;
   border-radius: 5px;
   
+}
+
+/* Style pour le conteneur du formulaire */
+.formulaire-container {
+  position: relative; /* Assurez-vous que le conteneur est positionné */
+  z-index: 1; /* Définissez le z-index du conteneur */
 }
 
 .formulaire form {
@@ -28,7 +37,7 @@
   gap: 20px;
   width: 90%;
   align-items: center; /* Centrer verticalement les éléments */
-  color:rgb(0, 0, 0);
+  
   
 }
 
@@ -73,22 +82,19 @@
   margin-left: 70%;
 }
 
-
-
-
-
 .MuiSvgIcon-root {
   font-size: 5rem;
 }
 
-.formulaire form .MuiFormControl-root,
+
 .formulaire form .MuiInputBase-root {
   background-color: rgb(247, 247, 247);
   border-radius: 5px;
+  width: 70%;
+  
 }
 
 .radio-group{
-
   width: 50%;
   
 }
@@ -106,7 +112,7 @@
   margin-top: 1.8rem;
   margin-left: 2.3rem;
   opacity: 0.5;
-  font-size: 1.2rem; /* Augmenter la taille des labels */
+ 
 }
 
 .radio-group {
@@ -131,6 +137,15 @@
 }
 
 .radio-item .MuiFormControlLabel-root .MuiTypography-root {
-  font-size: 0.8rem; /* Taille du texte du libellé */
+  font-size: 0.7rem; /* Taille du texte du libellé */
 }
+
+/* FormulaireAjout.css */
+
+.input-field {
+  display: block;
+  margin-top: -50px; /* Réduire l'espace entre les champs */
+}
+
+
 

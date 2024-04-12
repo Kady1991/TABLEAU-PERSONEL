@@ -5,9 +5,28 @@ body {
   background: linear-gradient(to bottom, #0465ce, #d9e3eb); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
   font-family: Arial, sans-serif; /* Choix d'une police de caractères sans-serif */
   height: 100vh; /* Hauteur à 100% de la fenêtre visible */
+  z-index: 0;
   
   }
 
 
+/* Style pour la barre de défilement */
+.formulaire::-webkit-scrollbar {
+  width: 10px; /* Largeur de la barre de défilement */
+  
+}
+
+/* Style pour la poignée de défilement */
+.formulaire::-webkit-scrollbar-thumb {
+  background-color: #888; /* Couleur de la poignée */
+  border-radius: 5px; /* Bordure arrondie */
+ 
+}
+
+/* Style pour la piste de défilement */
+.formulaire::-webkit-scrollbar-track {
+  background: transparent; /* Couleur de fond de la piste */
+
+}
 
 

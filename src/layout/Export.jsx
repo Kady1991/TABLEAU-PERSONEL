@@ -1,7 +1,6 @@
 import React from "react";
-import Button from "@mui/material/Button"; // Importez le bouton MUI
-
-
+import Button from "@mui/material/Button";
+import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Importez l'icône de téléchargement de fichier
 import "../index.css"; // Importez le fichier CSS
 
 const Export = ({ personnes, className }) => {
