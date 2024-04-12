@@ -15,7 +15,7 @@
   max-height: 50vh; /* Limiter la hauteur maximale */
   padding: 20px; /* Espacement intérieur */
   z-index: 1;
-  background: #94b8d4;
+  background: rgb(180, 181, 182);
   border-radius: 5px;
   
 }
