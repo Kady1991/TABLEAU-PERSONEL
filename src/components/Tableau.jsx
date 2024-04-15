@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import Add from "../layout/Add"; // Importez votre composant Add ici
+import AddMemberForm from "../layout/AddMemberForm"; // Importez votre composant Add ici
 import Export from "../layout/Export"; // Importez votre composant ButtonExport ici
 import ActionComponent from "../layout/ActionComponent";
+import { Fab } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false); // État pour contrôler la visibilité du formulaire
+
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     fetchData();
@@ -46,11 +55,11 @@ function Tableau() {
   };
 
   const columns = [
+    { field: "IDPersonne", headerName: "ID", width: 50, hideable: true },
     { field: "NomPersonne", headerName: "NOM", width: 150, },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
     { field: "Email", headerName: "E-mail", width: 250 },
     { field: "TelPro", headerName: "TEL", width: 150 },
-    { field: "IDPersonne", headerName: "ID", width: 50, hideable: true },
     { field: "SiFrancais", headerName: "RÔLE", width: 100, hide: true },
     { field: "DateEntree", headerName: "ENTREE SERVICE", width: 250, hide: true },
     { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 150, hide: true },
@@ -104,7 +113,7 @@ function Tableau() {
       }}
     >
       <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
-
+  
       <div
         style={{
           height: "75px",
@@ -124,12 +133,23 @@ function Tableau() {
             columns={columns}
             className="bouton-export"
           />
-
         </div>
-        <div style={{ margin: "2rem" }}>
-          <Add />
+  
+        {/* Bouton flottant pour afficher le formulaire */}
+        <div style={{ marginRight: "2rem" }}>
+          <Fab color="primary" aria-label="add" onClick={() => setShowForm(true)}>
+            <AddIcon />
+          </Fab>
         </div>
       </div>
+  
+      {/* Affichage conditionnel du formulaire */}
+      {showForm && (
+        <div style={{ margin: "2rem" }}>
+          <AddMemberForm />
+        </div>
+      )}
+  
       <div
         style={{
           height: "calc(100% - 75px - 2rem)", // Calcul de la hauteur restante
@@ -151,5 +171,6 @@ function Tableau() {
       </div>
     </div>
   );
-}
+  
+};
 export default Tableau;
