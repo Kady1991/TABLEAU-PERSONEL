@@ -166,51 +166,63 @@ const AddMemberForm = () => {
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
+
+            
             <Col span={12}>
-              <Form.Item
-                name="grade"
-                label="Grade"
-                rules={[{ required: true, message: 'Veuillez choisir le grade' }]}
-              >
-                <Select style={{ width: '100%' }}>
-                  {grades.map(grade => (
-                    <Option key={grade.id} value={grade.NomWWGradeFr}>{grade.NomWWGradeFr}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+    <Form.Item
+      name="grade"
+      label="Grade"
+      rules={[{ required: true, message: 'Veuillez choisir le grade' }]}
+    >
+      <Select style={{ width: '100%' }}>
+        <option value="">Sélectionner un grade</option>
+        {[...new Set(grades.map(grade => grade.NomWWGradeFr))]
+          .sort()
+          .map((gradeName, index) => (
+            <option key={index} value={gradeName}>{gradeName}</option>
+          ))}
+      </Select>
+    </Form.Item>
+  </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="adresse"
-                label="Adresse"
-                rules={[{ required: true, message: 'Veuillez choisir l\'adresse' }]}
-              >
-                <Select style={{ width: '100%' }}>
-                  {addressData.map(address => (
-                    <Option key={address.id} value={address.NomRueFr}>{address.NomRueFr}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
+          <Col span={12}>
+    <Form.Item
+      name="adresse"
+      label="Adresse"
+      rules={[{ required: true, message: 'Veuillez choisir l\'adresse' }]}
+    >
+      <Select style={{ width: '100%' }}>
+        <option value="">Sélectionner une adresse</option>
+        {[...new Set(addressData.map(address => address.NomRueFr))]
+          .sort()
+          .map((addressName, index) => (
+            <option key={index} value={addressName}>{addressName}</option>
+          ))}
+      </Select>
+    </Form.Item>
+  </Col>
+  <Col span={12}>
               <Form.Item
                 name="service"
                 label="Service"
+                
                 rules={[{ required: true, message: 'Veuillez choisir le service' }]}
               >
                 <Select style={{ width: '100%' }}>
-                  {services.map(service => (
-                    <Option key={service.id} value={service.NomServiceFr}>{service.NomServiceFr}</Option>
-                  ))}
-                </Select>
+        <option value="">Sélectionner un service</option>
+        {[...new Set(services.map(service => service.NomServiceFr))]
+          .sort()
+          .map((serviceName, index) => (
+            <option key={index} value={serviceName}>{serviceName}</option>
+          ))}
+      </Select>
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item style={{ textAlign: 'center' }}>
+          <Form.Item style={{ textAlign: 'center', fontSize:"5rem", }}>
             <Button type="primary" htmlType="submit" loading={loading}>
               Valider
             </Button>
