@@ -91,6 +91,7 @@ function Tableau() {
           onEdit={() => handleEdit(params.row.id)}
           onDelete={() => handleDelete(params.row.id)}
           onAddService={() => handleAddService(params.row.id)}
+          onInfo={() => handleInfo(params.row.id)}
         />
       ),
     },
