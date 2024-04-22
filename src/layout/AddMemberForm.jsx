@@ -35,6 +35,17 @@ const AddMemberForm = () => {
     fetchData();
   }, []);
 
+  const handleServiceSelection = async (IDService) => {
+    try {
+      const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/affectation/${IDService}`);
+
+      const serviceDetails = response.data;
+      setSelectedServiceDetails(serviceDetails);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails du service:', error);
+    }
+  };
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -48,31 +59,28 @@ const AddMemberForm = () => {
       }
 
       // Mapper la valeur de siPersonnel
-      if (values.siPersonnel === true) {
-        siPersonnel = true;
-      } else if (values.siPersonnel === false) {
-        siPersonnel = false;
-      }
+      siPersonnel = !!values.siPersonnel;
 
       // Créer un objet avec les valeurs du formulaire
       const formData = {
-        NomPersonne: values.nom,
-        PrenomPersonne: values.prenom,
-        Email: values.email,
-        TelPro: values.telephone,
-        DateEntree: values.dateEntree,
-        Grade: values.id,
-        Adresse: values.id,
-        Service: values.id,
-        SiFrancais: siFrancais,
-        SiTypePersonnel: siPersonnel ? 'Oui' : 'Non',
+        NomPersonne: values.NomPersonne,
+        PrenomPersonne: values.PrenomPersonne,
+        Email: values.Email,
+        TelPro: values.TelPro,
+        DateEntree: values.DateEntree,
+        Grade: values.IDWWGrade, // Utilisation de values.grade au lieu de values.id
+        Adresse: values.adresse, // Utilisation de values.adresse au lieu de values.id
+        Service: values.IDService, // Utilisation de values.service au lieu de values.id
+        SiFrancais: values.siFrancais,
+        SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
+       
       };
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
 
       // Vérifier si la requête a réussi
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error('Erreur lors de l\'envoi des données');
       }
 
@@ -83,30 +91,6 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
-
-  const handleServiceSelection = async (IDService) => {
-    try {
-      const response = await fetch(`https://server-iis.uccle.intra/API_Personne/api/affectation/services/${IDService}`);
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des détails du service:', response.statusText);
-      }
-      const serviceDetailsArray = await response.json();
-      // Supposons que serviceDetailsArray est un tableau d'objets AffectationModelView
-      const serviceDetails = serviceDetailsArray.find(service => service.IDService === IDService);
-      if (serviceDetails) {
-        setSelectedServiceDetails(serviceDetails);
-      } else {
-        console.error('Détails du service non trouvés pour ID:', IDService);
-        // Gérez le cas où les détails du service ne sont pas trouvés, par exemple afficher un message d'erreur à l'utilisateur
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération des détails du service:', error);
-      // Gérez l'erreur de récupération des détails du service ici, par exemple afficher un message d'erreur à l'utilisateur
-    }
-  };
-  
-  
-  
 
   return (
     <div style={{
@@ -228,7 +212,6 @@ const AddMemberForm = () => {
                   </Option>
                 </Select>
               </Form.Item>
-
             </Col>
           </Row>
 
