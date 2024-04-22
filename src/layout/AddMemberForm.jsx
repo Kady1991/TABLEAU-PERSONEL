@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -16,16 +16,23 @@ const AddMemberForm = () => {
     setLoadingData(true);
     const fetchData = async () => {
       try {
-        const gradesResponse = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
+        const gradesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/Personne"
+        );
         setGrades(gradesResponse.data);
 
-        const servicesResponse = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
+        const servicesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/Personne"
+        );
         setServices(servicesResponse.data);
 
-        const addressResponse = await axios.get('https://server-iis.uccle.intra/API_Personne/api/Personne');
+        const addressResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/Adresses"
+        );
+        console.log(addressResponse.data[0].AdresseComplete);
         setAddressData(addressResponse.data);
       } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        console.error("Erreur lors du chargement des données:", error);
       } finally {
         setLoadingData(false);
       }
@@ -40,9 +47,9 @@ const AddMemberForm = () => {
       let siFrancais, siPersonnel;
 
       // Mapper la valeur de langue
-      if (values.langue === 'fr') {
+      if (values.langue === "fr") {
         siFrancais = true;
-      } else if (values.langue === 'nl') {
+      } else if (values.langue === "nl") {
         siFrancais = false;
       }
 
@@ -64,34 +71,46 @@ const AddMemberForm = () => {
         Adresse: values.adresse,
         Service: values.service,
         SiFrancais: siFrancais,
-        SiTypePersonnel: siPersonnel ? 'Oui' : 'Non',
+        SiTypePersonnel: siPersonnel ? "Oui" : "Non",
       };
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
-      const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
+      const response = await axios.put(
+        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        formData
+      );
       console.log("Grades:", gradesResponse.data);
       console.log("Services:", servicesResponse.data);
       console.log("Personne:", response.data);
-      
+
       // Vérifier si la requête a réussi
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi des données');
+        throw new Error("Erreur lors de l'envoi des données");
       }
 
-      console.log('Nouveau membre ajouté avec succès');
+      console.log("Nouveau membre ajouté avec succès");
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error("Erreur:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: "600px", zIndex: "1", position: "fixed", top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-    }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "600px",
+        zIndex: "1",
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      }}
+    >
       {loadingData ? (
         <p>Chargement des données...</p>
       ) : (
@@ -99,14 +118,26 @@ const AddMemberForm = () => {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          style={{ maxWidth: '600px', width: '100%', padding: '20px', backgroundColor: '#f0f2f5', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
+          style={{
+            maxWidth: "600px",
+            width: "100%",
+            padding: "20px",
+            backgroundColor: "#f0f2f5",
+            borderRadius: "8px",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          }}
         >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="siPersonnel"
                 label="Si personnel"
-                rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez choisir si le membre est personnel",
+                  },
+                ]}
               >
                 <Radio.Group>
                   <Radio value={true}>Oui</Radio>
@@ -118,7 +149,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="langue"
                 label="Langue"
-                rules={[{ required: true, message: 'Veuillez choisir la langue' }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir la langue" },
+                ]}
               >
                 <Radio.Group>
                   <Radio value="fr">Français</Radio>
@@ -133,7 +166,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="nom"
                 label="Nom"
-                rules={[{ required: true, message: 'Veuillez entrer le nom' }]}
+                rules={[{ required: true, message: "Veuillez entrer le nom" }]}
               >
                 <Input />
               </Form.Item>
@@ -142,7 +175,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="prenom"
                 label="Prénom"
-                rules={[{ required: true, message: 'Veuillez entrer le prénom' }]}
+                rules={[
+                  { required: true, message: "Veuillez entrer le prénom" },
+                ]}
               >
                 <Input />
               </Form.Item>
@@ -154,7 +189,12 @@ const AddMemberForm = () => {
               <Form.Item
                 name="telephone"
                 label="Téléphone"
-                rules={[{ required: true, message: 'Veuillez entrer le numéro de téléphone' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer le numéro de téléphone",
+                  },
+                ]}
               >
                 <Input />
               </Form.Item>
@@ -163,7 +203,12 @@ const AddMemberForm = () => {
               <Form.Item
                 name="email"
                 label="Email"
-                rules={[{ required: true, message: 'Veuillez entrer l\'adresse email' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer l'adresse email",
+                  },
+                ]}
               >
                 <Input />
               </Form.Item>
@@ -175,9 +220,14 @@ const AddMemberForm = () => {
               <Form.Item
                 name="dateEntree"
                 label="Date d'entrée"
-                rules={[{ required: true, message: 'Veuillez choisir la date d\'entrée' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez choisir la date d'entrée",
+                  },
+                ]}
               >
-                <DatePicker style={{ width: '100%' }} />
+                <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
 
@@ -185,14 +235,20 @@ const AddMemberForm = () => {
               <Form.Item
                 name="grade"
                 label="Grade"
-                rules={[{ required: true, message: 'Veuillez choisir le grade' }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir le grade" },
+                ]}
               >
-                <Select style={{ width: '100%' }}>
-                <Option key="placeholder" value="placeholder" disabled>Sélectionner une grade</Option>
-                  {[...new Set(grades.map(grade => grade.NomWWGradeFr))]
+                <Select style={{ width: "100%" }}>
+                  <Option key="placeholder" value="placeholder" disabled>
+                    Sélectionner une grade
+                  </Option>
+                  {[...new Set(grades.map((grade) => grade.NomWWGradeFr))]
                     .sort()
                     .map((gradeName, index) => (
-                      <Option key={index} value={gradeName}>{gradeName}</Option>
+                      <Option key={index} value={gradeName}>
+                        {gradeName}
+                      </Option>
                     ))}
                 </Select>
               </Form.Item>
@@ -204,14 +260,20 @@ const AddMemberForm = () => {
               <Form.Item
                 name="adresse"
                 label="Adresse"
-                rules={[{ required: true, message: 'Veuillez choisir l\'adresse' }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir l'adresse" },
+                ]}
               >
-                <Select style={{ width: '100%' }}>
-                <Option key="placeholder" value="placeholder" disabled>Sélectionner une adresse</Option>
-                  {[...new Set(addressData.map(address => address.NomRueFr))]
+                <Select style={{ width: "100%" }}>
+                  <Option key="placeholder" value="placeholder" disabled>
+                    Sélectionner une adresse
+                  </Option>
+                  {[...new Set(addressData.map((address) => address.NomRueFr))]
                     .sort()
                     .map((addressName, index) => (
-                      <Option key={index} value={addressName}>{addressName}</Option>
+                      <Option key={index} value={addressName}>
+                        {addressName}
+                      </Option>
                     ))}
                 </Select>
               </Form.Item>
@@ -220,21 +282,27 @@ const AddMemberForm = () => {
               <Form.Item
                 name="service"
                 label="Service"
-                rules={[{ required: true, message: 'Veuillez choisir le service' }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir le service" },
+                ]}
               >
-                <Select style={{ width: '100%' }}>
-                <Option key="placeholder" value="placeholder" disabled>Sélectionner un service</Option>
-                  {[...new Set(services.map(service => service.NomServiceFr))]
+                <Select style={{ width: "100%" }}>
+                  <Option key="placeholder" value="placeholder" disabled>
+                    Sélectionner un service
+                  </Option>
+                  {[...new Set(services.map((service) => service.NomServiceFr))]
                     .sort()
                     .map((serviceName, index) => (
-                      <Option key={index} value={serviceName}>{serviceName}</Option>
+                      <Option key={index} value={serviceName}>
+                        {serviceName}
+                      </Option>
                     ))}
                 </Select>
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item style={{ textAlign: 'center' }}>
+          <Form.Item style={{ textAlign: "center" }}>
             <Button type="primary" htmlType="submit" loading={loading}>
               Valider
             </Button>
