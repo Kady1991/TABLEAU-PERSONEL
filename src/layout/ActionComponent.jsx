@@ -23,14 +23,53 @@ const ActionComponent = () => {
       .catch(error => console.error('Erreur lors de la récupération des services :', error));
   }, []); // Utilisation d'un effet avec une dépendance vide pour exécuter le chargement une seule fois au montage du composant
 
-  const handleEditClick = () => {
-    // Logique pour l'édition
-    console.log('Édition en cours...');
+
+
+  // Fonction pour gérer l'édition des données dans le tableau
+
+  const handleEditClick = (itemId, newValue) => {
+    // Mettre à jour les données dans le tableau (optionnel, si besoin)
+    updateTable(itemId, newValue);
+
+    // Mettre à jour les données dans l'API
+    updateDataInAPI(itemId, newValue);
   };
 
-  const handleDeleteClick = () => {
-    // Logique pour la suppression
-    console.log('Suppression en cours...');
+  // Fonction pour mettre à jour les données dans le tableau (optionnel, si vous souhaitez afficher les modifications en temps réel)
+  const updateTable = (itemId, newValue) => {
+    // Implémentez votre logique pour mettre à jour les données dans le tableau ici
+  };
+
+  // Fonction pour mettre à jour les données dans l'API
+  const updateDataInAPI = (itemId, newValue) => {
+    // Envoyez une requête à votre API pour mettre à jour les données
+    // Exemple avec fetch API :
+    fetch(`https://server-iis.uccle.intra/API_Personne/api/Personne/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newValue }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Échec de la mise à jour des données dans l\'API');
+        }
+        // Gérer la réponse de l'API si nécessaire
+      })
+      .catch(error => {
+        console.error('Erreur lors de la mise à jour des données dans l\'API:', error);
+        // Gérer les erreurs
+      });
+  };
+  // fin de la Fonction pour gérer l'édition des données dans le tableau
+
+
+
+
+  const handleAddServiceClick = () => {
+    // Ouvrir la pop-up pour afficher la liste des services
+    setIsPopupOpen(true);
   };
 
   const handleDetailClick = () => {
@@ -38,10 +77,33 @@ const ActionComponent = () => {
     console.log('Affichage des détails...');
   };
 
-  const handleAddServiceClick = () => {
-    // Ouvrir la pop-up pour afficher la liste des services
-    setIsPopupOpen(true);
+
+  // LOGIQUE POUR SUPPRIMER UN MEMBRE
+  const handleDeleteClick = (itemId, isArchived) => {
+    // Supprimer l'élément du tableau
+    // Exemple: Si votre tableau est un array JavaScript, vous pouvez utiliser splice pour le supprimer
+    // Remplacez cela par votre propre logique pour supprimer l'élément de votre tableau
+    removeElementFromTable(itemId);
+
+    // Si l'élément n'est pas déjà dans l'archive, le déplacer vers l'archive
+    if (!isArchived) {
+      // Logique pour déplacer l'élément vers l'archive
+      // Exemple: Mettre à jour l'attribut SiArchive de l'élément à true dans votre API
+      updateSiArchive(itemId, true);
+    }
   };
+
+  // Fonction pour supprimer l'élément du tableau
+  const removeElementFromTable = (itemId) => {
+    // Implémentez votre logique pour supprimer l'élément du tableau ici
+  };
+
+  // Fonction pour mettre à jour l'attribut SiArchive dans votre API
+  const updateSiArchive = (itemId, siArchiveValue) => {
+    // Implémentez votre logique pour mettre à jour l'attribut SiArchive de l'élément dans votre API ici
+  };
+
+
 
   const handleClosePopup = () => {
     // Fermer la pop-up
@@ -57,13 +119,15 @@ const ActionComponent = () => {
         </IconButton>
       </Tooltip>
 
-      {/* Bouton "Supprimer" */}
-      <Tooltip title="Supprimer">
-        <IconButton size="medium" onClick={handleDeleteClick}>
-          <DeleteForever fontSize="medium" style={{ color: '#f44336' }} />
+
+      {/* Bouton "Ajouter service" */}
+      <Tooltip title="Ajouter service">
+        <IconButton size="medium" onClick={handleAddServiceClick}>
+          <AddBox fontSize="medium" style={{ color: '#4caf50' }} />
         </IconButton>
       </Tooltip>
-      
+
+
       {/* Bouton "Détail" */}
       <Tooltip title="Détail">
         <IconButton size="medium" onClick={handleDetailClick}>
@@ -71,10 +135,12 @@ const ActionComponent = () => {
         </IconButton>
       </Tooltip>
 
-      {/* Bouton "Ajouter service" */}
-      <Tooltip title="Ajouter service">
-        <IconButton size="medium" onClick={handleAddServiceClick}>
-          <AddBox fontSize="medium" style={{ color: '#4caf50' }} />
+
+
+      {/* Bouton "Supprimer" */}
+      <Tooltip title="Supprimer">
+        <IconButton size="medium" onClick={handleDeleteClick}>
+          <DeleteForever fontSize="medium" style={{ color: '#f44336' }} />
         </IconButton>
       </Tooltip>
 

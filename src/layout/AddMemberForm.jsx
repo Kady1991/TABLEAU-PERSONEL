@@ -69,7 +69,11 @@ const AddMemberForm = () => {
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-
+      console.log("Grades:", gradesResponse.data);
+      console.log("Services:", servicesResponse.data);
+      console.log("Personne:", response.data);
+      
+      // Vérifier si la requête a réussi
       if (!response.ok) {
         throw new Error('Erreur lors de l\'envoi des données');
       }
@@ -184,7 +188,7 @@ const AddMemberForm = () => {
                 rules={[{ required: true, message: 'Veuillez choisir le grade' }]}
               >
                 <Select style={{ width: '100%' }}>
-                  <Option value="">Sélectionner un grade</Option>
+                <Option key="placeholder" value="placeholder" disabled>Sélectionner une grade</Option>
                   {[...new Set(grades.map(grade => grade.NomWWGradeFr))]
                     .sort()
                     .map((gradeName, index) => (
@@ -203,7 +207,7 @@ const AddMemberForm = () => {
                 rules={[{ required: true, message: 'Veuillez choisir l\'adresse' }]}
               >
                 <Select style={{ width: '100%' }}>
-                  <Option value="">Sélectionner une adresse</Option>
+                <Option key="placeholder" value="placeholder" disabled>Sélectionner une adresse</Option>
                   {[...new Set(addressData.map(address => address.NomRueFr))]
                     .sort()
                     .map((addressName, index) => (
@@ -219,7 +223,7 @@ const AddMemberForm = () => {
                 rules={[{ required: true, message: 'Veuillez choisir le service' }]}
               >
                 <Select style={{ width: '100%' }}>
-                  <Option value="">Sélectionner un service</Option>
+                <Option key="placeholder" value="placeholder" disabled>Sélectionner un service</Option>
                   {[...new Set(services.map(service => service.NomServiceFr))]
                     .sort()
                     .map((serviceName, index) => (
