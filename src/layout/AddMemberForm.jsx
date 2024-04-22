@@ -11,6 +11,7 @@ const AddMemberForm = () => {
   const [services, setServices] = useState([]);
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
   useEffect(() => {
     setLoadingData(true);
@@ -69,9 +70,6 @@ const AddMemberForm = () => {
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-      console.log("Grades:", gradesResponse.data);
-      console.log("Services:", servicesResponse.data);
-      console.log("Personne:", response.data);
 
       // Vérifier si la requête a réussi
       if (!response.ok) {
@@ -85,6 +83,30 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
+
+  const handleServiceSelection = async (IDService) => {
+    try {
+      const response = await fetch(`https://server-iis.uccle.intra/API_Personne/api/affectation/services/${IDService}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des détails du service:', response.statusText);
+      }
+      const serviceDetailsArray = await response.json();
+      // Supposons que serviceDetailsArray est un tableau d'objets AffectationModelView
+      const serviceDetails = serviceDetailsArray.find(service => service.IDService === IDService);
+      if (serviceDetails) {
+        setSelectedServiceDetails(serviceDetails);
+      } else {
+        console.error('Détails du service non trouvés pour ID:', IDService);
+        // Gérez le cas où les détails du service ne sont pas trouvés, par exemple afficher un message d'erreur à l'utilisateur
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails du service:', error);
+      // Gérez l'erreur de récupération des détails du service ici, par exemple afficher un message d'erreur à l'utilisateur
+    }
+  };
+  
+  
+  
 
   return (
     <div style={{
@@ -185,7 +207,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="grade"
                 label="Grade"
-                rules={[{ required: true, message: 'Veuillez choisir le grade' }]}
+                rules={[{ required: false, message: 'Veuillez choisir le grade' }]}
               >
                 <Select
                   style={{ width: '100%' }}
@@ -248,6 +270,7 @@ const AddMemberForm = () => {
                   allowClear
                   showSearch
                   optionFilterProp="children"
+                  onChange={handleServiceSelection}
                 >
                   <Option key="placeholder" value="" disabled>
                     Sélectionner un service
@@ -259,9 +282,24 @@ const AddMemberForm = () => {
                   ))}
                 </Select>
               </Form.Item>
-
             </Col>
           </Row>
+
+          {selectedServiceDetails && (
+            <div>
+              <p>ID du Service: {selectedServiceDetails.IDService}</p>
+              <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
+              <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
+              <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
+              <p>Email du Chef de Service: {selectedServiceDetails.EmailChefService}</p>
+              <p>Nom du Departement: { selectedServiceDetails.NomDepartementFr}</p>
+              <p>Nom Chef du Departement: { selectedServiceDetails.NomChefDepartement}</p>
+              <p>Prenom Chef du Département: {selectedServiceDetails.PrenomChefDepartement}</p>
+              <p>Email Chef du Département:{ selectedServiceDetails.EmailChefDepartement}</p>
+           
+            </div>
+          )}
+
 
           <Form.Item style={{ textAlign: 'center' }}>
             <Button type="primary" htmlType="submit" loading={loading}>
