@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
 import axios from 'axios';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -73,12 +74,12 @@ const AddMemberForm = () => {
         Service: values.IDService, // Utilisation values.id
         SiFrancais: values.siFrancais,
         SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
-       
+
       };
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-        
+
       // Vérifier si la requête a réussi
       if (!response.formData) {
         throw new Error('Erreur lors de l\'envoi des données');
@@ -113,6 +114,8 @@ const AddMemberForm = () => {
                 name="siPersonnel"
                 label="Si personnel"
                 rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
+                initialValue={false} // ou defaultValue={false}
+
               >
                 <Radio.Group>
                   <Radio value={true}>Oui</Radio>
@@ -125,12 +128,14 @@ const AddMemberForm = () => {
                 name="langue"
                 label="Langue"
                 rules={[{ required: true, message: 'Veuillez choisir la langue' }]}
+                initialValue="fr" // ou defaultValue="fr"
               >
                 <Radio.Group>
                   <Radio value="fr">Français</Radio>
                   <Radio value="nl">Néerlandais</Radio>
                 </Radio.Group>
               </Form.Item>
+
             </Col>
           </Row>
 
@@ -160,7 +165,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="telephone"
                 label="Téléphone"
-                rules={[{ required: true, message: 'Veuillez entrer le numéro de téléphone' }]}
+              // rules={[{ required: true, message: 'Veuillez entrer le numéro de téléphone' }]}
               >
                 <Input />
               </Form.Item>
@@ -182,6 +187,7 @@ const AddMemberForm = () => {
                 name="dateEntree"
                 label="Date d'entrée"
                 rules={[{ required: true, message: 'Veuillez choisir la date d\'entrée' }]}
+                initialValue={moment()} // ou defaultValue={moment()}
               >
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
@@ -275,11 +281,11 @@ const AddMemberForm = () => {
               <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
               <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
               <p>Email du Chef de Service: {selectedServiceDetails.EmailChefService}</p>
-              <p>Nom du Departement: { selectedServiceDetails.NomDepartementFr}</p>
-              <p>Nom Chef du Departement: { selectedServiceDetails.NomChefDepartement}</p>
+              <p>Nom du Departement: {selectedServiceDetails.NomDepartementFr}</p>
+              <p>Nom Chef du Departement: {selectedServiceDetails.NomChefDepartement}</p>
               <p>Prenom Chef du Département: {selectedServiceDetails.PrenomChefDepartement}</p>
-              <p>Email Chef du Département:{ selectedServiceDetails.EmailChefDepartement}</p>
-           
+              <p>Email Chef du Département:{selectedServiceDetails.EmailChefDepartement}</p>
+
             </div>
           )}
 
