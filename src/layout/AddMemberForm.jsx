@@ -139,6 +139,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="siPersonnel"
                 label="Si personnel"
+                initialValue= {false}
                 rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
               >
                 <Radio.Group>
@@ -151,6 +152,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="langue"
                 label="Langue"
+                initialValue="fr"
                 rules={[{ required: true, message: 'Veuillez choisir la langue' }]}
               >
                 <Radio.Group>
@@ -190,7 +192,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="telephone"
                 label="Téléphone"
-                rules={[{ required: true, message: 'Veuillez entrer le numéro de téléphone' }]}
+                rules={[{ required: false, message: 'Veuillez entrer le numéro de téléphone' }]}
               >
                 <Input />
               </Form.Item>
