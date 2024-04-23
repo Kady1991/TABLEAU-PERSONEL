@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
 import axios from 'axios';
+import { ConfigProvider } from 'antd';
+import frFR from 'antd/lib/locale/fr_FR'; // Importe la locale française d'Ant Design
+import dayjs from 'dayjs'; // Importe dayjs
+
+
+
+
+
 
 const { Option } = Select;
 
@@ -12,6 +20,7 @@ const AddMemberForm = () => {
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
+
 
   useEffect(() => {
     setLoadingData(true);
@@ -84,12 +93,12 @@ const AddMemberForm = () => {
         Service: values.IDService, // Utilisation values.id
         SiFrancais: values.siFrancais,
         SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
-       
+
       };
 
-      // Envoyer la requête PUT à l'API avec les données du formulaire
-      const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-        
+      // Envoyer la requête POST à l'API avec les données du formulaire
+      const response = await axios.post('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
+
       // Vérifier si la requête a réussi
       if (!response.formData) {
         throw new Error("Erreur lors de l'envoi des données");
@@ -139,7 +148,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="siPersonnel"
                 label="Si personnel"
-                initialValue= {false}
+                initialValue={false}
                 rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
               >
                 <Radio.Group>
@@ -171,7 +180,7 @@ const AddMemberForm = () => {
                 label="Nom"
                 rules={[{ required: true, message: "Veuillez entrer le nom" }]}
               >
-               <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
+                <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -220,8 +229,15 @@ const AddMemberForm = () => {
                 label="Date d'entrée"
                 rules={[{ required: true, message: 'Veuillez choisir la date d\'entrée' }]}
               >
-                <DatePicker style={{ width: "100%" }} />
+                <ConfigProvider locale={frFR}>
+                  <DatePicker
+                    defaultValue={dayjs()}
+                    format="DD/MM/YYYY" // Format d'affichage personnalisé
+                    style={{ width: "100%" }}
+                  />
+                </ConfigProvider>
               </Form.Item>
+
             </Col>
 
             <Col span={12}>
@@ -316,11 +332,11 @@ const AddMemberForm = () => {
               <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
               <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
               <p>Email du Chef de Service: {selectedServiceDetails.EmailChefService}</p>
-              <p>Nom du Departement: { selectedServiceDetails.NomDepartementFr}</p>
-              <p>Nom Chef du Departement: { selectedServiceDetails.NomChefDepartement}</p>
+              <p>Nom du Departement: {selectedServiceDetails.NomDepartementFr}</p>
+              <p>Nom Chef du Departement: {selectedServiceDetails.NomChefDepartement}</p>
               <p>Prenom Chef du Département: {selectedServiceDetails.PrenomChefDepartement}</p>
-              <p>Email Chef du Département:{ selectedServiceDetails.EmailChefDepartement}</p>
-           
+              <p>Email Chef du Département:{selectedServiceDetails.EmailChefDepartement}</p>
+
             </div>
           )}
 
