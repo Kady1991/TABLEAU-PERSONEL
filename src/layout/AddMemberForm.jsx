@@ -13,11 +13,6 @@ const AddMemberForm = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
-
-
-
-
-
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -85,18 +80,16 @@ const AddMemberForm = () => {
         TelPro: values.TelPro,
         DateEntree: values.DateEntree,
         NomWWGradeFr: values.NomWWGradeFr, // Utilisation values.id
-        NomWWGradeNl: values.NomWWGradeNl, // Utilisation values.id
-        IDGrade: values.GradeID, // Utilisation values.id
-        AdresseID: values.AdresseID, // Utilisation values.id
-        ServiceID: values.ServiceID, // Utilisation values.id
+        Adresse: values.IDAdresse, // Utilisation values.id
+        Service: values.IDService, // Utilisation values.id
         SiFrancais: values.siFrancais,
-        SiTypePersonnel: values.SiTypePersonnel,
-
+        SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
+       
       };
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-
+        
       // Vérifier si la requête a réussi
       if (!response.formData) {
         throw new Error("Erreur lors de l'envoi des données");
@@ -109,7 +102,6 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <div
@@ -147,7 +139,7 @@ const AddMemberForm = () => {
               <Form.Item
                 name="siPersonnel"
                 label="Si personnel"
-                initialValue={false}
+                initialValue= {false}
                 rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
               >
                 <Radio.Group>
@@ -175,32 +167,22 @@ const AddMemberForm = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="prenom"
-                label="Prénom"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez entrer le prénom",
-                  },
-                ]}
+                name="nom"
+                label="Nom"
+                rules={[{ required: true, message: "Veuillez entrer le nom" }]}
               >
-                <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
-
+               <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="nom"
-                label="Nom"
+                name="prenom"
+                label="Prénom"
                 rules={[
-                  {
-                    required: true,
-                    message: "Veuillez entrer le nom",
-                  },
+                  { required: true, message: "Veuillez entrer le prénom" },
                 ]}
               >
                 <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
-
               </Form.Item>
             </Col>
           </Row>
@@ -260,7 +242,7 @@ const AddMemberForm = () => {
                     Sélectionner un grade
                   </Option>
                   {grades.map((grade) => (
-                    <Option key={grade.NomWWGradeFr} value={grade.NomWWGradeFr}>
+                    <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
                       {grade.NomWWGradeFr}
                     </Option>
                   ))}
@@ -291,7 +273,7 @@ const AddMemberForm = () => {
                     Sélectionner une adresse
                   </Option>
                   {addressData.map((address) => (
-                    <Option key={address.AdresseID} value={address.AdresseID}>
+                    <Option key={address.IDAdresse} value={address.IDAdresse}>
                       {address.AdresseComplete}
                     </Option>
                   ))}
@@ -318,7 +300,7 @@ const AddMemberForm = () => {
                     Sélectionner un service
                   </Option>
                   {services.map((service) => (
-                    <Option key={service.ServiceID} value={service.ServiceID}>
+                    <Option key={service.IDService} value={service.IDService}>
                       {service.NomServiceFr}
                     </Option>
                   ))}
@@ -329,16 +311,16 @@ const AddMemberForm = () => {
 
           {selectedServiceDetails && (
             <div>
-              <p>ID du Service: {selectedServiceDetails.ServiceID}</p>
+              <p>ID du Service: {selectedServiceDetails.IDService}</p>
               <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
               <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
               <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
               <p>Email du Chef de Service: {selectedServiceDetails.EmailChefService}</p>
-              <p>Nom du Departement: {selectedServiceDetails.NomDepartementFr}</p>
-              <p>Nom Chef du Departement: {selectedServiceDetails.NomChefDepartement}</p>
+              <p>Nom du Departement: { selectedServiceDetails.NomDepartementFr}</p>
+              <p>Nom Chef du Departement: { selectedServiceDetails.NomChefDepartement}</p>
               <p>Prenom Chef du Département: {selectedServiceDetails.PrenomChefDepartement}</p>
-              <p>Email Chef du Département:{selectedServiceDetails.EmailChefDepartement}</p>
-
+              <p>Email Chef du Département:{ selectedServiceDetails.EmailChefDepartement}</p>
+           
             </div>
           )}
 
