@@ -50,6 +50,8 @@ const AddMemberForm = () => {
     fetchData();
   }, []);
 
+  // RECUPERATION DES DETAILS DE SERVICES
+
   const handleServiceSelection = async (IDService) => {
     try {
       const response = await axios.get(
@@ -66,44 +68,38 @@ const AddMemberForm = () => {
     }
   };
 
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      let siFrancais, siPersonnel;
-
-      // Mapper la valeur de langue
-      if (values.langue === "fr") {
-        siFrancais = true;
-      } else if (values.langue === "nl") {
-        siFrancais = false;
-      }
-
       // Mapper la valeur de siPersonnel
-      siPersonnel = !!values.siPersonnel;
-      console.log(values);
+      const siPersonnel = !!values.siPersonnel;
+  
+      // Mapper la valeur de siFrancais
+      const siFrancais = values.langue === "fr";
+  
       // Objet avec les valeurs du formulaire
       const formData = {
-        NomPersonne: values.NomPersonne,
-        PrenomPersonne: values.PrenomPersonne,
-        Email: values.Email,
-        TelPro: values.TelPro,
-        DateEntree: values.DateEntree,
-        NomWWGradeFr: values.NomWWGradeFr, // Utilisation values.id
-        Adresse: values.IDAdresse, // Utilisation values.id
-        Service: values.IDService, // Utilisation values.id
-        SiFrancais: values.siFrancais,
-        SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
-
+        NomPersonne: values.nom,
+        PrenomPersonne: values.prenom,
+        Email: values.email,
+        TelPro: values.telephone,
+        DateEntree: values.dateEntree,
+        NomWWGradeFr: values.grade,
+        Adresse: values.adresse,
+        Service: values.service,
+        SiFrancais: siFrancais,
+        SiTypePersonnel: siTypePersonnel ? 'Oui' : 'Non',
       };
-
+  
       // Envoyer la requête POST à l'API avec les données du formulaire
       const response = await axios.post('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-
+  
       // Vérifier si la requête a réussi
       if (!response.formData) {
         throw new Error("Erreur lors de l'envoi des données");
       }
-
+  
       console.log("Nouveau membre ajouté avec succès");
     } catch (error) {
       console.error("Erreur:", error);
@@ -111,6 +107,9 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
+  
+
+
 
   return (
     <div
@@ -146,27 +145,27 @@ const AddMemberForm = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="siPersonnel"
-                label="Si personnel"
+                name="siTypePersonnel"
+                label="Personnel"
                 initialValue={false}
-                rules={[{ required: true, message: 'Veuillez choisir si le membre est personnel' }]}
+                rules={[{ required: true, message: "Veuillez choisir si le membre est personnel" }]}
               >
                 <Radio.Group>
                   <Radio value={true}>Oui</Radio>
                   <Radio value={false}>Non</Radio>
                 </Radio.Group>
               </Form.Item>
-            </Col>
-            <Col span={12}>
+              </Col>
+              <Col span={12}>
               <Form.Item
-                name="langue"
-                label="Langue"
-                initialValue="fr"
-                rules={[{ required: true, message: 'Veuillez choisir la langue' }]}
+                name="siFrancais"
+                label="Français"
+                initialValue={true} // Modifiez ceci en fonction de votre logique par défaut
+                rules={[{ required: true, message: "Veuillez choisir la langue" }]}
               >
                 <Radio.Group>
-                  <Radio value="fr">Français</Radio>
-                  <Radio value="nl">Néerlandais</Radio>
+                  <Radio value={true}>Oui</Radio>
+                  <Radio value={false}>Non</Radio>
                 </Radio.Group>
               </Form.Item>
 
@@ -226,16 +225,15 @@ const AddMemberForm = () => {
             <Col span={12}>
               <Form.Item
                 name="dateEntree"
-                label="Date d'entrée"
+                label="Date"
                 rules={[{ required: true, message: 'Veuillez choisir la date d\'entrée' }]}
               >
-                <ConfigProvider locale={frFR}>
+                
                   <DatePicker
                     defaultValue={dayjs()}
-                    format="DD/MM/YYYY" // Format d'affichage personnalisé
                     style={{ width: "100%" }}
                   />
-                </ConfigProvider>
+                
               </Form.Item>
 
             </Col>
