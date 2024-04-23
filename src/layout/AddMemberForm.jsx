@@ -61,16 +61,16 @@ const AddMemberForm = () => {
       // Mapper la valeur de siPersonnel
       siPersonnel = !!values.siPersonnel;
 
-      // Créer un objet avec les valeurs du formulaire
+      // Objet avec les valeurs du formulaire
       const formData = {
         NomPersonne: values.NomPersonne,
         PrenomPersonne: values.PrenomPersonne,
         Email: values.Email,
         TelPro: values.TelPro,
         DateEntree: values.DateEntree,
-        Grade: values.IDWWGrade, // Utilisation de values.grade au lieu de values.id
-        Adresse: values.adresse, // Utilisation de values.adresse au lieu de values.id
-        Service: values.IDService, // Utilisation de values.service au lieu de values.id
+        Grade: values.IDWWGrade, // Utilisation values.id
+        Adresse: values.IDAdresse, // Utilisation values.id
+        Service: values.IDService, // Utilisation values.id
         SiFrancais: values.siFrancais,
         SiTypePersonnel: values.SiTypePersonnel ? 'Oui' : 'Non',
        
@@ -78,9 +78,9 @@ const AddMemberForm = () => {
 
       // Envoyer la requête PUT à l'API avec les données du formulaire
       const response = await axios.put('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
-
+        
       // Vérifier si la requête a réussi
-      if (!response.data) {
+      if (!response.formData) {
         throw new Error('Erreur lors de l\'envoi des données');
       }
 
