@@ -171,8 +171,19 @@ const AddMemberForm = () => {
                 label="Prénom"
                 rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
               >
-                <Input id="prenom" style={{ textTransform: 'uppercase' }} autoComplete="off" />
+                <Input
+                  id="prenom"
+                  style={{ textTransform: 'capitalize' }}
+                  autoComplete="off"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length > 0) {
+                      e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
+                    }
+                  }}
+                />
               </Form.Item>
+
             </Col>
           </Row>
           <Row gutter={16}>
