@@ -1,56 +1,55 @@
 import React from "react";
-import Button from "@mui/material/Button"; // Importez le bouton MUI
-
-
+import Button from "@mui/material/Button";
+import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Importez l'icône de téléchargement de fichier
 import "../index.css"; // Importez le fichier CSS
 
 const Export = ({ personnes, className }) => {
   const generateCsvData = () => {
     const columns = [
       // { field: 'IDPersonne', headerName: 'ID', width: 100 }, PAS BESOIND DE ID DANS L'EXPORT
-      { field: "NomPersonne", headerName: "NOM", width: 150 },
-      { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
-      { field: "SiFrancais", headerName: "RÔLE", width: 150 },
-      { field: "Email", headerName: "E-mail", width: 200 },
-      { field: "DateEntree", headerName: "ENTREE SERVICE", width: 200 },
-      { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 150 },
-      { field: "NomWWGradeFr", headerName: "GRADE", width: 150 },
-      { field: "NomServiceNl", headerName: "AFFECTATION (nl)", width: 150 },
-      { field: "NomServiceFr", headerName: "AFFECTATION", width: 150 },
-      { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 150 },
-      { field: "NomRueFr", headerName: "LOCALISATION", width: 150 },
-      { field: "Numero", headerName: "N°", width: 100 },
+      { field: "NomPersonne", headerName: "NOM", width: 250 },
+      { field: "PrenomPersonne", headerName: "PRENOM", width: 250 },
+      { field: "SiFrancais", headerName: "RÔLE", width: 250 },
+      { field: "Email", headerName: "E-mail", width: 250 },
+      { field: "DateEntree", headerName: "ENTREE SERVICE", width: 250 },
+      { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 250 },
+      { field: "NomWWGradeFr", headerName: "GRADE", width: 250 },
+      { field: "NomServiceNl", headerName: "AFFECTATION (nl)", width: 250 },
+      { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
+      { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 250 },
+      { field: "NomRueFr", headerName: "LOCALISATION", width: 250 },
+      { field: "Numero", headerName: "N°", width: 150 },
       {
         field: "NomChefService",
         headerName: "NOM CHEF DU SERVICE",
-        width: 200,
+        width: 250,
       },
       {
         field: "PrenomChefService",
         headerName: "PRENOM CHEF DU SERVICE",
-        width: 200,
+        width: 250,
       },
       {
         field: "EmailChefService",
         headerName: "E-MAIL CHEF DU SERVICE",
-        width: 200,
+        width: 250,
       },
-      { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 150 },
-      { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 150 },
+      { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 250 },
+      { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 250 },
       {
         field: "NomChefDepartement",
         headerName: "NOM CHEF DEPARTEMENT",
-        width: 200,
+        width: 250,
       },
       {
         field: "PrenomChefDepartement",
         headerName: "PRENOM CHEF DEPARTEMENT",
-        width: 200,
+        width: 250,
       },
       {
         field: "EmailChefDepartement",
         headerName: "E-MAIL CHEF DEPARTEMENT",
-        width: 200,
+        width: 250,
       },
       { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
       { field: "TelPro", headerName: "TEL", width: 150 },
@@ -67,30 +66,32 @@ const Export = ({ personnes, className }) => {
 
     const rows = filteredRows
       .map((item) =>
-        columns.map((column) => `"${item[column.field]}"`).join(",")
+        columns.map((column) => item[column.field]).join(";")
       )
       .join("\n");
 
-    return headers + rows;
-  };
+   // Création du Blob avec le type "text/csv;charset=utf-8"
+   const blob = new Blob([headers, rows], { type: "text/csv;charset=utf-8" });
 
-  const handleExportCsv = () => {
-    const csvData = generateCsvData();
-    const blob = new Blob([csvData], { type: "text/csv" });
-    const csvUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = csvUrl;
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+   return blob;
+ };
 
-  return (
-    <Button className={`bouton-export ${className}`} onClick={handleExportCsv}>
-      Exporter
-    </Button>
-  );
+ const handleExportCsv = () => {
+   const csvBlob = generateCsvData();
+   const csvUrl = window.URL.createObjectURL(csvBlob);
+   const link = document.createElement("a");
+   link.href = csvUrl;
+   link.setAttribute("download", "data.csv");
+   document.body.appendChild(link);
+   link.click();
+   document.body.removeChild(link);
+ };
+
+ return (
+   <Button className={`bouton-export ${className}`} onClick={handleExportCsv}>
+     Exporter
+   </Button>
+ );
 };
 
 export default Export;

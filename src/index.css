@@ -2,26 +2,31 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #246fc0, #8db5d6); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
+  background: linear-gradient(to bottom, #0465ce, #d9e3eb); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
   font-family: Arial, sans-serif; /* Choix d'une police de caractères sans-serif */
   height: 100vh; /* Hauteur à 100% de la fenêtre visible */
-}
+  z-index: 0;
+  
+  }
 
-.container {
- 
-  width: 90%;
-  height: 100vh; /* Pour centrer verticalement */
-  display: flex;
-  justify-content: center; /* Pour centrer horizontalement */
-  align-items: center; /* Pour centrer verticalement */
+
+/* Style pour la barre de défilement */
+.formulaire::-webkit-scrollbar {
+  width: 10px; /* Largeur de la barre de défilement */
   
 }
 
-.custom-header {
-  color: white; /* Couleur du texte pour l'en-tête du tableau */
+/* Style pour la poignée de défilement */
+.formulaire::-webkit-scrollbar-thumb {
+  background-color: #888; /* Couleur de la poignée */
+  border-radius: 5px; /* Bordure arrondie */
+ 
+}
+
+/* Style pour la piste de défilement */
+.formulaire::-webkit-scrollbar-track {
+  background: transparent; /* Couleur de fond de la piste */
 
 }
 
-table {
- z-index: 0;
-}
+
