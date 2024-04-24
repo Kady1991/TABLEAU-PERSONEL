@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, DatePicker, Select, Button, Row, Col, Radio, Space } from 'antd';
+import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
 import axios from 'axios';
-import dayjs from 'dayjs'; // Importe dayjs
+import moment from "moment";
 
 const { Option } = Select;
 
@@ -13,7 +13,7 @@ const AddMemberForm = () => {
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
-  
+
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -49,12 +49,18 @@ const AddMemberForm = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
+      const dateEntree = new Date(values.dateEntree);
+
+      if (isNaN(dateEntree.getTime())) {
+        throw new Error("Date d'entrée invalide");
+      }
+
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
         Email: values.email,
         TelPro: values.telephone,
-        DateEntree: values.dateEntree,
+        DateEntree: dateEntree,
         NomWWGradeFr: values.grade,
         Adresse: values.adresse,
         Service: values.service,
@@ -62,6 +68,7 @@ const AddMemberForm = () => {
         SiTypePersonnel: values.siPersonnel ? 'Oui' : 'Non',
       };
 
+      console.log(formData);
       const response = await axios.post('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
 
       if (!response.data) {
@@ -75,6 +82,9 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
+
+  const dateFormat = "YYYY/MM/DD";
+  const defaultDateFormatted = moment().format(dateFormat);
 
   return (
     <div
@@ -192,7 +202,7 @@ const AddMemberForm = () => {
                 label="Date"
                 rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}
               >
-                <DatePicker style={{ width: "100%" }} />
+                <DatePicker style={{ width: "100%" }} defaultValue={moment(defaultDateFormatted, dateFormat)} format={dateFormat} />
               </Form.Item>
             </Col>
             <Col span={12}>
