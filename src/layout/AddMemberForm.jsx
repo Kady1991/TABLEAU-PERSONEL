@@ -291,7 +291,11 @@ const AddMemberForm = () => {
           </Row>
 
           {selectedServiceDetails && (
-            <div>
+            <div style={{   
+              textAlign:"center",
+              justifyContent:"center",
+              zIndex:"9999"
+             }}>
               {/* <p>ID du Service: {selectedServiceDetails.IDService}</p> */}
               <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
               <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
