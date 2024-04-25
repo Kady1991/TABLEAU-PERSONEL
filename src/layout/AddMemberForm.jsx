@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, DatePicker, Select, Button, Row, Col, Radio, Space } from 'antd';
+import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
 import axios from 'axios';
-import dayjs from 'dayjs'; // Importe dayjs
+
 
 const { Option } = Select;
 
@@ -13,7 +13,7 @@ const AddMemberForm = () => {
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
-  
+
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -49,19 +49,26 @@ const AddMemberForm = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
+      const dateEntree = new Date(values.dateEntree);
+
+      if (isNaN(dateEntree.getTime())) {
+        throw new Error("Date d'entrée invalide");
+      }
+
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
         Email: values.email,
         TelPro: values.telephone,
-        DateEntree: values.dateEntree,
+        DateEntree: dateEntree,
         NomWWGradeFr: values.grade,
-        Adresse: values.adresse,
-        Service: values.service,
+        AdresseID: values.adresse,
+        ServiceID: values.service,
         SiFrancais: values.siFrancais,
-        SiTypePersonnel: values.siPersonnel ? 'Oui' : 'Non',
+        SiTypePersonnel: values.siPersonnel ? true : false,
       };
 
+      console.log(formData);
       const response = await axios.post('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
 
       if (!response.data) {
@@ -75,6 +82,7 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div
@@ -108,14 +116,14 @@ const AddMemberForm = () => {
           }}
           initialValues={{
             siPersonnel: false,
-            siFrancais: 'fr'
+            siFrancais: true,
           }}
         >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="siPersonnel"
-                label="Type Personnel"
+                label="Personnel"
                 rules={[{ required: true, message: "Veuillez choisir si le membre est personnel" }]}
               >
                 <Radio.Group>
@@ -135,14 +143,15 @@ const AddMemberForm = () => {
                 rules={[{ required: true, message: "Veuillez choisir la langue" }]}
               >
                 <Radio.Group>
-                  <Radio value="fr">
+                  <Radio id="fr" value={true}>
                     Fr
                   </Radio>
-                  <Radio value="nl">
+                  <Radio id="nl" value={false}>
                     Nl
                   </Radio>
                 </Radio.Group>
               </Form.Item>
+
             </Col>
           </Row>
           <Row gutter={16}>
@@ -152,8 +161,9 @@ const AddMemberForm = () => {
                 label="Nom"
                 rules={[{ required: true, message: "Veuillez entrer le nom" }]}
               >
-                <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
+                <Input id="nom" style={{ textTransform: 'uppercase' }} autoComplete="off" />
               </Form.Item>
+
             </Col>
             <Col span={12}>
               <Form.Item
@@ -161,8 +171,19 @@ const AddMemberForm = () => {
                 label="Prénom"
                 rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
               >
-                <Input style={{ textTransform: 'uppercase' }} autoComplete="off" />
+                <Input
+                  id="prenom"
+                  style={{ textTransform: 'capitalize' }}
+                  autoComplete="off"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length > 0) {
+                      e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
+                    }
+                  }}
+                />
               </Form.Item>
+
             </Col>
           </Row>
           <Row gutter={16}>
@@ -172,7 +193,7 @@ const AddMemberForm = () => {
                 label="Téléphone"
                 rules={[{ required: false, message: 'Veuillez entrer le numéro de téléphone' }]}
               >
-                <Input />
+                <Input di="telephone" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -181,7 +202,7 @@ const AddMemberForm = () => {
                 label="Email"
                 rules={[{ required: true, message: "Veuillez entrer l'adresse email" }]}
               >
-                <Input />
+                <Input id="email" />
               </Form.Item>
             </Col>
           </Row>
@@ -235,9 +256,9 @@ const AddMemberForm = () => {
                   <Option key="placeholder" value="" disabled>
                     Sélectionner une adresse
                   </Option>
-                  {addressData.map((address) => (
-                    <Option key={address.IDAdresse} value={address.IDAdresse}>
-                      {address.AdresseComplete}
+                  {addressData.map((adresse) => (
+                    <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
+                      {adresse.AdresseComplete}
                     </Option>
                   ))}
                 </Select>
@@ -268,9 +289,14 @@ const AddMemberForm = () => {
               </Form.Item>
             </Col>
           </Row>
+
           {selectedServiceDetails && (
-            <div>
-              <p>ID du Service: {selectedServiceDetails.IDService}</p>
+            <div style={{   
+              textAlign:"center",
+              justifyContent:"center",
+              zIndex:"9999"
+             }}>
+              {/* <p>ID du Service: {selectedServiceDetails.IDService}</p> */}
               <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
               <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
               <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
