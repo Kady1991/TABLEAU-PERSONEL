@@ -83,6 +83,7 @@ const ActionComponent = ({ rowData }) => {
 
   const handleDetailClick = (rowData) => {
     setPersonDetails(rowData);
+    console.log(rowData);
   };
 
   const handleDeleteClick = (itemId, isArchived) => {
