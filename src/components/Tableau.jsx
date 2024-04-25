@@ -39,20 +39,7 @@ function Tableau() {
       });
   };
 
-  const handleEdit = (id) => {
-    // Logique pour l'édition
-    console.log('Edit ID:', id);
-  };
 
-  const handleDelete = (id) => {
-    // Logique pour la suppression
-    console.log('Delete ID:', id);
-  };
-
-  const handleAddService = (id) => {
-    // Logique pour ajouter un service
-    console.log('Add Service ID:', id);
-  };
 
   const columns = [
     { field: "IDPersonne", headerName: "ID", width: 50, hideable: true },
@@ -87,13 +74,14 @@ function Tableau() {
       width: 200,
       sortable: false,
       renderCell: (params) => (
-        <ActionComponent
+        <ActionComponent rowData={params.row} 
           onEdit={() => handleEdit(params.row.id)}
           onAddService={() => handleAddService(params.row.id)}
           onInfo={() => handleInfo(params.row.id)}
           onDelete={() => handleDelete(params.row.id)}
         />
       ),
+      
     },
   ];
 
