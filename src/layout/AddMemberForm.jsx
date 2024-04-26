@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 
@@ -7,6 +7,7 @@ const { Option } = Select;
 const AddMemberForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [grades, setGrades] = useState([]);
   const [services, setServices] = useState([]);
   const [addressData, setAddressData] = useState([]);
@@ -64,15 +65,9 @@ const AddMemberForm = () => {
         month: "2-digit",
         year: "numeric",
       };
-      //const locale = navigator.language;
       const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
         values.dateEntree
       );
-      //const dateEntree = new Date(values.dateEntree.toLocalString());
-      console.log(dateEntree);
-      //if (isNaN(dateEntree.getTime())) {
-      //  throw new Error("Date d'entrée invalide");
-      //}
 
       const formData = {
         NomPersonne: values.nom,
@@ -85,27 +80,32 @@ const AddMemberForm = () => {
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
         SiServicePrincipal: true,
-        SiTypePersonnel: values.siPersonnel ? true : false,
+        SiTypePersonnel: values.siPersonnel,
       };
 
-      console.log(formData);
       const response = await axios.post(
         "https://server-iis.uccle.intra/API_Personne/api/Personne",
         formData
       );
 
-      if (!response.data) {
-        throw new Error("Erreur lors de l'envoi des données");
-      }
+      // Afficher une alerte lorsque l'ajout est réussi
+      alert("Ajout réussi !");
 
-      console.log("Nouveau membre ajouté avec succès");
+      // Fermer le formulaire après l'ajout réussi
+      setFormSubmitted(true);
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error("Erreur lors de la soumission du formulaire:", error);
     } finally {
       setLoading(false);
+      setLoadingData(false);
     }
   };
 
+  if (formSubmitted) {
+    // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
+    return null;
+  }
+  
   return (
     <div
       style={{
@@ -138,7 +138,7 @@ const AddMemberForm = () => {
           }}
           initialValues={{
             siPersonnel: false,
-            siFrancais: true,
+            siFrancais:true,
           }}
         >
           <Row gutter={16}>
@@ -168,13 +168,10 @@ const AddMemberForm = () => {
                 ]}
               >
                 <Radio.Group>
-                  <Radio id="fr" value={true}>
-                    Fr
-                  </Radio>
-                  <Radio id="nl" value={false}>
-                    Nl
-                  </Radio>
+                  <Radio value={true}>FR</Radio>
+                  <Radio value={false}>Nl</Radio>
                 </Radio.Group>
+
               </Form.Item>
             </Col>
           </Row>
@@ -343,43 +340,32 @@ const AddMemberForm = () => {
           {selectedServiceDetails && (
             <div
               style={{
-                textAlign: "center",
-                justifyContent: "center",
-                zIndex: "9999",
+                display: "grid",
+                gridTemplateColumns: "auto auto", // Deux colonnes
+                gap: 1, // Espacement entre les éléments
               }}
             >
-              {/* <p>ID du Service: {selectedServiceDetails.IDService}</p> */}
-              <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
-              <p>
-                Nom du Chef de Service: {selectedServiceDetails.NomChefService}
-              </p>
-              <p>
-                Prénom du Chef de Service:{" "}
-                {selectedServiceDetails.PrenomChefService}
-              </p>
-              <p>
-                Email du Chef de Service:{" "}
-                {selectedServiceDetails.EmailChefService}
-              </p>
-              <p>
-                Nom du Département: {selectedServiceDetails.NomDepartementFr}
-              </p>
-              <p>
-                Nom Chef du Département:{" "}
-                {selectedServiceDetails.NomChefDepartement}
-              </p>
-              <p>
-                Prénom Chef du Département:{" "}
-                {selectedServiceDetails.PrenomChefDepartement}
-              </p>
-              <p>
-                Email Chef du Département:{" "}
-                {selectedServiceDetails.EmailChefDepartement}
-              </p>
+              <div style={{ textAlign: "left" }}>
+                <p>
+                  <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
+                  {selectedServiceDetails.NomChefService}{"  "}
+                  {selectedServiceDetails.PrenomChefService}
+                </p>
+
+                <p>
+                  <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>Chef du Département:</span>{"  "}
+                  {selectedServiceDetails.NomChefDepartement}{" "}
+                  {selectedServiceDetails.PrenomChefDepartement}
+                </p>
+              </div>
+
+
             </div>
           )}
-          <Form.Item style={{ textAlign: "center" }}>
-            <Button type="primary" htmlType="submit" loading={loading}>
+
+
+          <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
+            <Button type="primary" htmlType="submit" loading={loading} style={{ position: "relative", zIndex: "9999" }}>
               Valider
             </Button>
           </Form.Item>

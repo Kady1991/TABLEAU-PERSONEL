@@ -18,8 +18,7 @@ body {
 
 /* Style pour la poignée de défilement */
 .formulaire::-webkit-scrollbar-thumb {
-  background-color: #888; /* Couleur de la poignée */
-  border-radius: 5px; /* Bordure arrondie */
+  background-color: #888; 
  
 }
 

@@ -153,6 +153,7 @@ function Tableau() {
           position: "relative",
           marginTop: "2rem",
           borderRadius: "0.5rem",
+          zIndex: "0",
         }}
       >
         <DataGrid
