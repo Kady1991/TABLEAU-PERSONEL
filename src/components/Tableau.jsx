@@ -49,7 +49,7 @@ function Tableau() {
     {
       field: 'actions',
       headerName: 'Actions' ,
-      width: 50, 
+      width: 150, 
 
       sortable: false,
       renderCell: (params) => (
