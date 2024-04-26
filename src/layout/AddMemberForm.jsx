@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from 'antd';
-import axios from 'axios';
-
+import React, { useState, useEffect } from "react";
+import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -18,13 +17,19 @@ const AddMemberForm = () => {
     setLoadingData(true);
     const fetchData = async () => {
       try {
-        const gradesResponse = await axios.get("https://server-iis.uccle.intra/API_Personne/api/wwgrades");
+        const gradesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/wwgrades"
+        );
         setGrades(gradesResponse.data);
 
-        const servicesResponse = await axios.get("https://server-iis.uccle.intra/API_Personne/api/affectation/services");
+        const servicesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/affectation/services"
+        );
         setServices(servicesResponse.data);
 
-        const addressResponse = await axios.get("https://server-iis.uccle.intra/API_Personne/api/Adresses");
+        const addressResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/Adresses"
+        );
         setAddressData(addressResponse.data);
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -38,38 +43,56 @@ const AddMemberForm = () => {
 
   const handleServiceSelection = async (IDService) => {
     try {
-      const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/affectation/${IDService}`);
+      const response = await axios.get(
+        `https://server-iis.uccle.intra/API_Personne/api/affectation/${IDService}`
+      );
       const serviceDetails = response.data;
       setSelectedServiceDetails(serviceDetails);
     } catch (error) {
-      console.error("Erreur lors de la récupération des détails du service:", error);
+      console.error(
+        "Erreur lors de la récupération des détails du service:",
+        error
+      );
     }
   };
 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const dateEntree = new Date(values.dateEntree);
-
-      if (isNaN(dateEntree.getTime())) {
-        throw new Error("Date d'entrée invalide");
-      }
+      const option = {
+        day: "numeric",
+        month: "2-digit",
+        year: "numeric",
+      };
+      //const locale = navigator.language;
+      const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+        values.dateEntree
+      );
+      //const dateEntree = new Date(values.dateEntree.toLocalString());
+      console.log(dateEntree);
+      //if (isNaN(dateEntree.getTime())) {
+      //  throw new Error("Date d'entrée invalide");
+      //}
 
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
         Email: values.email,
-        TelPro: values.telephone,
+        TelPro: values.telephone == undefined ? null : values.telephone,
         DateEntree: dateEntree,
-        NomWWGradeFr: values.grade,
+        WWGradeID: values.grade,
         AdresseID: values.adresse,
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
+        SiServicePrincipal: true,
         SiTypePersonnel: values.siPersonnel ? true : false,
       };
 
       console.log(formData);
-      const response = await axios.post('https://server-iis.uccle.intra/API_Personne/api/Personne', formData);
+      const response = await axios.post(
+        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        formData
+      );
 
       if (!response.data) {
         throw new Error("Erreur lors de l'envoi des données");
@@ -82,7 +105,6 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <div
@@ -124,15 +146,16 @@ const AddMemberForm = () => {
               <Form.Item
                 name="siPersonnel"
                 label="Personnel"
-                rules={[{ required: true, message: "Veuillez choisir si le membre est personnel" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez choisir si le membre est personnel",
+                  },
+                ]}
               >
                 <Radio.Group>
-                  <Radio value={true}>
-                    Oui
-                  </Radio>
-                  <Radio value={false}>
-                    Non
-                  </Radio>
+                  <Radio value={true}>Oui</Radio>
+                  <Radio value={false}>Non</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -140,7 +163,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="siFrancais"
                 label="Français"
-                rules={[{ required: true, message: "Veuillez choisir la langue" }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir la langue" },
+                ]}
               >
                 <Radio.Group>
                   <Radio id="fr" value={true}>
@@ -151,7 +176,6 @@ const AddMemberForm = () => {
                   </Radio>
                 </Radio.Group>
               </Form.Item>
-
             </Col>
           </Row>
           <Row gutter={16}>
@@ -161,29 +185,34 @@ const AddMemberForm = () => {
                 label="Nom"
                 rules={[{ required: true, message: "Veuillez entrer le nom" }]}
               >
-                <Input id="nom" style={{ textTransform: 'uppercase' }} autoComplete="off" />
+                <Input
+                  id="nom"
+                  style={{ textTransform: "uppercase" }}
+                  autoComplete="off"
+                />
               </Form.Item>
-
             </Col>
             <Col span={12}>
               <Form.Item
                 name="prenom"
                 label="Prénom"
-                rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
+                rules={[
+                  { required: true, message: "Veuillez entrer le prénom" },
+                ]}
               >
                 <Input
                   id="prenom"
-                  style={{ textTransform: 'capitalize' }}
+                  style={{ textTransform: "capitalize" }}
                   autoComplete="off"
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value.length > 0) {
-                      e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
+                      e.target.value =
+                        value.charAt(0).toUpperCase() + value.slice(1);
                     }
                   }}
                 />
               </Form.Item>
-
             </Col>
           </Row>
           <Row gutter={16}>
@@ -191,7 +220,12 @@ const AddMemberForm = () => {
               <Form.Item
                 name="telephone"
                 label="Téléphone"
-                rules={[{ required: false, message: 'Veuillez entrer le numéro de téléphone' }]}
+                rules={[
+                  {
+                    required: false,
+                    message: "Veuillez entrer le numéro de téléphone",
+                  },
+                ]}
               >
                 <Input di="telephone" />
               </Form.Item>
@@ -200,7 +234,12 @@ const AddMemberForm = () => {
               <Form.Item
                 name="email"
                 label="Email"
-                rules={[{ required: true, message: "Veuillez entrer l'adresse email" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer l'adresse email",
+                  },
+                ]}
               >
                 <Input id="email" />
               </Form.Item>
@@ -211,7 +250,12 @@ const AddMemberForm = () => {
               <Form.Item
                 name="dateEntree"
                 label="Date"
-                rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez choisir la date d'entrée",
+                  },
+                ]}
               >
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
@@ -220,7 +264,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="grade"
                 label="Grade"
-                rules={[{ required: false, message: "Veuillez choisir le grade" }]}
+                rules={[
+                  { required: false, message: "Veuillez choisir le grade" },
+                ]}
               >
                 <Select
                   style={{ width: "100%" }}
@@ -245,7 +291,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="adresse"
                 label="Adresse"
-                rules={[{ required: true, message: "Veuillez choisir l'adresse" }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir l'adresse" },
+                ]}
               >
                 <Select
                   style={{ width: "100%" }}
@@ -268,7 +316,9 @@ const AddMemberForm = () => {
               <Form.Item
                 name="service"
                 label="Service"
-                rules={[{ required: true, message: "Veuillez choisir le service" }]}
+                rules={[
+                  { required: true, message: "Veuillez choisir le service" },
+                ]}
               >
                 <Select
                   style={{ width: "100%" }}
@@ -291,20 +341,41 @@ const AddMemberForm = () => {
           </Row>
 
           {selectedServiceDetails && (
-            <div style={{   
-              textAlign:"center",
-              justifyContent:"center",
-              zIndex:"9999"
-             }}>
+            <div
+              style={{
+                textAlign: "center",
+                justifyContent: "center",
+                zIndex: "9999",
+              }}
+            >
               {/* <p>ID du Service: {selectedServiceDetails.IDService}</p> */}
               <p>Nom du Service: {selectedServiceDetails.NomServiceFr}</p>
-              <p>Nom du Chef de Service: {selectedServiceDetails.NomChefService}</p>
-              <p>Prénom du Chef de Service: {selectedServiceDetails.PrenomChefService}</p>
-              <p>Email du Chef de Service: {selectedServiceDetails.EmailChefService}</p>
-              <p>Nom du Département: {selectedServiceDetails.NomDepartementFr}</p>
-              <p>Nom Chef du Département: {selectedServiceDetails.NomChefDepartement}</p>
-              <p>Prénom Chef du Département: {selectedServiceDetails.PrenomChefDepartement}</p>
-              <p>Email Chef du Département: {selectedServiceDetails.EmailChefDepartement}</p>
+              <p>
+                Nom du Chef de Service: {selectedServiceDetails.NomChefService}
+              </p>
+              <p>
+                Prénom du Chef de Service:{" "}
+                {selectedServiceDetails.PrenomChefService}
+              </p>
+              <p>
+                Email du Chef de Service:{" "}
+                {selectedServiceDetails.EmailChefService}
+              </p>
+              <p>
+                Nom du Département: {selectedServiceDetails.NomDepartementFr}
+              </p>
+              <p>
+                Nom Chef du Département:{" "}
+                {selectedServiceDetails.NomChefDepartement}
+              </p>
+              <p>
+                Prénom Chef du Département:{" "}
+                {selectedServiceDetails.PrenomChefDepartement}
+              </p>
+              <p>
+                Email Chef du Département:{" "}
+                {selectedServiceDetails.EmailChefDepartement}
+              </p>
             </div>
           )}
           <Form.Item style={{ textAlign: "center" }}>
