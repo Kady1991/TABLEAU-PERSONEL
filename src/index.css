@@ -30,3 +30,9 @@ body {
 }
 
 
+.MuiDataGrid-root .MuiDataGrid-colCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #c9d7dd; /* Couleur de fond de l'en-tête */
+}
