@@ -2,22 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import AddMemberForm from "../layout/AddMemberForm"; // Importez votre composant Add ici
 import Export from "../layout/Export"; // Importez votre composant ButtonExport ici
-import ActionComponent from "../layout/ActionComponent";
+import Delete from '../layout/Delete';
+import AddService from '../layout/AddService';
 import { Fab } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import "../index.css"; // Importez le fichier CSS
-import styled from 'styled-components';
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false); // État pour contrôler la visibilité du formulaire
-
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
 
   useEffect(() => {
     fetchData();
@@ -31,7 +25,6 @@ function Tableau() {
           ...personne,
           id: personne.IDPersonne,
         }));
-
         setPersonnes(personnesData);
         setLoading(false);
       })
@@ -41,27 +34,39 @@ function Tableau() {
       });
   };
 
-
+  // Filtrer les personnes non archivées
+  const personnesNonArchives = personnes.filter(personne => personne.SiArchive === false || personne.SiArchive === undefined);
 
   const columns = [
-   
+
     { field: "IDPersonne", headerName: "ID", width: 150, hideable: true },
     {
       field: 'actions',
-      headerName: 'Actions' ,
-      width: 250, 
+      headerName: 'Actions',
+      width: 250,
 
       sortable: false,
       renderCell: (params) => (
-        <ActionComponent rowData={params.row} 
-          onEdit={() => handleEdit(params.row.id)}
-          onAddService={() => handleAddService(params.row.id)}
-          onInfo={() => handleInfo(params.row.id)}
-          onDelete={() => handleDelete(params.row.id)}
-        />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Delete
+            IDPersonne={params.row.IDPersonne}
+            PrenomPersonne={params.row.PrenomPersonne}
+            NomPersonne={params.row.NomPersonne}
+            NomServiceFr={params.row.NomServiceFr}
+          />
+          <AddService
+            firstName={params.row.PrenomPersonne}
+            lastName={params.row.NomPersonne}
+            email={params.row.Email}
+            serviceOptions={['Service A', 'Service B', 'Service C']}
+            onServiceAdded={(name, service) => console.log(`Service ajouté pour ${name}: ${service}`)}
+          />
+        </div>
+        
+
       ),
-      
-      
+
+
     },
     { field: "NomPersonne", headerName: "NOM", width: 200, },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
@@ -88,7 +93,7 @@ function Tableau() {
     { field: "Batiment", headerName: "Batiment", width: 100, hide: true },
     { field: "Etage", headerName: "Etage", width: 100, hide: true },
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
-  
+
   ];
 
 
@@ -108,7 +113,7 @@ function Tableau() {
       }}
     >
       <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
-  
+
       <div
         style={{
           height: "75px",
@@ -129,7 +134,7 @@ function Tableau() {
             className="bouton-export"
           />
         </div>
-  
+
         {/* Bouton flottant pour afficher le formulaire */}
         <div style={{ marginRight: "2rem" }}>
           <Fab color="primary" aria-label="add" onClick={() => setShowForm(true)}>
@@ -137,14 +142,14 @@ function Tableau() {
           </Fab>
         </div>
       </div>
-  
+
       {/* Affichage conditionnel du formulaire */}
       {showForm && (
-        <div style={{ }}>
+        <div style={{}}>
           <AddMemberForm />
         </div>
       )}
-  
+
       <div
         style={{
           height: "calc(100% - 75px - 2rem)", // Calcul de la hauteur restante
@@ -156,17 +161,17 @@ function Tableau() {
           zIndex: "0",
         }}
       >
-        <DataGrid
-          rows={personnes}
-          columns={columns}
-          pageSize={10}
-          loading={loading}
-          checkboxSelection
-          disableSelectionOnClick
-        />
+       <DataGrid
+           rows={personnesNonArchives}
+           columns={columns}
+           pageSize={10}
+           loading={loading}
+           checkboxSelection
+           disableSelectionOnClick
+         />
       </div>
     </div>
   );
-  
-};
+}
+
 export default Tableau;
