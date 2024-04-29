@@ -82,19 +82,23 @@ const AddMemberForm = () => {
         SiServicePrincipal: true,
         SiTypePersonnel: values.siPersonnel,
       };
-
+      console.log(formData);
       const response = await axios.post(
         "https://server-iis.uccle.intra/API_Personne/api/Personne",
         formData
       );
 
+      if (!response.data) {
+        throw new Error("Erreur lors de l'envoi des données");
+      }
       // Afficher une alerte lorsque l'ajout est réussi
       alert("Ajout réussi !");
 
+      console.log("Nouveau membre ajouté avec succès");
       // Fermer le formulaire après l'ajout réussi
       setFormSubmitted(true);
     } catch (error) {
-      console.error("Erreur lors de la soumission du formulaire:", error);
+      
     } finally {
       setLoading(false);
       setLoadingData(false);
@@ -105,7 +109,8 @@ const AddMemberForm = () => {
     // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
     return null;
   }
-  
+
+
   return (
     <div
       style={{
