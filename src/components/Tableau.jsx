@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import AddMemberForm from "../layout/AddMemberForm"; // Importez votre composant Add ici
-import Export from "../layout/Export"; // Importez votre composant ButtonExport ici
-import Delete from '../layout/Delete';
-import AddService from '../layout/AddService';
-import { Fab } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import "../index.css"; // Importez le fichier CSS
+import { Fab } from '@mui/material';
+import "../index.css";
+import Export from "../layout/Export";
+import Delete from '../layout/Delete';
+import AddServiceForm from '../layout/AddServiceForm';
+
+
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false); // État pour contrôler la visibilité du formulaire
+
 
   useEffect(() => {
     fetchData();
@@ -48,25 +50,25 @@ function Tableau() {
       sortable: false,
       renderCell: (params) => (
         <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Votre code existant ici */}
+          <AddIcon
+            style={{ color: '#0080ff', cursor: 'pointer' }}
+            onClick={handleAddClick} // Appeler la fonction de gestion de clic
+          />
+
+          {/* Afficher le formulaire si showForm est true */}
+          {showForm && <AddServiceForm />}
+
+
           <Delete
             IDPersonne={params.row.IDPersonne}
             PrenomPersonne={params.row.PrenomPersonne}
             NomPersonne={params.row.NomPersonne}
             NomServiceFr={params.row.NomServiceFr}
-          />
-          <AddService
-            firstName={params.row.PrenomPersonne}
-            lastName={params.row.NomPersonne}
             email={params.row.Email}
-            serviceOptions={['Service A', 'Service B', 'Service C']}
-            onServiceAdded={(name, service) => console.log(`Service ajouté pour ${name}: ${service}`)}
           />
         </div>
-        
-
       ),
-
-
     },
     { field: "NomPersonne", headerName: "NOM", width: 200, },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
@@ -96,6 +98,21 @@ function Tableau() {
 
   ];
 
+  // Fonction pour ouvrir le formulaire
+  const openForm = () => {
+    setShowForm(true);
+  };
+
+  // Fonction pour fermer le formulaire
+  const closeForm = () => {
+    setShowForm(false);
+  };
+
+  // Fonction pour gérer le clic sur l'icône AddIcon
+  const handleAddClick = () => {
+    setShowForm(true); // Afficher le formulaire lors du clic sur l'icône
+  };
+
 
   return (
     <div
@@ -104,7 +121,7 @@ function Tableau() {
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        height: "500px", // Ajout de "px"
+        height: "500px",
         width: "100%",
         display: "flex",
         flexDirection: "column",
@@ -124,7 +141,7 @@ function Tableau() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginTop: "2rem", // Ajout de marginTop
+          marginTop: "2rem",
         }}
       >
         <div style={{ margin: "2rem" }}>
@@ -135,9 +152,9 @@ function Tableau() {
           />
         </div>
 
-        {/* Bouton flottant pour afficher le formulaire */}
+        {/* Bouton pour afficher le formulaire */}
         <div style={{ marginRight: "2rem" }}>
-          <Fab color="primary" aria-label="add" onClick={() => setShowForm(true)}>
+          <Fab color="primary" aria-label="add" onClick={openForm}>
             <AddIcon />
           </Fab>
         </div>
@@ -145,14 +162,14 @@ function Tableau() {
 
       {/* Affichage conditionnel du formulaire */}
       {showForm && (
-        <div style={{}}>
-          <AddMemberForm />
+        <div>
+          <AddServiceForm onClose={closeForm} />
         </div>
       )}
 
       <div
         style={{
-          height: "calc(100% - 75px - 2rem)", // Calcul de la hauteur restante
+          height: "calc(100% - 75px - 2rem)",
           width: "80%",
           backgroundColor: "white",
           position: "relative",
@@ -161,14 +178,14 @@ function Tableau() {
           zIndex: "0",
         }}
       >
-       <DataGrid
-           rows={personnesNonArchives}
-           columns={columns}
-           pageSize={10}
-           loading={loading}
-           checkboxSelection
-           disableSelectionOnClick
-         />
+        <DataGrid
+          rows={personnesNonArchives}
+          columns={columns}
+          pageSize={10}
+          loading={loading}
+          checkboxSelection
+          disableSelectionOnClick
+        />
       </div>
     </div>
   );
