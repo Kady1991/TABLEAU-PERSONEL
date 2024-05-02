@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { FaUserCog, FaEdit, FaTrashAlt, FaInfoCircle } from 'react-icons/fa';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import "../index.css";
-import Export from "../layout/Export";
-import Delete from '../layout/Delete';
-import AddServiceForm from '../layout/AddServiceForm';
+import Export from "../layout/Export.jsx";
+import AddMemberForm from '../layout/AddMemberForm.jsx';
+import Delete from '../layout/Delete.jsx'; 
 
 
+// import EditForm from '../layout/EditForm.jsx'; 
+// import DetailForm from '../layout/DetailForm.jsx'; 
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false); // État pour contrôler la visibilité du formulaire
-
+  const [showForm, setShowForm] = useState(false);
+  const [showServiceForm, setShowServiceForm] = useState(false); // Renommez ici
+ 
+  
 
   useEffect(() => {
     fetchData();
@@ -36,40 +41,32 @@ function Tableau() {
       });
   };
 
-  // Filtrer les personnes non archivées
-  const personnesNonArchives = personnes.filter(personne => personne.SiArchive === false || personne.SiArchive === undefined);
+  const openForm = () => {
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+  };
+
+ 
+   // Définition de la fonction handleDeleteSuccess
+   const handleDeleteSuccess = (deletedId) => {
+    setPersonnes((prevPersonnes) => prevPersonnes.filter((personne) => personne.id !== deletedId));
+  };
+
+    // Définition de la fonction handleDeleteError
+    const handleDeleteError = (error) => {
+      console.error("Une erreur s'est produite lors de la suppression :", error);
+      // Gérer l'erreur, afficher un message d'erreur, etc.
+    };
+  
+
+  // Fonction pour ouvrir le formulaire de détail
+ 
 
   const columns = [
-
     { field: "IDPersonne", headerName: "ID", width: 150, hideable: true },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 250,
-
-      sortable: false,
-      renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* Votre code existant ici */}
-          <AddIcon
-            style={{ color: '#0080ff', cursor: 'pointer' }}
-            onClick={handleAddClick} // Appeler la fonction de gestion de clic
-          />
-
-          {/* Afficher le formulaire si showForm est true */}
-          {showForm && <AddServiceForm />}
-
-
-          <Delete
-            IDPersonne={params.row.IDPersonne}
-            PrenomPersonne={params.row.PrenomPersonne}
-            NomPersonne={params.row.NomPersonne}
-            NomServiceFr={params.row.NomServiceFr}
-            email={params.row.Email}
-          />
-        </div>
-      ),
-    },
     { field: "NomPersonne", headerName: "NOM", width: 200, },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
     { field: "Email", headerName: "E-mail", width: 250 },
@@ -95,98 +92,106 @@ function Tableau() {
     { field: "Batiment", headerName: "Batiment", width: 100, hide: true },
     { field: "Etage", headerName: "Etage", width: 100, hide: true },
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
-
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 250,
+      sortable: false,
+      renderCell: (params) => (
+        <Delete
+          IDPersonne={params.row.id}
+          onSuccess={handleDeleteSuccess}
+          onError={handleDeleteError}
+        />
+      ),
+    },
+    // Autres colonnes...
   ];
 
-  // Fonction pour ouvrir le formulaire
-  const openForm = () => {
-    setShowForm(true);
-  };
-
-  // Fonction pour fermer le formulaire
-  const closeForm = () => {
-    setShowForm(false);
-  };
-
-  // Fonction pour gérer le clic sur l'icône AddIcon
-  const handleAddClick = () => {
-    setShowForm(true); // Afficher le formulaire lors du clic sur l'icône
-  };
+      
+      
+ 
 
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        height: "500px",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
-
+    <div>
       <div
         style={{
-          height: "75px",
-          width: "80%",
-          backgroundColor: "white",
-          position: "relative",
-          borderRadius: "0.4rem",
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          height: "500px",
+          width: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: "2rem",
+          justifyContent: "center",
         }}
-      >
-        <div style={{ margin: "2rem" }}>
-          <Export
-            personnes={personnes}
+    >
+        <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
+
+<div
+  style={{
+    height: "75px",
+    width: "80%",
+    backgroundColor: "white",
+    position: "relative",
+    borderRadius: "0.4rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: "2rem",
+  }}
+>
+  <div style={{ margin: "2rem" }}>
+    <Export
+      personnes={personnes}
+      columns={columns}
+      className="bouton-export"
+    />
+  </div>
+  <div style={{ marginRight: "2rem" }}>
+    <Fab color="primary" aria-label="add" onClick={openForm}>
+      <AddIcon />
+    </Fab>
+  </div>
+</div>
+{showForm && (
+  <div>
+    <AddMemberForm onClose={closeForm} />
+  </div>
+)}
+<div
+  style={{
+    height: "calc(100% - 75px - 2rem)",
+    width: "80%",
+    backgroundColor: "white",
+    position: "relative",
+    marginTop: "2rem",
+    borderRadius: "0.5rem",
+    zIndex: "0",
+  }}
+>
+          <DataGrid
+            rows={personnes}
             columns={columns}
-            className="bouton-export"
+            pageSize={10}
+            loading={loading}
+            checkboxSelection
+            disableSelectionOnClick
           />
         </div>
-
-        {/* Bouton pour afficher le formulaire */}
-        <div style={{ marginRight: "2rem" }}>
-          <Fab color="primary" aria-label="add" onClick={openForm}>
-            <AddIcon />
-          </Fab>
-        </div>
       </div>
-
-      {/* Affichage conditionnel du formulaire */}
       {showForm && (
         <div>
-          <AddServiceForm onClose={closeForm} />
+          {/* Afficher le formulaire correspondant à l'action */}
+          {/* Vous pouvez passer la personne sélectionnée comme une prop */}
+          {/* Par exemple, pour le formulaire de service */}
+          
+
         </div>
       )}
-
-      <div
-        style={{
-          height: "calc(100% - 75px - 2rem)",
-          width: "80%",
-          backgroundColor: "white",
-          position: "relative",
-          marginTop: "2rem",
-          borderRadius: "0.5rem",
-          zIndex: "0",
-        }}
-      >
-        <DataGrid
-          rows={personnesNonArchives}
-          columns={columns}
-          pageSize={10}
-          loading={loading}
-          checkboxSelection
-          disableSelectionOnClick
-        />
-      </div>
     </div>
   );
 }

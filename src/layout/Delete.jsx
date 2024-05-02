@@ -1,36 +1,38 @@
-import React from 'react';
-import { IconButton, Tooltip } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useState } from 'react';
 import axios from 'axios';
 
+const Delete = () => {
+  const [donnees, setDonnees] = useState([]); // État pour stocker les données de votre API
 
-const Delete = ({ IDPersonne, NomPersonne, PrenomPersonne, email }) => {
-  const handleDelete = async () => {
-    console.log({ IDPersonne, NomPersonne, PrenomPersonne, email }); // Afficher l'objet dans la console
+  const handleClick = async () => {
+    try {
+      // Mettre à jour la valeur de SiArchive dans l'API
+      await axios.put(`https://server-iis.uccle.intra/API_Personne/api/Personne?/${email}`, {
+        SiArchive: true
+      });
 
-    const confirmDelete = window.confirm(`Êtes-vous sûr de supprimer  (ID: ${IDPersonne}) ${NomPersonne} ${PrenomPersonne} ${email}  ?`);
+      // Mettre à jour l'état des données locales si nécessaire
+      // Par exemple, si vous voulez refléter les changements localement sans recharger les données depuis l'API
+      const nouvellesDonnees = [...donnees];
+      nouvellesDonnees.map(donnee => {
+        donnee.SiArchive = true;
+        return donnee;
+      });
+      setDonnees(nouvellesDonnees);
 
-    if (confirmDelete) {
-      try {
-        // Envoyer une requête PUT pour mettre à jour la ressource en l'archivant
-        await axios.put(`https://server-iis.uccle.intra/API_Personne/api/Personne/${email}`, {
-          SiArchive: true // Ajoutez le paramètre SiArchive avec la valeur true
-        });
-        // Gérer la réussite de la mise à jour
-        console.log('Ressource archivée avec succès.');
-      } catch (error) {
-        // Gérer les erreurs éventuelles
-        console.error('Une erreur est survenue lors de l\'archivage de la ressource :', error);
-      }
+      console.log('La valeur de SiArchive a été mise à jour avec succès.');
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la mise à jour de la valeur de SiArchive :', error);
     }
   };
 
   return (
-    <Tooltip title="Supprimer" style={{margin:2}}>
-      <IconButton onClick={handleDelete}>
-        <DeleteIcon  style={{ color: "#ff6600", fontSize: '24px' }}/>
-      </IconButton>
-    </Tooltip>
+    <div>
+      {/* Bouton déclenchant la mise à jour */}
+      <button onClick={handleClick}>
+        Mettre à jour SiArchive à true
+      </button>
+    </div>
   );
 };
 

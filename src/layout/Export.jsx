@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Importez l'icône de téléchargement de fichier
-import "../index.css"; // Importez le fichier CSS
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
 
 const Export = ({ personnes, className }) => {
   const generateCsvData = () => {
@@ -58,7 +58,7 @@ const Export = ({ personnes, className }) => {
       { field: "BatimentNl", headerName: "Batiment(nl)", width: 150 },
     ];
 
-    const headers = columns.map((column) => column.headerName).join(",") + "\n";
+    const headers = columns.map((column) => column.headerName).join(";") + "\n";
     const filteredRows = personnes.filter(
       (personne) =>
         personne.SiArchive === false || personne.SiArchive === undefined
@@ -70,28 +70,41 @@ const Export = ({ personnes, className }) => {
       )
       .join("\n");
 
-   // Création du Blob avec le type "text/csv;charset=utf-8"
-   const blob = new Blob([headers, rows], { type: "text/csv;charset=utf-8" });
+    // Retourner les données CSV sous forme de texte
+    return headers + rows;
+  };
 
-   return blob;
- };
+  const handleExportCsv = () => {
+    const csvData = generateCsvData();
 
- const handleExportCsv = () => {
-   const csvBlob = generateCsvData();
-   const csvUrl = window.URL.createObjectURL(csvBlob);
-   const link = document.createElement("a");
-   link.href = csvUrl;
-   link.setAttribute("download", "data.csv");
-   document.body.appendChild(link);
-   link.click();
-   document.body.removeChild(link);
- };
+    // Créer un objet Blob à partir des données CSV avec le type "text/csv"
+    const blob = new Blob([csvData], { type: "text/csv" });
 
- return (
-   <Button className={`bouton-export ${className}`} onClick={handleExportCsv}>
-     Exporter
-   </Button>
- );
+    // Créer un URL à partir du Blob
+    const csvUrl = window.URL.createObjectURL(blob);
+
+    // Créer un élément d'ancrage pour télécharger le fichier CSV
+    const link = document.createElement("a");
+    link.href = csvUrl;
+    link.setAttribute("download", "data.csv");
+
+    // Simuler un clic sur le lien pour télécharger le fichier
+    link.click();
+
+    // Libérer l'URL de l'objet Blob
+    window.URL.revokeObjectURL(csvUrl);
+  };
+
+  return (
+    <Button
+      variant="contained"
+      startIcon={<FileDownloadIcon />}
+      onClick={handleExportCsv}
+      className={className}
+    >
+      Exporter 
+    </Button>
+  );
 };
 
 export default Export;
