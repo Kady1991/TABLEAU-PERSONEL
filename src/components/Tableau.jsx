@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { FaUserCog, FaEdit, FaTrashAlt, FaInfoCircle } from 'react-icons/fa';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import "../index.css";
 import Export from "../layout/Export.jsx";
 import AddMemberForm from '../layout/AddMemberForm.jsx';
-import Delete from '../layout/Delete.jsx'; 
+import Delete from '../layout/Delete.jsx';
+import FormService from '../layout/FormService.jsx';
 
-
-// import EditForm from '../layout/EditForm.jsx'; 
-// import DetailForm from '../layout/DetailForm.jsx'; 
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [showServiceForm, setShowServiceForm] = useState(false); // Renommez ici
- 
-  
+
+
+
 
   useEffect(() => {
     fetchData();
@@ -49,21 +46,21 @@ function Tableau() {
     setShowForm(false);
   };
 
- 
-   // Définition de la fonction handleDeleteSuccess
-   const handleDeleteSuccess = (deletedId) => {
+
+  // Définition de la fonction handleDeleteSuccess
+  const handleDeleteSuccess = (deletedId) => {
     setPersonnes((prevPersonnes) => prevPersonnes.filter((personne) => personne.id !== deletedId));
   };
 
-    // Définition de la fonction handleDeleteError
-    const handleDeleteError = (error) => {
-      console.error("Une erreur s'est produite lors de la suppression :", error);
-      // Gérer l'erreur, afficher un message d'erreur, etc.
-    };
-  
+  // Définition de la fonction handleDeleteError
+  const handleDeleteError = (error) => {
+    console.error("Une erreur s'est produite lors de la suppression :", error);
+    // Gérer l'erreur, afficher un message d'erreur, etc.
+  };
+
 
   // Fonction pour ouvrir le formulaire de détail
- 
+
 
   const columns = [
     { field: "IDPersonne", headerName: "ID", width: 150, hideable: true },
@@ -98,19 +95,20 @@ function Tableau() {
       width: 250,
       sortable: false,
       renderCell: (params) => (
-        <Delete
-          IDPersonne={params.row.id}
-          onSuccess={handleDeleteSuccess}
-          onError={handleDeleteError}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center', }}>
+      <Delete
+        IDPersonne={params.row.id}
+        onSuccess={handleDeleteSuccess}
+        onError={handleDeleteError}
+      />
+      <FormService /> {/* Ajoutez le composant FormService ici */}
+    </div>
       ),
     },
     // Autres colonnes...
   ];
 
-      
-      
- 
+
 
 
   return (
@@ -128,51 +126,51 @@ function Tableau() {
           alignItems: "center",
           justifyContent: "center",
         }}
-    >
+      >
         <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
 
-<div
-  style={{
-    height: "75px",
-    width: "80%",
-    backgroundColor: "white",
-    position: "relative",
-    borderRadius: "0.4rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: "2rem",
-  }}
->
-  <div style={{ margin: "2rem" }}>
-    <Export
-      personnes={personnes}
-      columns={columns}
-      className="bouton-export"
-    />
-  </div>
-  <div style={{ marginRight: "2rem" }}>
-    <Fab color="primary" aria-label="add" onClick={openForm}>
-      <AddIcon />
-    </Fab>
-  </div>
-</div>
-{showForm && (
-  <div>
-    <AddMemberForm onClose={closeForm} />
-  </div>
-)}
-<div
-  style={{
-    height: "calc(100% - 75px - 2rem)",
-    width: "80%",
-    backgroundColor: "white",
-    position: "relative",
-    marginTop: "2rem",
-    borderRadius: "0.5rem",
-    zIndex: "0",
-  }}
->
+        <div
+          style={{
+            height: "75px",
+            width: "80%",
+            backgroundColor: "white",
+            position: "relative",
+            borderRadius: "0.4rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "2rem",
+          }}
+        >
+          <div style={{ margin: "2rem" }}>
+            <Export
+              personnes={personnes}
+              columns={columns}
+              className="bouton-export"
+            />
+          </div>
+          <div style={{ marginRight: "2rem" }}>
+            <Fab color="primary" aria-label="add" onClick={openForm}>
+              <AddIcon />
+            </Fab>
+          </div>
+        </div>
+        {showForm && (
+          <div>
+            <AddMemberForm onClose={closeForm} />
+          </div>
+        )}
+        <div
+          style={{
+            height: "calc(100% - 75px - 2rem)",
+            width: "80%",
+            backgroundColor: "white",
+            position: "relative",
+            marginTop: "2rem",
+            borderRadius: "0.5rem",
+            zIndex: "0",
+          }}
+        >
           <DataGrid
             rows={personnes}
             columns={columns}
@@ -183,15 +181,7 @@ function Tableau() {
           />
         </div>
       </div>
-      {showForm && (
-        <div>
-          {/* Afficher le formulaire correspondant à l'action */}
-          {/* Vous pouvez passer la personne sélectionnée comme une prop */}
-          {/* Par exemple, pour le formulaire de service */}
-          
 
-        </div>
-      )}
     </div>
   );
 }

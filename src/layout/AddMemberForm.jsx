@@ -14,6 +14,7 @@ const AddMemberForm = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
+
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -93,15 +94,14 @@ const AddMemberForm = () => {
       }
       // Afficher une alerte lorsque l'ajout est réussi
       alert("Ajout réussi !");
-
       console.log("Nouveau membre ajouté avec succès");
       // Fermer le formulaire après l'ajout réussi
       setFormSubmitted(true);
+
     } catch (error) {
-      
+      console.error("Erreur lors de l'envoi des données", error);
     } finally {
       setLoading(false);
-      setLoadingData(false);
     }
   };
 
@@ -143,7 +143,7 @@ const AddMemberForm = () => {
           }}
           initialValues={{
             siPersonnel: false,
-            siFrancais:true,
+            siFrancais: true,
           }}
         >
           <Row gutter={16}>
@@ -370,7 +370,7 @@ const AddMemberForm = () => {
 
 
           <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-            <Button type="primary" htmlType="submit" loading={loading} style={{ position: "relative", zIndex: "9999" }}>
+            <Button onClick={handleSubmit} type="primary" htmlType="submit" loading={loading} style={{ position: "relative", zIndex: "9999" }}>
               Valider
             </Button>
           </Form.Item>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { RiDeleteBin5Line } from "react-icons/ri";
 
-const Delete = () => {
+const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composant
   const [donnees, setDonnees] = useState([]); // État pour stocker les données de votre API
 
   const handleClick = async () => {
@@ -28,10 +29,8 @@ const Delete = () => {
 
   return (
     <div>
-      {/* Bouton déclenchant la mise à jour */}
-      <button onClick={handleClick}>
-        Mettre à jour SiArchive à true
-      </button>
+      {/* Utilisation de l'icône de suppression */}
+      <RiDeleteBin5Line onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:20 }} />
     </div>
   );
 };
