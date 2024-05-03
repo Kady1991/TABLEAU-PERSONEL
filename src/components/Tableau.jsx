@@ -101,7 +101,8 @@ function Tableau() {
         onSuccess={handleDeleteSuccess}
         onError={handleDeleteError}
       />
-      <FormService /> {/* Ajoutez le composant FormService ici */}
+        <FormService personId={params.row.id} />
+
     </div>
       ),
     },
