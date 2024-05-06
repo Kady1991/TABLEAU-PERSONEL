@@ -14,7 +14,6 @@ const AddMemberForm = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
-
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -61,55 +60,62 @@ const AddMemberForm = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const option = {
-        day: "numeric",
-        month: "2-digit",
-        year: "numeric",
-      };
-      const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-        values.dateEntree
-      );
+        const option = {
+            day: "numeric",
+            month: "2-digit",
+            year: "numeric",
+        };
+        const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+            values.dateEntree
+        );
 
-      const formData = {
-        NomPersonne: values.nom,
-        PrenomPersonne: values.prenom,
-        Email: values.email,
-        TelPro: values.telephone == undefined ? null : values.telephone,
-        DateEntree: dateEntree,
-        WWGradeID: values.grade,
-        AdresseID: values.adresse,
-        ServiceID: values.service,
-        SiFrancais: values.siFrancais,
-        SiServicePrincipal: true,
-        SiTypePersonnel: values.siPersonnel,
-      };
-      console.log(formData);
-      const response = await axios.post(
-        "https://server-iis.uccle.intra/API_Personne/api/Personne",
-        formData
-      );
+        const formData = {
+            NomPersonne: values.nom,
+            PrenomPersonne: values.prenom,
+            Email: values.email,
+            TelPro: values.telephone == undefined ? null : values.telephone,
+            DateEntree: dateEntree,
+            WWGradeID: values.grade,
+            AdresseID: values.adresse,
+            ServiceID: values.service,
+            SiFrancais: values.siFrancais,
+            SiServicePrincipal: true,
+            SiTypePersonnel: values.siPersonnel,
+        };
 
-      if (!response.data) {
-        throw new Error("Erreur lors de l'envoi des données");
-      }
-      // Afficher une alerte lorsque l'ajout est réussi
-      alert("Ajout réussi !");
-      console.log("Nouveau membre ajouté avec succès");
-      // Fermer le formulaire après l'ajout réussi
-      setFormSubmitted(true);
+        // Vérification de la soumission du formulaire
+        console.log("Données du formulaire soumises:", formData);
 
+        const response = await axios.post(
+            "https://server-iis.uccle.intra/API_Personne/api/Personne",
+            formData
+        );
+
+        // console.log("Réponse de l'API:", response.data);
+        // if (response.data === "Success") { 
+
+        //     alert("Ajout réussi !");
+
+        //     console.log("Nouveau membre ajouté avec succès");
+            
+            
+        //     setFormSubmitted(true);
+        // } else {
+        //     throw new Error("Erreur lors de l'envoi des données");
+        // }
     } catch (error) {
-      console.error("Erreur lors de l'envoi des données", error);
+        console.error("Erreur lors de l'envoi des données", error);
+        // Afficher une alerte en cas d'erreur
+        alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   if (formSubmitted) {
     // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
     return null;
   }
-
 
   return (
     <div
@@ -176,7 +182,6 @@ const AddMemberForm = () => {
                   <Radio value={true}>FR</Radio>
                   <Radio value={false}>Nl</Radio>
                 </Radio.Group>
-
               </Form.Item>
             </Col>
           </Row>
@@ -353,27 +358,34 @@ const AddMemberForm = () => {
               <div style={{ textAlign: "left" }}>
                 <p>
                   <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
-                  {selectedServiceDetails.NomChefService}{"  "}
+                  {selectedServiceDetails.NomChefService}
+                  {"  "}
                   {selectedServiceDetails.PrenomChefService}
                 </p>
 
                 <p>
-                  <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>Chef du Département:</span>{"  "}
+                  <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                    Chef du Département:
+                  </span>
+                  {"  "}
                   {selectedServiceDetails.NomChefDepartement}{" "}
                   {selectedServiceDetails.PrenomChefDepartement}
                 </p>
               </div>
-
-
             </div>
           )}
 
+<Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
+  <Button
+    type="primary"
+    htmlType="submit"
+    loading={loading}
+    style={{ position: "relative", zIndex: "9999" }}
+  >
+    Valider
+  </Button>
+</Form.Item>
 
-          <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-            <Button onClick={handleSubmit} type="primary" htmlType="submit" loading={loading} style={{ position: "relative", zIndex: "9999" }}>
-              Valider
-            </Button>
-          </Form.Item>
         </Form>
       )}
     </div>
