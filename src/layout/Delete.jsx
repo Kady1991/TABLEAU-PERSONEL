@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { RiDeleteBin5Line } from "react-icons/ri";
+import { MdDeleteForever } from "react-icons/md";
 
 const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composant
   const [donnees, setDonnees] = useState([]); // État pour stocker les données de votre API
@@ -30,7 +30,7 @@ const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composa
   return (
     <div>
       {/* Utilisation de l'icône de suppression */}
-      <RiDeleteBin5Line onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:"20px",marginTop:20 }} />
+      <MdDeleteForever title='archiver' onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:"20px", }} />
     </div>
   );
 };

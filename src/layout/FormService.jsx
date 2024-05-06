@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
-import { MdWorkHistory } from "react-icons/md";
+import { BsBuildingCheck } from "react-icons/bs";
 import axios from 'axios';
 
 const { Option } = Select;
@@ -115,7 +115,7 @@ const FormService = ({ personId }) => {
 
     return (
     <>
-        <MdWorkHistory style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB', margin:5 }} onClick={handleOpenModal} />
+        <BsBuildingCheck title='ajouter un service' style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB' }} onClick={handleOpenModal} />
         <Modal
             title="Ajouter un Service supplémentaire"
             open={isModalVisible}

@@ -7,7 +7,8 @@ import Export from "../layout/Export.jsx";
 import AddMemberForm from '../layout/AddMemberForm.jsx';
 import Delete from '../layout/Delete.jsx';
 import FormService from '../layout/FormService.jsx';
-import Detail from '../layout/Detail.jsx'
+import Detail from '../layout/Detail.jsx';
+import Edit from '../layout/Edit.jsx';
 
 
 function Tableau() {
@@ -53,6 +54,7 @@ function Tableau() {
     setPersonnes((prevPersonnes) => prevPersonnes.filter((personne) => personne.id !== deletedId));
   };
 
+
   // Définition de la fonction handleDeleteError
   const handleDeleteError = (error) => {
     console.error("Une erreur s'est produite lors de la suppression :", error);
@@ -60,16 +62,41 @@ function Tableau() {
   };
 
 
-  // Fonction pour ouvrir le formulaire de détail
+  // Define handleClick function
+  const handleClick = () => {
+    // Add your click handling logic here
+  };
+
+
+
 
 
   const columns = [
-    { field: "IDPersonne", headerName: "ID", width: 150, hideable: true },
+    { field: "IDPersonne", headerName: "ID", width: 50, hideable: true },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 250,
+      sortable: false,
+      headerAlign: 'center', // Centrer horizontalement le titre du header
+      headerClassName: 'header-center', // Ajouter une classe pour centrer verticalement le titre du header
+      renderCell: (params) => (
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', margin:5 }}>
+          <FormService personId={params.row.id} />
+          <Detail onClick={handleClick} rowData={params.row.data} />
+          <Edit />
+          <Delete IDPersonne={params.row.id} onSuccess={handleDeleteSuccess} onError={handleDeleteError} />
+        </div>
+
+      ),
+
+    },
     { field: "NomPersonne", headerName: "NOM", width: 200, },
-    { field: "PrenomPersonne", headerName: "PRENOM", width: 150 },
+    { field: "PrenomPersonne", headerName: "PRENOM", width: 200 },
     { field: "Email", headerName: "E-mail", width: 250 },
     { field: "TelPro", headerName: "TEL", width: 150 },
-    { field: "SiFrancais", headerName: "RÔLE", width: 100, hide: true },
+    { field: "SiFrancais", headerName: "RÔLE", width: 150, hide: true },
     { field: "DateEntree", headerName: "ENTREE SERVICE", width: 200, hide: true },
     { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200, hide: true },
     { field: "NomWWGradeFr", headerName: "GRADE", width: 200, hide: true },
@@ -90,24 +117,7 @@ function Tableau() {
     { field: "Batiment", headerName: "Batiment", width: 100, hide: true },
     { field: "Etage", headerName: "Etage", width: 100, hide: true },
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 250,
-      sortable: false,
-      renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-          <Delete
-            IDPersonne={params.row.id}
-            onSuccess={handleDeleteSuccess}
-            onError={handleDeleteError}
-          />
-          <FormService personId={params.row.id} />
-          <Detail/>
 
-        </div>
-      ),
-    },
     // Autres colonnes...
   ];
 
