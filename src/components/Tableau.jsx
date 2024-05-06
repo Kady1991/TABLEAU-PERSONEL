@@ -163,16 +163,10 @@ function Tableau() {
             />
           </div>
           <div style={{ marginRight: "2rem" }}>
-            <Fab color="primary" aria-label="add" onClick={openForm}>
-              <AddIcon />
-            </Fab>
-          </div>
+            <AddMemberForm/>
+           </div>
         </div>
-        {showForm && (
-          <div>
-            <AddMemberForm onClose={closeForm} />
-          </div>
-        )}
+       
         <div
           style={{
             height: "calc(100% - 75px - 2rem)",

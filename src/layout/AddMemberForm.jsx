@@ -1,18 +1,20 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
+import { PlusOutlined } from '@ant-design/icons';
+
 
 const { Option } = Select;
 
 const AddMemberForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
   const [grades, setGrades] = useState([]);
   const [services, setServices] = useState([]);
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     setLoadingData(true);
@@ -57,6 +59,7 @@ const AddMemberForm = () => {
     }
   };
 
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -68,7 +71,7 @@ const AddMemberForm = () => {
       const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
         values.dateEntree
       );
-
+  
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
@@ -82,23 +85,21 @@ const AddMemberForm = () => {
         SiServicePrincipal: true,
         SiTypePersonnel: values.siPersonnel,
       };
-
+  
       // Vérification de la soumission du formulaire
       console.log("Données du formulaire soumises:", formData);
-
+  
       const response = await axios.post(
         "https://server-iis.uccle.intra/API_Personne/api/Personne",
         formData
       );
-
+  
       console.log("Réponse de l'API:", response.data);
       if (response.data === "Success") {
-
         alert("Ajout réussi !");
         console.log("Nouveau membre ajouté avec succès");
-
+        setFormSubmitted(true); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
       }
-
     } catch (error) {
       console.error("Erreur lors de l'envoi des données", error);
       // Afficher une alerte en cas d'erreur
@@ -107,282 +108,298 @@ const AddMemberForm = () => {
       setLoading(false);
     }
   };
+  
 
-  if (formSubmitted) {
-    // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
-    return null;
-  }
+
+  const openForm = () => {
+    setIsFormOpen(true);
+  };
+
+ 
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "600px",
-        zIndex: "1",
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-      }}
-    >
-      {loadingData ? (
-        <p>Chargement des données...</p>
-      ) : (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
+    <div>
+      {/* Affiche le bouton pour ouvrir le formulaire */}
+      <Button
+        type="primary"
+        onClick={openForm}
+        icon={<PlusOutlined />}
+      >
+        Créer membre
+      </Button>
+
+      {isFormOpen && (
+        <div
           style={{
-            maxWidth: "600px",
-            width: "100%",
-            padding: "20px",
-            backgroundColor: "#f0f2f5",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-          }}
-          initialValues={{
-            siPersonnel: false,
-            siFrancais: true,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            width: "600px",
+            zIndex: "1",
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
           }}
         >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="siPersonnel"
-                label="Personnel"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez choisir si le membre est personnel",
-                  },
-                ]}
-              >
-                <Radio.Group>
-                  <Radio value={true}>Oui</Radio>
-                  <Radio value={false}>Non</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="siFrancais"
-                label="Français"
-                rules={[
-                  { required: true, message: "Veuillez choisir la langue" },
-                ]}
-              >
-                <Radio.Group>
-                  <Radio value={true}>FR</Radio>
-                  <Radio value={false}>Nl</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="nom"
-                label="Nom"
-                rules={[{ required: true, message: "Veuillez entrer le nom" }]}
-              >
-                <Input
-                  id="nom"
-                  style={{ textTransform: "uppercase" }}
-                  autoComplete="off"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="prenom"
-                label="Prénom"
-                rules={[
-                  { required: true, message: "Veuillez entrer le prénom" },
-                ]}
-              >
-                <Input
-                  id="prenom"
-                  style={{ textTransform: "capitalize" }}
-                  autoComplete="off"
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value.length > 0) {
-                      e.target.value =
-                        value.charAt(0).toUpperCase() + value.slice(1);
-                    }
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="telephone"
-                label="Téléphone"
-                rules={[
-                  {
-                    required: false,
-                    message: "Veuillez entrer le numéro de téléphone",
-                  },
-                ]}
-              >
-                <Input di="telephone" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez entrer l'adresse email",
-                  },
-                ]}
-              >
-                <Input id="email" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="dateEntree"
-                label="Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez choisir la date d'entrée",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="grade"
-                label="Grade"
-                rules={[
-                  { required: false, message: "Veuillez choisir le grade" },
-                ]}
-              >
-                <Select
-                  style={{ width: "100%" }}
-                  allowClear
-                  showSearch
-                  optionFilterProp="children"
-                >
-                  <Option key="placeholder" value="" disabled>
-                    Sélectionner un grade
-                  </Option>
-                  {grades.map((grade) => (
-                    <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                      {grade.NomWWGradeFr}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="adresse"
-                label="Adresse"
-                rules={[
-                  { required: true, message: "Veuillez choisir l'adresse" },
-                ]}
-              >
-                <Select
-                  style={{ width: "100%" }}
-                  allowClear
-                  showSearch
-                  optionFilterProp="children"
-                >
-                  <Option key="placeholder" value="" disabled>
-                    Sélectionner une adresse
-                  </Option>
-                  {addressData.map((adresse) => (
-                    <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
-                      {adresse.AdresseComplete}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="service"
-                label="Service"
-                rules={[
-                  { required: true, message: "Veuillez choisir le service" },
-                ]}
-              >
-                <Select
-                  style={{ width: "100%" }}
-                  allowClear
-                  showSearch
-                  optionFilterProp="children"
-                  onChange={handleServiceSelection}
-                >
-                  <Option key="placeholder" value="" disabled>
-                    Sélectionner un service
-                  </Option>
-                  {services.map((service) => (
-                    <Option key={service.IDService} value={service.IDService}>
-                      {service.NomServiceFr}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {selectedServiceDetails && (
-            <div
+          {loadingData ? (
+            <p>Chargement des données...</p>
+          ) : (
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
               style={{
-                display: "grid",
-                gridTemplateColumns: "auto auto", // Deux colonnes
-                gap: 1, // Espacement entre les éléments
+                maxWidth: "600px",
+                width: "100%",
+                padding: "20px",
+                backgroundColor: "#f0f2f5",
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+              }}
+              initialValues={{
+                siPersonnel: false,
+                siFrancais: true,
               }}
             >
-              <div style={{ textAlign: "left" }}>
-                <p>
-                  <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
-                  {selectedServiceDetails.NomChefService}
-                  {"  "}
-                  {selectedServiceDetails.PrenomChefService}
-                </p>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="siPersonnel"
+                    label="Personnel"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez choisir si le membre est personnel",
+                      },
+                    ]}
+                  >
+                    <Radio.Group>
+                      <Radio value={true}>Oui</Radio>
+                      <Radio value={false}>Non</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="siFrancais"
+                    label="Français"
+                    rules={[
+                      { required: true, message: "Veuillez choisir la langue" },
+                    ]}
+                  >
+                    <Radio.Group>
+                      <Radio value={true}>FR</Radio>
+                      <Radio value={false}>Nl</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="nom"
+                    label="Nom"
+                    rules={[{ required: true, message: "Veuillez entrer le nom" }]}
+                  >
+                    <Input
+                      id="nom"
+                      style={{ textTransform: "uppercase" }}
+                      autoComplete="off"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="prenom"
+                    label="Prénom"
+                    rules={[
+                      { required: true, message: "Veuillez entrer le prénom" },
+                    ]}
+                  >
+                    <Input
+                      id="prenom"
+                      style={{ textTransform: "capitalize" }}
+                      autoComplete="off"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length > 0) {
+                          e.target.value =
+                            value.charAt(0).toUpperCase() + value.slice(1);
+                        }
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="telephone"
+                    label="Téléphone"
+                    rules={[
+                      {
+                        required: false,
+                        message: "Veuillez entrer le numéro de téléphone",
+                      },
+                    ]}
+                  >
+                    <Input di="telephone" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez entrer l'adresse email",
+                      },
+                    ]}
+                  >
+                    <Input id="email" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="dateEntree"
+                    label="Date"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez choisir la date d'entrée",
+                      },
+                    ]}
+                  >
+                    <DatePicker style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="grade"
+                    label="Grade"
+                    rules={[
+                      { required: false, message: "Veuillez choisir le grade" },
+                    ]}
+                  >
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
+                    >
+                      <Option key="placeholder" value="" disabled>
+                        Sélectionner un grade
+                      </Option>
+                      {grades.map((grade) => (
+                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                          {grade.NomWWGradeFr}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="adresse"
+                    label="Adresse"
+                    rules={[
+                      { required: true, message: "Veuillez choisir l'adresse" },
+                    ]}
+                  >
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
+                    >
+                      <Option key="placeholder" value="" disabled>
+                        Sélectionner une adresse
+                      </Option>
+                      {addressData.map((adresse) => (
+                        <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
+                          {adresse.AdresseComplete}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="service"
+                    label="Service"
+                    rules={[
+                      { required: true, message: "Veuillez choisir le service" },
+                    ]}
+                  >
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
+                      onChange={handleServiceSelection}
+                    >
+                      <Option key="placeholder" value="" disabled>
+                        Sélectionner un service
+                      </Option>
+                      {services.map((service) => (
+                        <Option key={service.IDService} value={service.IDService}>
+                          {service.NomServiceFr}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
 
-                <p>
-                  <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
-                    Chef du Département:
-                  </span>
-                  {"  "}
-                  {selectedServiceDetails.NomChefDepartement}{" "}
-                  {selectedServiceDetails.PrenomChefDepartement}
-                </p>
-              </div>
-            </div>
+              {selectedServiceDetails && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "auto auto", // Deux colonnes
+                    gap: 1, // Espacement entre les éléments
+                  }}
+                >
+                  <div style={{ textAlign: "left" }}>
+                    <p>
+                      <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
+                      {selectedServiceDetails.NomChefService}
+                      {"  "}
+                      {selectedServiceDetails.PrenomChefService}
+                    </p>
+
+                    <p>
+                      <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                        Chef du Département:
+                      </span>
+                      {"  "}
+                      {selectedServiceDetails.NomChefDepartement}{" "}
+                      {selectedServiceDetails.PrenomChefDepartement}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  style={{ position: "relative", zIndex: "9999" }}
+                >
+                  Valider
+                </Button>
+              </Form.Item>
+
+            </Form>
           )}
-
-          <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              style={{ position: "relative", zIndex: "9999" }}
-            >
-              Valider
-            </Button>
-          </Form.Item>
-
-        </Form>
+        </div>
       )}
     </div>
   );
