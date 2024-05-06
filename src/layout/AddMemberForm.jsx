@@ -60,53 +60,53 @@ const AddMemberForm = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-        const option = {
-            day: "numeric",
-            month: "2-digit",
-            year: "numeric",
-        };
-        const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-            values.dateEntree
-        );
+      const option = {
+        day: "numeric",
+        month: "2-digit",
+        year: "numeric",
+      };
+      const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+        values.dateEntree
+      );
 
-        const formData = {
-            NomPersonne: values.nom,
-            PrenomPersonne: values.prenom,
-            Email: values.email,
-            TelPro: values.telephone == undefined ? null : values.telephone,
-            DateEntree: dateEntree,
-            WWGradeID: values.grade,
-            AdresseID: values.adresse,
-            ServiceID: values.service,
-            SiFrancais: values.siFrancais,
-            SiServicePrincipal: true,
-            SiTypePersonnel: values.siPersonnel,
-        };
+      const formData = {
+        NomPersonne: values.nom,
+        PrenomPersonne: values.prenom,
+        Email: values.email,
+        TelPro: values.telephone == undefined ? null : values.telephone,
+        DateEntree: dateEntree,
+        WWGradeID: values.grade,
+        AdresseID: values.adresse,
+        ServiceID: values.service,
+        SiFrancais: values.siFrancais,
+        SiServicePrincipal: true,
+        SiTypePersonnel: values.siPersonnel,
+      };
 
-        // Vérification de la soumission du formulaire
-        console.log("Données du formulaire soumises:", formData);
+      // Vérification de la soumission du formulaire
+      console.log("Données du formulaire soumises:", formData);
 
-        const response = await axios.post(
-            "https://server-iis.uccle.intra/API_Personne/api/Personne",
-            formData
-        );
+      const response = await axios.post(
+        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        formData
+      );
 
-        console.log("Réponse de l'API:", response.data);
-        if (response.data === "Success") { 
+      console.log("Réponse de l'API:", response.data);
+      if (response.data === "Success") {
 
-            alert("Ajout réussi !");
-            console.log("Nouveau membre ajouté avec succès");
-            
-        }  
-      
+        alert("Ajout réussi !");
+        console.log("Nouveau membre ajouté avec succès");
+
+      }
+
     } catch (error) {
-        console.error("Erreur lors de l'envoi des données", error);
-        // Afficher une alerte en cas d'erreur
-        alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
+      console.error("Erreur lors de l'envoi des données", error);
+      // Afficher une alerte en cas d'erreur
+      alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   if (formSubmitted) {
     // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
@@ -371,16 +371,16 @@ const AddMemberForm = () => {
             </div>
           )}
 
-<Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-  <Button
-    type="primary"
-    htmlType="submit"
-    loading={loading}
-    style={{ position: "relative", zIndex: "9999" }}
-  >
-    Valider
-  </Button>
-</Form.Item>
+          <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              style={{ position: "relative", zIndex: "9999" }}
+            >
+              Valider
+            </Button>
+          </Form.Item>
 
         </Form>
       )}

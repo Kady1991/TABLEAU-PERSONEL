@@ -12,7 +12,8 @@ const FormService = ({ personId }) => {
     const [addresses, setAddresses] = useState([]);
     const [otherServices, setOtherServices] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [formSubmitted, setFormSubmitted] = useState(false); // Déclaration de formSubmitted
+    const [formSubmitted, setFormSubmitted] = useState(false);
+    const [selectedServiceDetails, setSelectedServiceDetails] = useState(null); // Ajout de l'état pour stocker les détails du service sélectionné
 
 
     useEffect(() => {
@@ -50,7 +51,7 @@ const FormService = ({ personId }) => {
 
         fetchData();
     }, [personId]);
-
+    
     const handleOpenModal = () => {
         setIsModalVisible(true);
     };
@@ -58,6 +59,13 @@ const FormService = ({ personId }) => {
     const handleCloseModal = () => {
         setIsModalVisible(false);
     };
+
+    const handleServiceSelection = (value) => {
+        // Recherche des détails du service sélectionné
+        const selectedService = otherServices.find(service => service.IDService === value);
+        setSelectedServiceDetails(selectedService);
+    };
+
 
     // Logique de soumission du formulaire
     const handleSubmit = async (values) => {
@@ -114,176 +122,205 @@ const FormService = ({ personId }) => {
     }
 
     return (
-    <>
-        <PiBuildingLight title='ajouter un service' style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB' }} onClick={handleOpenModal} />
-        <Modal
-            title="Ajouter un Service supplémentaire"
-            open={isModalVisible}
-            onCancel={handleCloseModal}
-            style={{ textAlign: "center" }}
-            centered
+        <>
+            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '20px', cursor: 'pointer', color: '#1E7FCB' }} onClick={handleOpenModal} />
+            <Modal
+                title="Ajouter un Service supplémentaire"
+                open={isModalVisible}
+                onCancel={handleCloseModal}
+                style={{ textAlign: "center" }}
+                centered
 
 
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
-                }}
             >
-                <Form
-                    onFinish={handleSubmit}
-                    initialValues={personData}
-                    layout="vertical"
+                <div
                     style={{
-                        maxWidth: "800px",
-                        width: "100%",
-                        padding: "20px",
-                        backgroundColor: "#f0f2f5",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
                     }}
                 >
-                    <Row gutter={[16]}>
-                        <Col span={12}>
-                            <Form.Item label="Nom" name="NomPersonne" rules={[{ required: true }]}>
-                                <Input disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item label="Prénom" name="PrenomPersonne" rules={[{ required: true }]}>
-                                <Input disabled />
-                            </Form.Item>
-                        </Col>
+                    <Form
+                        onFinish={handleSubmit}
+                        initialValues={personData}
+                        layout="vertical"
+                        style={{
+                            maxWidth: "800px",
+                            width: "100%",
+                            padding: "20px",
+                            backgroundColor: "#f0f2f5",
+                            borderRadius: "8px",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                        }}
+                    >
+                        <Row gutter={[16]}>
+                            <Col span={12}>
+                                <Form.Item label="Nom" name="NomPersonne" rules={[{ required: true }]}>
+                                    <Input disabled />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item label="Prénom" name="PrenomPersonne" rules={[{ required: true }]}>
+                                    <Input disabled />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={12}>
-                            <Form.Item label="Service principal" name="NomServiceFr" rules={[{ required: true }]}>
-                                <Input disabled />
-                            </Form.Item>
-                        </Col>
+                            <Col span={12}>
+                                <Form.Item label="Service principal" name="NomServiceFr" rules={[{ required: true }]}>
+                                    <Input disabled />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={12}>
-                            <Form.Item label="Téléphone" name="tel" rules={[{ required: true }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item label="E-mail" name="email" rules={[{ required: true, type: 'email' }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                            <Col span={12}>
+                                <Form.Item label="Téléphone" name="tel" rules={[{ required: true }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item label="E-mail" name="email" rules={[{ required: true, type: 'email' }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={12}>
-                            <Form.Item label="Date" name="dateEntree" rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}>
-                                <DatePicker style={{ width: '100%' }} />
-                            </Form.Item>
-                        </Col>
-                        {/* <Col span={16}> */}
-                        <Form.Item
-                            style={{ width: "100%" }}
-                            name="grade"
-                            label="Grade"
-                            rules={[
-                                { required: true, message: "Veuillez choisir le grade" },
-                            ]}
-                        >
-                            <Select
-
-                                allowClear
-                                showSearch
-                                optionFilterProp="children"
-                            >
-                                <Option key="placeholder" value="" disabled>
-                                    Sélectionner un grade
-                                </Option>
-                                {grades.map(grade => (
-                                    <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                                        {grade.NomWWGradeFr}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        {/* </Col> */}
-                        <Form.Item
-                            style={{ width: "100%" }}
-                            name="adresse"
-                            label="Adresse"
-                            rules={[
-                                { required: true, message: "Veuillez choisir l'adresse" },
-                            ]}
-                        >
-                            <Select
+                            <Col span={12}>
+                                <Form.Item label="Date" name="dateEntree" rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}>
+                                    <DatePicker style={{ width: '100%' }} />
+                                </Form.Item>
+                            </Col>
+                           
+                            <Form.Item
                                 style={{ width: "100%" }}
-                                allowClear
-                                showSearch
-                                optionFilterProp="children"
+                                name="grade"
+                                label="Grade"
+                                rules={[
+                                    { required: true, message: "Veuillez choisir le grade" },
+                                ]}
                             >
-                                <Option key="placeholder" value="" disabled>
-                                    Sélectionner une adresse
-                                </Option>
-                                {addresses.map(address => (
-                                    <Option key={address.IDAdresse} value={address.IDAdresse}>
-                                        {address.NomRueFr} {address.NomRueNl}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                                <Select
 
-                        <Form.Item
-                            style={{ width: "100%" }}
-                            name="service"
-                            label="Service"
-                            rules={[
-                                { required: true, message: "Veuillez choisir le service" },
-                            ]}
-                        >
-                            <Select
-                                // style={{ width: "100%" }}
-                                allowClear
-                                showSearch
-                                optionFilterProp="children"
+                                    allowClear
+                                    showSearch
+                                    optionFilterProp="children"
+                                >
+                                    <Option key="placeholder" value="" disabled>
+                                        Sélectionner un grade
+                                    </Option>
+                                    {grades.map(grade => (
+                                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                                            {grade.NomWWGradeFr}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                           
+                            <Form.Item
+                                style={{ width: "100%" }}
+                                name="adresse"
+                                label="Adresse"
+                                rules={[
+                                    { required: true, message: "Veuillez choisir l'adresse" },
+                                ]}
                             >
-                                <Option key="placeholder" value="" disabled>
-                                    Sélectionner un service
-                                </Option>
-                                {otherServices.map(service => (
-                                    <Option key={service.IDService} value={service.IDService}>
-                                        {service.NomServiceFr} {service.NomServiceNl}
+                                <Select
+                                    style={{ width: "100%" }}
+                                    allowClear
+                                    showSearch
+                                    optionFilterProp="children"
+                                >
+                                    <Option key="placeholder" value="" disabled>
+                                        Sélectionner une adresse
                                     </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                                    {addresses.map(address => (
+                                        <Option key={address.IDAdresse} value={address.IDAdresse}>
+                                            {address.NomRueFr} {address.NomRueNl}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
 
-                        <Col span={12}>
-                            <Form.Item label="Français" name="siFrancais" rules={[{ required: true }]}>
-                                <Radio.Group>
-                                    <Radio value={true}>FR</Radio>
-                                    <Radio value={false}>Nl</Radio>
-                                </Radio.Group>
+                            <Form.Item
+                                style={{ width: "100%" }}
+                                name="service"
+                                label="Service"
+                                rules={[
+                                    { required: true, message: "Veuillez choisir le service" },
+                                ]}
+                            >
+                                <Select
+                                    // style={{ width: "100%" }}
+                                    allowClear
+                                    showSearch
+                                    optionFilterProp="children"
+                                    onChange={handleServiceSelection}
+                                >
+                                    <Option key="placeholder" value="" disabled>
+                                        Sélectionner un service
+                                    </Option>
+                                    {otherServices.map(service => (
+                                        <Option key={service.IDService} value={service.IDService}>
+                                            {service.NomServiceFr} {service.NomServiceNl}
+                                        </Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item label="Personnel" name="siPersonnel" rules={[{ required: true }]}>
-                                <Radio.Group>
-                                    <Radio value={true}>Oui</Radio>
-                                    <Radio value={false}>Non</Radio>
-                                </Radio.Group>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Form.Item>
-                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                            <Button style={{ margin: 10 }} type="primary" htmlType="submit">Valider</Button>
-                            <Button onClick={handleCloseModal}>Annuler</Button>
-                        </div>
-                    </Form.Item>
-                </Form>
-            </div>
-        </Modal>
-    </>
-);
+
+                            <Col span={12}>
+                                <Form.Item label="Français" name="siFrancais" rules={[{ required: true }]}>
+                                    <Radio.Group>
+                                        <Radio value={true}>FR</Radio>
+                                        <Radio value={false}>Nl</Radio>
+                                    </Radio.Group>
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item label="Personnel" name="siPersonnel" rules={[{ required: true }]}>
+                                    <Radio.Group>
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+
+                        {selectedServiceDetails && (
+                            <div
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "auto auto", // Deux colonnes
+                                    gap: 1, // Espacement entre les éléments
+                                }}
+                            >
+                                <div style={{ textAlign: "left" }}>
+                                    <p>
+                                        <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
+                                        {selectedServiceDetails.NomChefService}
+                                        {"  "}
+                                        {selectedServiceDetails.PrenomChefService}
+                                    </p>
+
+                                    <p>
+                                        <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                                            Chef du Département:
+                                        </span>
+                                        {"  "}
+                                        {selectedServiceDetails.NomChefDepartement}{" "}
+                                        {selectedServiceDetails.PrenomChefDepartement}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        <Form.Item>
+                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                <Button style={{ margin: 10 }} type="primary" htmlType="submit">Valider</Button>
+                                <Button onClick={handleCloseModal}>Annuler</Button>
+                            </div>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Modal>
+        </>
+    );
 };
 
 

@@ -30,7 +30,7 @@ const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composa
   return (
     <div>
       {/* Utilisation de l'icône de suppression */}
-      <MdDeleteForever title='archiver' onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:"20px", }} />
+      <MdDeleteForever title='Archiver' onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:"20px", }} />
     </div>
   );
 };
