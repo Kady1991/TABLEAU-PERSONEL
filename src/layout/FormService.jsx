@@ -3,60 +3,53 @@ import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 
 import { MdWorkHistory } from "react-icons/md";
 import axios from 'axios';
 
+const { Option } = Select;
+
 const FormService = ({ personId }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [personData, setPersonData] = useState(null);
     const [grades, setGrades] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [otherServices, setOtherServices] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false); // Déclaration de formSubmitted
+
 
     useEffect(() => {
-        const fetchPersonData = async () => {
-            try {
-                const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
-                setPersonData(response.data);
-            } catch (error) {
-                console.error('Erreur lors de la récupération des données de la personne:', error);
+        const fetchData = async () => {
+            if (personId) {
+                try {
+                    const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
+                    setPersonData(personResponse.data);
+                } catch (error) {
+                    console.error('Erreur lors de la récupération des données de la personne:', error);
+                }
             }
-        };
 
-
-        const fetchAddresses = async () => {
-            try {
-                const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Adresses`);
-                setAddresses(response.data);
-            } catch (error) {
-                console.error('Erreur lors de la récupération des adresses:', error);
-            }
-        };
-
-        const fetchOtherServices = async () => {
-            try {
-                const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/affectation/services`);
-                setOtherServices(response.data);
-            } catch (error) {
-                console.error('Erreur lors de la récupération des autres services:', error);
-            }
-        };
-
-
-        const fetchGrades = async () => {
             try {
                 const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/wwgrades`);
                 setGrades(gradesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des grades:', error);
             }
+
+            try {
+                const addressesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Adresses`);
+                setAddresses(addressesResponse.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des adresses:', error);
+            }
+
+            try {
+                const servicesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/affectation/services`);
+                setOtherServices(servicesResponse.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des autres services:', error);
+            }
         };
 
-
-        if (personId) {
-            fetchPersonData();
-        }
+        fetchData();
     }, [personId]);
-
-
-
 
     const handleOpenModal = () => {
         setIsModalVisible(true);
@@ -66,184 +59,232 @@ const FormService = ({ personId }) => {
         setIsModalVisible(false);
     };
 
-    const handleSubmit = (values) => {
-        // Logique de soumission du formulaire
-        console.log(values);
-        handleCloseModal();
+    // Logique de soumission du formulaire
+    const handleSubmit = async (values) => {
+        setLoading(true);
+        setLoading(true);
+        try {
+            const option = {
+                day: "numeric",
+                month: "2-digit",
+                year: "numeric",
+            };
+            const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+                values.dateEntree
+            );
+
+            const formData = {
+                NomPersonne: values.nom,
+                PrenomPersonne: values.prenom,
+                Email: values.email,
+                TelPro: values.telephone == undefined ? null : values.telephone,
+                DateEntree: dateEntree,
+                WWGradeID: values.grade,
+                AdresseID: values.adresse,
+                ServiceID: values.service,
+                SiFrancais: values.siFrancais,
+                SiServicePrincipal: true,
+                SiTypePersonnel: values.siPersonnel,
+            };
+            console.log(formData);
+            const response = await axios.post(
+                "https://server-iis.uccle.intra/API_Personne/api/Personne",
+                formData
+            );
+
+            if (!response.data) {
+                throw new Error("Erreur lors de l'envoi des données");
+            }
+            // Afficher une alerte lorsque l'ajout est réussi
+            alert("Ajout réussi !");
+            console.log("Nouveau membre ajouté avec succès");
+            // Fermer le formulaire après l'ajout réussi
+            setFormSubmitted(true);
+
+        } catch (error) {
+            console.error("Erreur lors de l'envoi des données", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    if (formSubmitted) {
+        // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
+        return null;
+    }
+
     return (
-        <>
-            <MdWorkHistory style={{ fontSize: '20px', cursor: 'pointer' }} onClick={handleOpenModal} />
-            <Modal
-                title="Ajouter un Service supplémentaire"
-                open={isModalVisible}
-                onCancel={handleCloseModal}
-                style={{ textAlign: "center" }}
-                centered
+    <>
+        <MdWorkHistory style={{ fontSize: '20px', cursor: 'pointer' }} onClick={handleOpenModal} />
+        <Modal
+            title="Ajouter un Service supplémentaire"
+            open={isModalVisible}
+            onCancel={handleCloseModal}
+            style={{ textAlign: "center" }}
+            centered
 
 
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
+                }}
             >
-                <div
+                <Form
+                    onFinish={handleSubmit}
+                    initialValues={personData}
+                    layout="vertical"
                     style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
+                        maxWidth: "800px",
+                        width: "100%",
+                        padding: "20px",
+                        backgroundColor: "#f0f2f5",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                     }}
                 >
-                    <Form
-                        onFinish={handleSubmit}
-                        initialValues={personData}
-                        layout="vertical"
-                        style={{
-                            maxWidth: "800px",
-                            width: "100%",
-                            padding: "20px",
-                            backgroundColor: "#f0f2f5",
-                            borderRadius: "8px",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        }}
-                    >
-                        <Row gutter={[16]}>
-                            <Col span={12}>
-                                <Form.Item label="Nom" name="NomPersonne" rules={[{ required: true }]}>
-                                    <Input disabled />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Prénom" name="PrenomPersonne" rules={[{ required: true }]}>
-                                    <Input disabled />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={12}>
-                                <Form.Item label="Service principal" name="NomServiceFr" rules={[{ required: true }]}>
-                                    <Input disabled />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Autre Service" name="Service" rules={[{ required: true }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Téléphone" name="tel" rules={[{ required: true }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="E-mail" name="email" rules={[{ required: true, type: 'email' }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={12}>
-                                <Form.Item label="Date d'entrée" name="dateEntree" rules={[{ required: true }]}>
-                                    <DatePicker style={{ width: '100%' }} />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item
-                                    name="grade"
-                                    label="Grade"
-                                    rules={[
-                                        { required: false, message: "Veuillez choisir le grade" },
-                                    ]}
-                                >
-                                    <Select
-                                        style={{ width: "100%" }}
-                                        allowClear
-                                        showSearch
-                                        optionFilterProp="children"
-                                    >
-                                        <Option key="placeholder" value="" disabled>
-                                            Sélectionner un grade
-                                        </Option>
-                                        {grades.map(grade => (
-                                            <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                                                {grade.NomWWGradeFr}
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </Col>
-                            <Form.Item
-                                name="adresse"
-                                label="Adresse"
-                                rules={[
-                                    { required: true, message: "Veuillez choisir l'adresse" },
-                                ]}
-                            >
-                                <Select
-                                    style={{ width: "100%" }}
-                                    allowClear
-                                    showSearch
-                                    optionFilterProp="children"
-                                >
-                                    <Option key="placeholder" value="" disabled>
-                                        Sélectionner une adresse
-                                    </Option>
-                                    {addresses.map(address => (
-                                        <Option key={address.IDAdresse} value={address.IDAdresse}>
-                                            {address.NomRueFr} {address.NomRueNl}
-                                        </Option>
-                                    ))}
-                                </Select>
+                    <Row gutter={[16]}>
+                        <Col span={12}>
+                            <Form.Item label="Nom" name="NomPersonne" rules={[{ required: true }]}>
+                                <Input disabled />
                             </Form.Item>
-
-                            <Form.Item
-                                name="service"
-                                label="Service"
-                                rules={[
-                                    { required: true, message: "Veuillez choisir le service" },
-                                ]}
-                            >
-                                <Select
-                                    style={{ width: "100%" }}
-                                    allowClear
-                                    showSearch
-                                    optionFilterProp="children"
-                                >
-                                    <Option key="placeholder" value="" disabled>
-                                        Sélectionner un service
-                                    </Option>
-                                    {otherServices.map(service => (
-                                        <Option key={service.IDService} value={service.IDService}>
-                                            {service.NomServiceFr} {service.NomServiceNl}
-                                        </Option>
-                                    ))}
-                                </Select>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Prénom" name="PrenomPersonne" rules={[{ required: true }]}>
+                                <Input disabled />
                             </Form.Item>
+                        </Col>
 
-                            <Col span={12}>
-                                <Form.Item label="Si Français" name="siFrancais" rules={[{ required: true }]}>
-                                    <Radio.Group>
-                                        <Radio value={true}>Oui</Radio>
-                                        <Radio value={false}>Non</Radio>
-                                    </Radio.Group>
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Si Personnel" name="siPersonnel" rules={[{ required: true }]}>
-                                    <Radio.Group>
-                                        <Radio value={true}>Oui</Radio>
-                                        <Radio value={false}>Non</Radio>
-                                    </Radio.Group>
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Form.Item>
-                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Button style={{ margin: 10 }} type="primary" htmlType="submit">Valider</Button>
-                                <Button onClick={handleCloseModal}>Annuler</Button>
-                            </div>
+                        <Col span={12}>
+                            <Form.Item label="Service principal" name="NomServiceFr" rules={[{ required: true }]}>
+                                <Input disabled />
+                            </Form.Item>
+                        </Col>
+
+                        <Col span={12}>
+                            <Form.Item label="Téléphone" name="tel" rules={[{ required: true }]}>
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="E-mail" name="email" rules={[{ required: true, type: 'email' }]}>
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col span={12}>
+                            <Form.Item label="Date" name="dateEntree" rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}>
+                                <DatePicker style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+                        {/* <Col span={16}> */}
+                        <Form.Item
+                            style={{ width: "100%" }}
+                            name="grade"
+                            label="Grade"
+                            rules={[
+                                { required: true, message: "Veuillez choisir le grade" },
+                            ]}
+                        >
+                            <Select
+
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                            >
+                                <Option key="placeholder" value="" disabled>
+                                    Sélectionner un grade
+                                </Option>
+                                {grades.map(grade => (
+                                    <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                                        {grade.NomWWGradeFr}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
-                    </Form>
-                </div>
-            </Modal>
-        </>
-    );
+                        {/* </Col> */}
+                        <Form.Item
+                            style={{ width: "100%" }}
+                            name="adresse"
+                            label="Adresse"
+                            rules={[
+                                { required: true, message: "Veuillez choisir l'adresse" },
+                            ]}
+                        >
+                            <Select
+                                style={{ width: "100%" }}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                            >
+                                <Option key="placeholder" value="" disabled>
+                                    Sélectionner une adresse
+                                </Option>
+                                {addresses.map(address => (
+                                    <Option key={address.IDAdresse} value={address.IDAdresse}>
+                                        {address.NomRueFr} {address.NomRueNl}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
+                        <Form.Item
+                            style={{ width: "100%" }}
+                            name="service"
+                            label="Service"
+                            rules={[
+                                { required: true, message: "Veuillez choisir le service" },
+                            ]}
+                        >
+                            <Select
+                                // style={{ width: "100%" }}
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                            >
+                                <Option key="placeholder" value="" disabled>
+                                    Sélectionner un service
+                                </Option>
+                                {otherServices.map(service => (
+                                    <Option key={service.IDService} value={service.IDService}>
+                                        {service.NomServiceFr} {service.NomServiceNl}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
+                        <Col span={12}>
+                            <Form.Item label="Français" name="siFrancais" rules={[{ required: true }]}>
+                                <Radio.Group>
+                                    <Radio value={true}>FR</Radio>
+                                    <Radio value={false}>Nl</Radio>
+                                </Radio.Group>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Personnel" name="siPersonnel" rules={[{ required: true }]}>
+                                <Radio.Group>
+                                    <Radio value={true}>Oui</Radio>
+                                    <Radio value={false}>Non</Radio>
+                                </Radio.Group>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Form.Item>
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <Button style={{ margin: 10 }} type="primary" htmlType="submit">Valider</Button>
+                            <Button onClick={handleCloseModal}>Annuler</Button>
+                        </div>
+                    </Form.Item>
+                </Form>
+            </div>
+        </Modal>
+    </>
+);
 };
+
 
 export default FormService;
