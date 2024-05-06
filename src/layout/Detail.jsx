@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // Importez useState depuis 'react'
-import { BiDetail } from "react-icons/bi"; // Importez MdDetails depuis 'react-icons/md'
+import { TbListDetails } from "react-icons/tb"; // Importez MdDetails depuis 'react-icons/md'
 import axios from 'axios'; // Importez axios depuis 'axios'
 
 const Detail = ({ onClick, personId }) => {
@@ -29,7 +29,7 @@ const Detail = ({ onClick, personId }) => {
 
     return (
         <div>
-          <BiDetail title='Détails' onClick={handleClick} style={{ cursor: 'pointer', color: '#008000', fontSize: '20px' }} />
+         <TbListDetails  title='Détails' onClick={handleClick} style={{ cursor: 'pointer', color: '#008000', fontSize: '20px' }} />
         </div>
     );
 };

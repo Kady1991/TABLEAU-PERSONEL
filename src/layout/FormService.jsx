@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
-import { BsBuildingCheck } from "react-icons/bs";
+import { PiBuildingLight } from "react-icons/pi";
 import axios from 'axios';
 
 const { Option } = Select;
@@ -115,7 +115,7 @@ const FormService = ({ personId }) => {
 
     return (
     <>
-        <BsBuildingCheck title='ajouter un service' style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB' }} onClick={handleOpenModal} />
+        <PiBuildingLight title='ajouter un service' style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB' }} onClick={handleOpenModal} />
         <Modal
             title="Ajouter un Service supplémentaire"
             open={isModalVisible}
