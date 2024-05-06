@@ -91,18 +91,14 @@ const AddMemberForm = () => {
             formData
         );
 
-        // console.log("Réponse de l'API:", response.data);
-        // if (response.data === "Success") { 
+        console.log("Réponse de l'API:", response.data);
+        if (response.data === "Success") { 
 
-        //     alert("Ajout réussi !");
-
-        //     console.log("Nouveau membre ajouté avec succès");
+            alert("Ajout réussi !");
+            console.log("Nouveau membre ajouté avec succès");
             
-            
-        //     setFormSubmitted(true);
-        // } else {
-        //     throw new Error("Erreur lors de l'envoi des données");
-        // }
+        }  
+      
     } catch (error) {
         console.error("Erreur lors de l'envoi des données", error);
         // Afficher une alerte en cas d'erreur
