@@ -115,7 +115,7 @@ const FormService = ({ personId }) => {
 
     return (
     <>
-        <MdWorkHistory style={{ fontSize: '20px', cursor: 'pointer' }} onClick={handleOpenModal} />
+        <MdWorkHistory style={{ fontSize:'20px', cursor:'pointer', color:'#1E7FCB', margin:5 }} onClick={handleOpenModal} />
         <Modal
             title="Ajouter un Service supplémentaire"
             open={isModalVisible}

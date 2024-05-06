@@ -7,6 +7,7 @@ import Export from "../layout/Export.jsx";
 import AddMemberForm from '../layout/AddMemberForm.jsx';
 import Delete from '../layout/Delete.jsx';
 import FormService from '../layout/FormService.jsx';
+import Detail from '../layout/Detail.jsx'
 
 
 function Tableau() {
@@ -95,15 +96,16 @@ function Tableau() {
       width: 250,
       sortable: false,
       renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center', }}>
-      <Delete
-        IDPersonne={params.row.id}
-        onSuccess={handleDeleteSuccess}
-        onError={handleDeleteError}
-      />
-        <FormService personId={params.row.id} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+          <Delete
+            IDPersonne={params.row.id}
+            onSuccess={handleDeleteSuccess}
+            onError={handleDeleteError}
+          />
+          <FormService personId={params.row.id} />
+          <Detail/>
 
-    </div>
+        </div>
       ),
     },
     // Autres colonnes...

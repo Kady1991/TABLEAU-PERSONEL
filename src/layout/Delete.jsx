@@ -30,7 +30,7 @@ const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composa
   return (
     <div>
       {/* Utilisation de l'icône de suppression */}
-      <RiDeleteBin5Line onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:20 }} />
+      <RiDeleteBin5Line onClick={handleClick} style={{ cursor: 'pointer', color:"red", fontSize:"20px",marginTop:20 }} />
     </div>
   );
 };
