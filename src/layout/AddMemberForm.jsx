@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
-import { PlusOutlined } from '@ant-design/icons';
-
+import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -60,7 +59,6 @@ const AddMemberForm = () => {
     }
   };
 
-
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -72,7 +70,7 @@ const AddMemberForm = () => {
       const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
         values.dateEntree
       );
-  
+
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
@@ -86,20 +84,20 @@ const AddMemberForm = () => {
         SiServicePrincipal: true,
         SiTypePersonnel: values.siPersonnel,
       };
-  
+
       // Vérification de la soumission du formulaire
       console.log("Données du formulaire soumises:", formData);
-  
+
       const response = await axios.post(
         "https://server-iis.uccle.intra/API_Personne/api/Personne",
         formData
       );
-  
+
       console.log("Réponse de l'API:", response.data);
       if (response.data === "Success") {
         alert("Ajout réussi !");
         console.log("Nouveau membre ajouté avec succès");
-        setFormSubmitted(true); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
+        setIsFormOpen(true); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données", error);
@@ -107,25 +105,19 @@ const AddMemberForm = () => {
       alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
     } finally {
       setLoading(false);
+      setIsFormOpen(false);
     }
     setFormSubmitted(true);
   };
-  
 
   const openForm = () => {
     setIsFormOpen(true);
   };
 
- 
-
   return (
     <div>
       {/* Affiche le bouton pour ouvrir le formulaire */}
-      <Button
-        type="primary"
-        onClick={openForm}
-        icon={<PlusOutlined />}
-      >
+      <Button type="primary" onClick={openForm} icon={<PlusOutlined />}>
         Créer membre
       </Button>
 
@@ -202,7 +194,9 @@ const AddMemberForm = () => {
                   <Form.Item
                     name="nom"
                     label="Nom"
-                    rules={[{ required: true, message: "Veuillez entrer le nom" }]}
+                    rules={[
+                      { required: true, message: "Veuillez entrer le nom" },
+                    ]}
                   >
                     <Input
                       id="nom"
@@ -324,7 +318,10 @@ const AddMemberForm = () => {
                         Sélectionner une adresse
                       </Option>
                       {addressData.map((adresse) => (
-                        <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
+                        <Option
+                          key={adresse.IDAdresse}
+                          value={adresse.IDAdresse}
+                        >
                           {adresse.AdresseComplete}
                         </Option>
                       ))}
@@ -336,7 +333,10 @@ const AddMemberForm = () => {
                     name="service"
                     label="Service"
                     rules={[
-                      { required: true, message: "Veuillez choisir le service" },
+                      {
+                        required: true,
+                        message: "Veuillez choisir le service",
+                      },
                     ]}
                   >
                     <Select
@@ -350,7 +350,10 @@ const AddMemberForm = () => {
                         Sélectionner un service
                       </Option>
                       {services.map((service) => (
-                        <Option key={service.IDService} value={service.IDService}>
+                        <Option
+                          key={service.IDService}
+                          value={service.IDService}
+                        >
                           {service.NomServiceFr}
                         </Option>
                       ))}
@@ -369,7 +372,9 @@ const AddMemberForm = () => {
                 >
                   <div style={{ textAlign: "left" }}>
                     <p>
-                      <span style={{ fontWeight: "bold" }}>Chef du Service:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>
+                        Chef du Service:
+                      </span>{" "}
                       {selectedServiceDetails.NomChefService}
                       {"  "}
                       {selectedServiceDetails.PrenomChefService}
@@ -397,7 +402,6 @@ const AddMemberForm = () => {
                   Valider
                 </Button>
               </Form.Item>
-
             </Form>
           )}
         </div>
