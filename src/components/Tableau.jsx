@@ -11,10 +11,7 @@ import Edit from "../layout/Edit.jsx";
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  
 
-
- 
 
   const fetchData = () => {
     fetch("https://server-iis.uccle.intra/API_Personne/api/Personne")
@@ -38,18 +35,18 @@ function Tableau() {
 
   useEffect(() => {
     fetchData();
-  }, []); 
-  
-  const handleUpdatePersonne = (id) => {
-    // Mettez à jour les données locales pour refléter le changement après l'archivage réussi
-    const updatedPersonnes = personnes.map(personne => {
-      if (personne.IDPersonne === id) {
-        return { ...personne, SiArchive: true };
-      }
-      return personne;
-    });
-    setPersonnes(updatedPersonnes);
-  };
+  }, []);
+
+  // const handleUpdatePersonne = (id) => {
+
+  //   const updatedPersonnes = personnes.map(personne => {
+  //     if (personne.IDPersonne === id) {
+  //       return { ...personne, SiArchive: true };
+  //     }
+  //     return personne;
+  //   });
+  //   setPersonnes(updatedPersonnes);
+  // };
 
 
 
@@ -65,7 +62,7 @@ function Tableau() {
   const handleDeleteError = (deletedId) => {
     //  gérer l'erreur lors de la suppression
     console.error(`Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`);
-    
+
   };
 
 
@@ -93,6 +90,7 @@ function Tableau() {
             justifyContent: "center",
             gap: "20px",
             margin: 5,
+
           }}
         >
           <FormService personId={params.row.id} />
@@ -106,10 +104,11 @@ function Tableau() {
             onSuccess={handleDeleteSuccess}
             onError={handleDeleteError} // Assurez-vous de passer cette fonction
           />
-
         </div>
       ),
+
     },
+
     { field: "NomPersonne", headerName: "NOM", width: 200 },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 200 },
     { field: "Email", headerName: "E-mail", width: 250 },
@@ -196,7 +195,7 @@ function Tableau() {
     { field: "Etage", headerName: "Etage", width: 100, hide: true },
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
 
-    // Autres colonnes...
+
   ];
 
   return (
@@ -260,6 +259,9 @@ function Tableau() {
             loading={loading}
             checkboxSelection
             disableSelectionOnClick
+            getRowClassName={(params) =>
+              params.row.SiArchive ? "archive-row" : ""
+            }
           />
         </div>
       </div>

@@ -2,7 +2,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #0465ce, #d9e3eb); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
+  background: linear-gradient(to bottom, #095c83, #d9e3eb); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
   font-family: Arial, sans-serif; /* Choix d'une police de caractères sans-serif */
   height: 100vh; /* Hauteur à 100% de la fenêtre visible */
   z-index: 0;
@@ -21,4 +21,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.archive-row {
+  background-color: #e9eff5; /* ou toute autre couleur grise */
 }

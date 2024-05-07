@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RiInformationLine } from 'react-icons/ri';
+import { GoListOrdered } from "react-icons/go";
 
 const Detail = ({ columnId, data }) => {
     const [showWindow, setShowWindow] = useState(false);
@@ -14,10 +14,10 @@ const Detail = ({ columnId, data }) => {
     return (
         <div>
             {/* Icône d'information */}
-            <RiInformationLine
+            <GoListOrdered
                 title="Voir les détails"
                 onClick={handleClick}
-                style={{ fontSize: 24, cursor: 'pointer' }} // Définit la taille de l'icône et le curseur
+                style={{ fontSize: 20, cursor: 'pointer', marginTop:"20px", color:"green" }} // Définit la taille de l'icône et le curseur
             />
 
             {/* Fenêtre détaillée */}
