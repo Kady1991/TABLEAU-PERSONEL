@@ -13,7 +13,7 @@ const AddMemberForm = () => {
   const [addressData, setAddressData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);  
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     setLoadingData(true);

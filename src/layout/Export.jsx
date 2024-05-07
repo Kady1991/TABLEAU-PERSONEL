@@ -1,7 +1,6 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const Export = ({ personnes, className }) => {
   const generateCsvData = () => {
@@ -9,7 +8,7 @@ const Export = ({ personnes, className }) => {
       // { field: 'IDPersonne', headerName: 'ID', width: 100 }, PAS BESOIND DE ID DANS L'EXPORT
       { field: "NomPersonne", headerName: "NOM", width: 250 },
       { field: "PrenomPersonne", headerName: "PRENOM", width: 250 },
-      { field: "SiFrancais", headerName: "RÔLE", width: 250 },
+      { field: "SiFrancaisSting", headerName: "RÔLE", width: 250 },
       { field: "Email", headerName: "E-mail", width: 250 },
       { field: "DateEntree", headerName: "ENTREE SERVICE", width: 250 },
       { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 250 },
@@ -65,9 +64,7 @@ const Export = ({ personnes, className }) => {
     );
 
     const rows = filteredRows
-      .map((item) =>
-        columns.map((column) => item[column.field]).join(";")
-      )
+      .map((item) => columns.map((column) => item[column.field]).join(";"))
       .join("\n");
 
     // Retourner les données CSV sous forme de texte
@@ -102,7 +99,7 @@ const Export = ({ personnes, className }) => {
       onClick={handleExportCsv}
       className={className}
     >
-      Exporter 
+      Exporter
     </Button>
   );
 };
