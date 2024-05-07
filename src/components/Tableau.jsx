@@ -102,6 +102,7 @@ function Tableau() {
             IDPersonne={params.row.id}
             nomPersonne={params.row.NomPersonne}
             prenomPersonne={params.row.PrenomPersonne}
+            email={params.row.Email}
             onSuccess={handleDeleteSuccess}
             onError={handleDeleteError} // Assurez-vous de passer cette fonction
           />
