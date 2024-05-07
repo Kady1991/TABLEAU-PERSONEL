@@ -15,6 +15,7 @@ const AddMemberForm = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
     setLoadingData(true);
@@ -107,9 +108,9 @@ const AddMemberForm = () => {
     } finally {
       setLoading(false);
     }
+    setFormSubmitted(true);
   };
   
-
 
   const openForm = () => {
     setIsFormOpen(true);
