@@ -122,8 +122,9 @@ const AddMemberForm = () => {
   return (
     <div>
       {/* Affiche le bouton pour ouvrir le formulaire */}
-      <Button  style={{ backgroundColor: "#095c83" }} type="primary" onClick={openForm} icon={<PlusOutlined />}>
-        Créer membre
+      <Button  style={{ backgroundColor: "#095c83", height:"2.4rem", fontStyle:"bold"
+       }} type="primary" onClick={openForm} icon={<PlusOutlined />}>
+        CREER MEMBRE
       </Button >
 
       {isFormOpen && (
