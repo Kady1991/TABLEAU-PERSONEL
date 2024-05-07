@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Add as AddIcon } from "@mui/icons-material";
-import { Fab } from "@mui/material";
 import "../index.css";
 import Export from "../layout/Export.jsx";
 import AddMemberForm from "../layout/AddMemberForm.jsx";
@@ -13,11 +11,10 @@ import Edit from "../layout/Edit.jsx";
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+
+ 
 
   const fetchData = () => {
     fetch("https://server-iis.uccle.intra/API_Personne/api/Personne")
@@ -39,13 +36,23 @@ function Tableau() {
       });
   };
 
-  const openForm = () => {
-    setShowForm(true);
+  useEffect(() => {
+    fetchData();
+  }, []); 
+  
+  const handleUpdatePersonne = (id) => {
+    // Mettez à jour les données locales pour refléter le changement après l'archivage réussi
+    const updatedPersonnes = personnes.map(personne => {
+      if (personne.IDPersonne === id) {
+        return { ...personne, SiArchive: true };
+      }
+      return personne;
+    });
+    setPersonnes(updatedPersonnes);
   };
 
-  const closeForm = () => {
-    setShowForm(false);
-  };
+
+
 
   // Définition de la fonction handleDeleteSuccess
   const handleDeleteSuccess = (deletedId) => {
@@ -55,10 +62,14 @@ function Tableau() {
   };
 
   // Définition de la fonction handleDeleteError
-  const handleDeleteError = (error) => {
-    console.error("Une erreur s'est produite lors de la suppression :", error);
-    // Gérer l'erreur, afficher un message d'erreur, etc.
+  const handleDeleteError = (deletedId) => {
+    //  gérer l'erreur lors de la suppression
+    console.error(`Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`);
+    
   };
+
+
+
 
   // Define handleClick function
   const handleClick = () => {
@@ -85,13 +96,16 @@ function Tableau() {
           }}
         >
           <FormService personId={params.row.id} />
-          <Detail onClick={handleClick} rowData={params.row.data} />
+          <Detail onClick={handleClick} rowData={params.row.id} />
           <Edit />
           <Delete
             IDPersonne={params.row.id}
+            nomPersonne={params.row.NomPersonne}
+            prenomPersonne={params.row.PrenomPersonne}
             onSuccess={handleDeleteSuccess}
-            onError={handleDeleteError}
+            onError={handleDeleteError} // Assurez-vous de passer cette fonction
           />
+
         </div>
       ),
     },
@@ -249,7 +263,7 @@ function Tableau() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default Tableau;

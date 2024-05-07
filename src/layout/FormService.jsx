@@ -105,7 +105,7 @@ const FormService = ({ personId }) => {
             }
             // Afficher une alerte lorsque l'ajout est réussi
             alert("Ajout réussi !");
-            console.log("Nouveau membre ajouté avec succès");
+            console.log("Nouveau service ajouté avec succès");
             // Fermer le formulaire après l'ajout réussi
             setFormSubmitted(true);
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
-import { PlusOutlined } from "@ant-design/icons";
+import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
+
 
 const { Option } = Select;
 
@@ -114,6 +115,10 @@ const AddMemberForm = () => {
     setIsFormOpen(true);
   };
 
+  const closeForm = () => {
+    setIsFormOpen(false);
+  };
+
   return (
     <div>
       {/* Affiche le bouton pour ouvrir le formulaire */}
@@ -124,18 +129,24 @@ const AddMemberForm = () => {
       {isFormOpen && (
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-            width: "600px",
-            zIndex: "1",
             position: "fixed",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
+            zIndex: "9999",
+            backgroundColor: "#fff",
+            padding: "20px",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            borderRadius: "8px",
+            maxWidth: "600px",
+            width: "100%",
           }}
         >
+          {/* croix de la fermeture du formulaire */}
+          <div style={{ textAlign: "right", marginBottom: "20px" }}>
+            <CloseOutlined onClick={closeForm} style={{ cursor: "pointer" }} />
+          </div>
+
           {loadingData ? (
             <p>Chargement des données...</p>
           ) : (
@@ -400,6 +411,9 @@ const AddMemberForm = () => {
                   style={{ position: "relative", zIndex: "9999" }}
                 >
                   Valider
+                </Button>
+                <Button onClick={closeForm} style={{ position: "relative", zIndex: "9999", margin:8 }}>
+                  Annuler
                 </Button>
               </Form.Item>
             </Form>

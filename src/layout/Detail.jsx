@@ -1,35 +1,39 @@
-import React, { useState } from 'react'; // Importez useState depuis 'react'
-import { TbListDetails } from "react-icons/tb"; // Importez MdDetails depuis 'react-icons/md'
-import axios from 'axios'; // Importez axios depuis 'axios'
+import React, { useState } from 'react';
+import { RiInformationLine } from 'react-icons/ri';
 
-const Detail = ({ onClick, personId }) => {
-    const [modalOpen, setModalOpen] = useState(false); // Utilisez useState pour le state modalOpen
+const Detail = ({ columnId, data }) => {
+    const [showWindow, setShowWindow] = useState(false);
+    const [detailData, setDetailData] = useState(null);
 
-    const handleOpenModal = () => {
-        setModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setModalOpen(false);
-    };
-
-    const handleClick = async () => {
-        try {
-            // Effectuez une requête à votre API pour récupérer les détails de la personne
-            const response = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
-            const personDetails = response.data; // Les détails de la personne seront dans response.data
-            
-            // Appelez la fonction onClick avec les détails de la personne
-            onClick(personDetails);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des détails de la personne :', error);
-            // Gérez l'erreur, par exemple afficher un message à l'utilisateur
-        }
+    const handleClick = () => {
+        const columnData = data.find(item => item.id === columnId);
+        setDetailData(columnData);
+        setShowWindow(true);
     };
 
     return (
         <div>
-         <TbListDetails  title='Détails' onClick={handleClick} style={{ cursor: 'pointer', color: '#008000', fontSize: '20px' }} />
+            {/* Icône d'information */}
+            <RiInformationLine
+                title="Voir les détails"
+                onClick={handleClick}
+                style={{ fontSize: 24, cursor: 'pointer' }} // Définit la taille de l'icône et le curseur
+            />
+
+            {/* Fenêtre détaillée */}
+            {showWindow && (
+                <div className="detail-window">
+                    {/* Affichage des détails */}
+                    {detailData && (
+                        <div>
+                            <h2>Détails de la colonne {detailData.id}</h2>
+                            <p>Champ 1: {detailData.field1}</p>
+                            <p>Champ 2: {detailData.field2}</p>
+                            {/* Ajoutez autant de champs que nécessaire */}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

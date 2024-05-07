@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { MdDeleteForever } from "react-icons/md";
 
-const Delete = ({ email }) => { // Ajout de 'email' comme propriété du composant
-  const [donnees, setDonnees] = useState([]); // État pour stocker les données de votre API
-
+const Delete = ({IDPersonne, nomPersonne, prenomPersonne, onSuccess, onError }) => {
   const handleClick = async () => {
+    // Demande de confirmation avant d'archiver la personne
+    const confirmation = window.confirm(`Voulez-vous vraiment archiver cette personne ?\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}`);
+    if (!confirmation) return; // Arrête le processus si l'utilisateur annule
+  
     try {
       // Mettre à jour la valeur de SiArchive dans l'API
-      await axios.put(`https://server-iis.uccle.intra/API_Personne/api/Personne?/${email}`, {
+      await axios.put(`https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`, {
         SiArchive: true
       });
-
-      // Mettre à jour l'état des données locales si nécessaire
-      // Par exemple, si vous voulez refléter les changements localement sans recharger les données depuis l'API
-      const nouvellesDonnees = [...donnees];
-      nouvellesDonnees.map(donnee => {
-        donnee.SiArchive = true;
-        return donnee;
-      });
-      setDonnees(nouvellesDonnees);
-
+  
+      // Si la mise à jour réussit, appeler la fonction onSuccess
+      onSuccess(IDPersonne);
+  
       console.log('La valeur de SiArchive a été mise à jour avec succès.');
     } catch (error) {
+      // Si une erreur se produit, appeler la fonction onError
+      onError(IDPersonne);
+      
+      // Afficher un message d'erreur dans la console
       console.error('Une erreur s\'est produite lors de la mise à jour de la valeur de SiArchive :', error);
     }
   };
