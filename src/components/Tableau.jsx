@@ -9,20 +9,21 @@ import Detail from "../layout/Detail.jsx";
 import Edit from "../layout/Edit.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 
-
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
+  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_Personne/api/Personne";
+  //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
   const fetchData = () => {
-    fetch("https://server-iis.uccle.intra/API_Personne/api/Personne")
+    fetch(linkGetAllPersonnel)
       .then((response) => response.json())
       .then((data) => {
         const personnesData = data.map((personne) => ({
           ...personne,
           id: personne.IDPersonne,
+          personneID: personne.PersonneID,
         }));
+        
         setPersonnes(personnesData);
         setLoading(false);
       })
@@ -44,7 +45,6 @@ function Tableau() {
     fetchData();
   }, [personnes]); // This will trigger the effect whenever personnes state changes
 
-
   // Définition de la fonction handleDeleteSuccess
   const handleDeleteSuccess = (deletedId) => {
     setPersonnes((prevPersonnes) =>
@@ -55,21 +55,24 @@ function Tableau() {
   // Définition de la fonction handleDeleteError
   const handleDeleteError = (deletedId) => {
     //  gérer l'erreur lors de la suppression
-    console.error(`Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`);
-
+    console.error(
+      `Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`
+    );
   };
-
 
   const handleRestoreSuccess = (restoredEmail) => {
     // Mettez ici le code à exécuter en cas de succès de la restauration
-    console.log(`La personne avec l'email ${restoredEmail} a été restaurée avec succès.`);
+    console.log(
+      `La personne avec l'email ${restoredEmail} a été restaurée avec succès.`
+    );
   };
-  
+
   const handleRestoreError = (restoredEmail) => {
     // Mettez ici le code à exécuter en cas d'erreur lors de la restauration
-    console.error(`Une erreur s'est produite lors de la restauration de la personne avec l'email ${restoredEmail}.`);
+    console.error(
+      `Une erreur s'est produite lors de la restauration de la personne avec l'email ${restoredEmail}.`
+    );
   };
-  
 
   // Define handleClick function
   const handleClick = () => {
@@ -96,14 +99,13 @@ function Tableau() {
             visibility: params.row.SiArchive === false ? "visible" : "hidden",
           }}
         >
-           {/* Autres éléments d'action */}
-    
-  
-          <FormService personId={params.row.id} />
-          <Detail onClick={handleClick} rowData={params.row.id} />
+          {/* Autres éléments d'action */}
+
+          <FormService personId={params.row.personneID} />
+          <Detail onClick={handleClick} rowData={params.row.personneID} />
           <Edit />
           <Delete
-            IDPersonne={params.row.id}
+            IDPersonne={params.row.personneID}
             nomPersonne={params.row.NomPersonne}
             prenomPersonne={params.row.PrenomPersonne}
             email={params.row.Email}
@@ -206,8 +208,6 @@ function Tableau() {
     { field: "Batiment", headerName: "Batiment", width: 100, hide: true },
     { field: "Etage", headerName: "Etage", width: 100, hide: true },
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
-
-
   ];
 
   return (
@@ -278,7 +278,7 @@ function Tableau() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Tableau;
