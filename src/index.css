@@ -17,11 +17,8 @@ body {
   background-color: #b6d2df; /* Couleur de fond de l'en-tête */
 }
 
-.header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 .archive-row {
-  background-color: #e9eff5; /* ou toute autre couleur grise */
+  color: #ff0202; /* ou toute autre couleur grise */
+  background-color: #b6d2df; /* Couleur de fond de l'en-tête */
 }

@@ -7,6 +7,8 @@ import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import Edit from "../layout/Edit.jsx";
+import RestoreAction from "../layout/RestoreAction.jsx";
+
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
@@ -37,18 +39,10 @@ function Tableau() {
     fetchData();
   }, []);
 
-  // const handleUpdatePersonne = (id) => {
-
-  //   const updatedPersonnes = personnes.map(personne => {
-  //     if (personne.IDPersonne === id) {
-  //       return { ...personne, SiArchive: true };
-  //     }
-  //     return personne;
-  //   });
-  //   setPersonnes(updatedPersonnes);
-  // };
-
-
+  useEffect(() => {
+    // Effect for fetching data after successful deletion or addition
+    fetchData();
+  }, [personnes]); // This will trigger the effect whenever personnes state changes
 
 
   // Définition de la fonction handleDeleteSuccess
@@ -66,7 +60,16 @@ function Tableau() {
   };
 
 
-
+  const handleRestoreSuccess = (restoredEmail) => {
+    // Mettez ici le code à exécuter en cas de succès de la restauration
+    console.log(`La personne avec l'email ${restoredEmail} a été restaurée avec succès.`);
+  };
+  
+  const handleRestoreError = (restoredEmail) => {
+    // Mettez ici le code à exécuter en cas d'erreur lors de la restauration
+    console.error(`Une erreur s'est produite lors de la restauration de la personne avec l'email ${restoredEmail}.`);
+  };
+  
 
   // Define handleClick function
   const handleClick = () => {
@@ -78,10 +81,10 @@ function Tableau() {
     {
       field: "actions",
       headerName: "Actions",
-      width: 250,
+      width: 350, // Augmentez la largeur pour inclure l'icône de restauration
       sortable: false,
-      headerAlign: "center", // Centrer horizontalement le titre du header
-      headerClassName: "header-center", // Ajouter une classe pour centrer verticalement le titre du header
+      headerAlign: "center",
+      headerClassName: "header-center",
       renderCell: (params) => (
         <div
           style={{
@@ -90,9 +93,12 @@ function Tableau() {
             justifyContent: "center",
             gap: "20px",
             margin: 5,
-
+            visibility: params.row.SiArchive === false ? "visible" : "hidden",
           }}
         >
+           {/* Autres éléments d'action */}
+    
+  
           <FormService personId={params.row.id} />
           <Detail onClick={handleClick} rowData={params.row.id} />
           <Edit />
@@ -102,11 +108,17 @@ function Tableau() {
             prenomPersonne={params.row.PrenomPersonne}
             email={params.row.Email}
             onSuccess={handleDeleteSuccess}
-            onError={handleDeleteError} // Assurez-vous de passer cette fonction
+            onError={handleDeleteError}
           />
+          {params.SiArchive && ( // Afficher RestoreAction uniquement si SiArchive est true
+            <RestoreAction
+              email={params.row.Email}
+              onSuccess={handleRestoreSuccess}
+              onError={handleRestoreError}
+            />
+          )}
         </div>
       ),
-
     },
 
     { field: "NomPersonne", headerName: "NOM", width: 200 },
