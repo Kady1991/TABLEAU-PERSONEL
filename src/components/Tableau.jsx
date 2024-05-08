@@ -6,7 +6,7 @@ import AddMemberForm from "../layout/AddMemberForm.jsx";
 import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
-import Edit from "../layout/Edit.jsx";
+import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 
 function Tableau() {
@@ -103,7 +103,7 @@ function Tableau() {
 
           <FormService personId={params.row.personneID} />
           <Detail onClick={handleClick} rowData={params.row.personneID} />
-          <Edit />
+          <EditMemberForm />
           <Delete
             IDPersonne={params.row.personneID}
             nomPersonne={params.row.NomPersonne}
