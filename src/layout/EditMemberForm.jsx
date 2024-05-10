@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, } from "react";
 import {
     Modal,
     Form,
@@ -165,18 +165,19 @@ const EditMemberForm = ({ IDPersonne }) => {
                 onClick={handleOpenModal}
             />
             <Modal
-                title="EDITER"
-                open={isModalVisible}
-                onCancel={handleCloseModal}
-                style={{ textAlign: "center" }}
-                centered
+               title="EDITER"
+               open={isModalVisible}
+               onCancel={handleCloseModal}
+               footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
+               style={{ textAlign: "center" }}
+               centered
             >
                 <div
                     style={{
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        minHeight: "100vh",
+                        minHeight: "70vh",
                     }}
                 >
                     <Form
@@ -185,8 +186,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                         initialValues={personData}
                         layout="vertical"
                         style={{
-                            maxWidth: "800px",
-                            width: "100%",
+                            maxWidth: "1000px",
+                            height:"700px",
+                            width: "200%",
                             padding: "20px",
                             backgroundColor: "#f0f2f5",
                             borderRadius: "8px",
@@ -212,7 +214,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                                     <Input />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            {/* <Col span={12}>
                                 <Form.Item
                                     label="Service principal"
                                     name="NomServiceFr"
@@ -220,7 +222,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                                 >
                                     <Input />
                                 </Form.Item>
-                            </Col>
+                            </Col> */}
                             <Col span={12}>
                                 <Form.Item
                                     label="Téléphone"
@@ -240,52 +242,65 @@ const EditMemberForm = ({ IDPersonne }) => {
                                     <Input />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Date d'entrée"
-                                    name="DateEntree"
-                                    initialValue={
-                                        personData?.DateEntree
-                                            ? Intl.DateTimeFormat(personData.DateEntree, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
-                                            : undefined
+
+                            <Form.Item style={{ width: "100%" }}
+                                label="Date d'entrée"
+                                name="DateEntree"
+                                initialValue={
+                                    personData?.DateEntree
+                                        ? Intl.DateTimeFormat(personData.DateEntree, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
+                                        : undefined
+                                }
+                            >
+                                <DatePicker style={{ width: "100%" }} />
+                            </Form.Item>
+
+
+
+                            <Form.Item
+                                style={{ width: "100%" }}
+                                label="Grade"
+                                name="WWGradeID"
+                                initialValue={personData?.WWGradeID}
+                                rules={[{ required: true, message: "Veuillez sélectionner un grade" }]}
+                            >
+                                <Select
+                                    showSearch
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                     }
                                 >
-                                    <DatePicker style={{ width: "100%" }} />
-                                </Form.Item>
+                                    {grades.map((grade) => (
+                                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                                            {grade.NomWWGradeFr}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
 
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Grade"
-                                    name="WWGradeID"
-                                    initialValue={personData?.WWGradeID}
-                                    rules={[{ required: true, message: "Veuillez sélectionner un grade" }]}
+
+                            <Form.Item
+                                style={{ width: "100%" }}
+                                label="Adresse"
+                                name="NomRueFr"
+                                initialValue={personData?.AdresseID}
+                                rules={[{ required: true, message: "Veuillez sélectionner une adresse" }]}
+                            >
+                                <Select
+                                    showSearch
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
                                 >
-                                    <Select>
-                                        {grades.map((grade) => (
-                                            <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                                                {grade.NomWWGradeFr}
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item style={{ width: "100%" }}
-                                    label="Adresse"
-                                    name="NomRueFr"
-                                    initialValue={personData?.AdresseID}
-                                    rules={[{ required: true, message: "Veuillez sélectionner une adresse" }]}
-                                >
-                                    <Select>
-                                        {addresses.map((address) => (
-                                            <Option key={address.IDAdresse} value={address.IDAdresse}>
-                                                {address.NomRueFr} {address.NomRueNl}
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </Col>
+                                    {addresses.map((address) => (
+                                        <Option key={address.IDAdresse} value={address.IDAdresse}>
+                                            {address.NomRueFr} {address.NomRueNl}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
 
                             <Form.Item
                                 style={{ width: "100%" }}
@@ -327,8 +342,8 @@ const EditMemberForm = ({ IDPersonne }) => {
                             <Col span={12}>
                                 <Form.Item
                                     label="Si Personnel"
-                                    name="SiTypePersonnel"
-                                    initialValue={personData?.SiTypePersonnel}
+                                    name="siPersonnel"
+                                    initialValue={true}
                                     rules={[{ required: true, message: "Veuillez sélectionner une option" }]}
                                 >
                                     <Radio.Group>
