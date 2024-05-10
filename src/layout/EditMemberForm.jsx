@@ -19,7 +19,7 @@ const EditMemberForm = ({ personId }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
+                const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/edit${personId}`);
                 setPersonData(personResponse.data);
                 console.log(personResponse);
                 form.setFieldsValue(personResponse.data); // Pré-remplir les champs avec les données de la personne
@@ -124,7 +124,7 @@ const EditMemberForm = ({ personId }) => {
             <FiEdit title='Editer' style={{ fontSize: '20px', cursor: 'pointer', color: '#095e74', marginBottom: "10px" }} onClick={handleOpenModal} />
             <Modal
                 title="EDITER"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onCancel={handleCloseModal}
                 style={{ textAlign: "center" }}
                 centered
