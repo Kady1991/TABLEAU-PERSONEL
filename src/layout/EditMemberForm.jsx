@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
 import { FiEdit } from "react-icons/fi";
-
 import axios from 'axios';
 
 const { Option } = Select;
@@ -14,19 +13,18 @@ const EditMemberForm = ({ personId }) => {
     const [otherServices, setOtherServices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [formSubmitted, setFormSubmitted] = useState(false);
-    const [selectedServiceDetails, setSelectedServiceDetails] = useState(null); // Ajout de l'état pour stocker les détails du service sélectionné
-
-    const formRef = useRef(null); // Définir la référence du formulaire
+    const [selectedServiceDetails, setSelectedServiceDetails] = useState(null); 
+    const [form] = Form.useForm(); 
 
     useEffect(() => {
         const fetchData = async () => {
-            if (personId) {
-                try {
-                    const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
-                    setPersonData(personResponse.data);
-                } catch (error) {
-                    console.error('Erreur lors de la récupération des données de la personne:', error);
-                }
+            try {
+                const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
+                setPersonData(personResponse.data);
+                console.log(personResponse);
+                form.setFieldsValue(personResponse.data); // Pré-remplir les champs avec les données de la personne
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données de la personne:', error);
             }
 
             try {
@@ -52,109 +50,96 @@ const EditMemberForm = ({ personId }) => {
         };
 
         fetchData();
-    }, [personId]);
+    }, [personId, form]);
 
-   const handleOpenModal = () => {
+    const handleOpenModal = () => {
         setIsModalVisible(true);
-        // Remplir les champs du formulaire avec les données de la personne
-        if (personData && formRef.current) {
-            formRef.current.setFieldsValue(personData);
-        }
     };
-    
-    // const handleOpenModal = () => {
-    //     setIsModalVisible(true);
-    // };
 
     const handleCloseModal = () => {
         setIsModalVisible(false);
     };
 
     const handleServiceSelection = (value) => {
-        // Recherche des détails du service sélectionné
         const selectedService = otherServices.find(service => service.IDService === value);
         setSelectedServiceDetails(selectedService);
     };
 
-
-    // Logique de soumission du formulaire
-    const handleSubmit = async (values) => {
-        setLoading(true);
-        setLoading(true);
-        try {
-            const option = {
-                day: "numeric",
-                month: "2-digit",
-                year: "numeric",
-            };
-            const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-                values.dateEntree
-            );
-
-            const formData = {
-                NomPersonne: values.nom,
-                PrenomPersonne: values.prenom,
-                Email: values.email,
-                TelPro: values.telephone == undefined ? null : values.telephone,
-                DateEntree: dateEntree,
-                WWGradeID: values.grade,
-                AdresseID: values.adresse,
-                ServiceID: values.service,
-                SiFrancais: values.siFrancais,
-                SiServicePrincipal: true,
-                SiTypePersonnel: values.siPersonnel,
-            };
-            console.log(formData);
-            const response = await axios.post(
-                "https://server-iis.uccle.intra/API_Personne/api/Personne",
-                formData
-            );
-
-            if (!response.data) {
-                throw new Error("Erreur lors de l'envoi des données");
+        // Logique de soumission du formulaire
+        const handleSubmit = async (values) => {
+            setLoading(true);
+            setLoading(true);
+            try {
+                const option = {
+                    day: "numeric",
+                    month: "2-digit",
+                    year: "numeric",
+                };
+                const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+                    values.dateEntree
+                );
+    
+                const formData = {
+                    NomPersonne: values.nom,
+                    PrenomPersonne: values.prenom,
+                    Email: values.email,
+                    TelPro: values.telephone == undefined ? null : values.telephone,
+                    DateEntree: dateEntree,
+                    WWGradeID: values.grade,
+                    AdresseID: values.adresse,
+                    ServiceID: values.service,
+                    SiFrancais: values.siFrancais,
+                    SiServicePrincipal: true,
+                    SiTypePersonnel: values.siPersonnel,
+                };
+                console.log(formData);
+                const response = await axios.put(
+                    `https://server-iis.uccle.intra/API_Personne/api/Personne/edit${personId}`,
+                    values
+                );
+    
+                if (!response.data) {
+                    throw new Error("Erreur lors de l'envoi des données");
+                }
+                // Afficher une alerte lorsque l'ajout est réussi
+                alert("Ajout réussi !");
+                console.log("Nouveau service ajouté avec succès");
+                // Fermer le formulaire après l'ajout réussi
+                setFormSubmitted(true);
+    
+            } catch (error) {
+                console.error("Erreur lors de l'envoi des données", error);
+            } finally {
+                setLoading(false);
             }
-            // Afficher une alerte lorsque l'ajout est réussi
-            alert("Ajout réussi !");
-            console.log("Nouveau service ajouté avec succès");
-            // Fermer le formulaire après l'ajout réussi
-            setFormSubmitted(true);
-
-        } catch (error) {
-            console.error("Erreur lors de l'envoi des données", error);
-        } finally {
-            setLoading(false);
+        };
+    
+        if (formSubmitted) {
+            // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
+            return null;
         }
-    };
-
-    if (formSubmitted) {
-        // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
-        return null;
-    }
 
     return (
         <>
-            
-            <FiEdit title='Editer' style={{ fontSize: '20px', cursor: 'pointer', color: '#095e74', marginBottom:"10px" }} onClick={handleOpenModal} />
+            <FiEdit title='Editer' style={{ fontSize: '20px', cursor: 'pointer', color: '#095e74', marginBottom: "10px" }} onClick={handleOpenModal} />
             <Modal
                 title="EDITER"
-                open={isModalVisible}
+                visible={isModalVisible}
                 onCancel={handleCloseModal}
                 style={{ textAlign: "center" }}
                 centered
-
-
             >
                 <div
                     style={{
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
+                        minHeight: '100vh',
                     }}
                 >
                     <Form
+                        form={form}
                         onFinish={handleSubmit}
-                        initialValues={personData}
                         layout="vertical"
                         style={{
                             maxWidth: "800px",
@@ -168,21 +153,19 @@ const EditMemberForm = ({ personId }) => {
                         <Row gutter={[16]}>
                             <Col span={12}>
                                 <Form.Item label="Nom" name="NomPersonne" rules={[{ required: true }]}>
-                                    <Input  />
+                                    <Input />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
                                 <Form.Item label="Prénom" name="PrenomPersonne" rules={[{ required: true }]}>
-                                    <Input  />
+                                    <Input />
                                 </Form.Item>
                             </Col>
-
                             <Col span={12}>
                                 <Form.Item label="Service principal" name="NomServiceFr" rules={[{ required: true }]}>
-                                    <Input  />
+                                    <Input />
                                 </Form.Item>
                             </Col>
-
                             <Col span={12}>
                                 <Form.Item label="Téléphone" name="tel" rules={[{ required: true }]}>
                                     <Input />
@@ -193,13 +176,11 @@ const EditMemberForm = ({ personId }) => {
                                     <Input />
                                 </Form.Item>
                             </Col>
-
                             <Col span={12}>
                                 <Form.Item label="Date" name="dateEntree" rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}>
                                     <DatePicker style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
-                           
                             <Form.Item
                                 style={{ width: "100%" }}
                                 name="grade"
@@ -209,7 +190,6 @@ const EditMemberForm = ({ personId }) => {
                                 ]}
                             >
                                 <Select
-
                                     allowClear
                                     showSearch
                                     optionFilterProp="children"
@@ -224,7 +204,6 @@ const EditMemberForm = ({ personId }) => {
                                     ))}
                                 </Select>
                             </Form.Item>
-                           
                             <Form.Item
                                 style={{ width: "100%" }}
                                 name="adresse"
@@ -249,7 +228,6 @@ const EditMemberForm = ({ personId }) => {
                                     ))}
                                 </Select>
                             </Form.Item>
-
                             <Form.Item
                                 style={{ width: "100%" }}
                                 name="service"
@@ -259,7 +237,6 @@ const EditMemberForm = ({ personId }) => {
                                 ]}
                             >
                                 <Select
-                                    // style={{ width: "100%" }}
                                     allowClear
                                     showSearch
                                     optionFilterProp="children"
@@ -275,7 +252,6 @@ const EditMemberForm = ({ personId }) => {
                                     ))}
                                 </Select>
                             </Form.Item>
-
                             <Col span={12}>
                                 <Form.Item label="Français" name="siFrancais" rules={[{ required: true }]}>
                                     <Radio.Group>
@@ -293,13 +269,12 @@ const EditMemberForm = ({ personId }) => {
                                 </Form.Item>
                             </Col>
                         </Row>
-
                         {selectedServiceDetails && (
                             <div
                                 style={{
                                     display: "grid",
-                                    gridTemplateColumns: "auto auto", // Deux colonnes
-                                    gap: 1, // Espacement entre les éléments
+                                    gridTemplateColumns: "auto auto",
+                                    gap: 1,
                                 }}
                             >
                                 <div style={{ textAlign: "left" }}>
@@ -309,7 +284,6 @@ const EditMemberForm = ({ personId }) => {
                                         {"  "}
                                         {selectedServiceDetails.PrenomChefService}
                                     </p>
-
                                     <p>
                                         <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
                                             Chef du Département:
@@ -333,6 +307,5 @@ const EditMemberForm = ({ personId }) => {
         </>
     );
 };
-
 
 export default EditMemberForm;
