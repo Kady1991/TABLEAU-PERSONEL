@@ -166,7 +166,7 @@ const EditMemberForm = ({ IDPersonne }) => {
             />
             <Modal
                title="EDITER"
-               open={isModalVisible}
+              open={isModalVisible}
                onCancel={handleCloseModal}
                footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
                style={{ textAlign: "center" }}
@@ -177,7 +177,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        minHeight: "70vh",
+                        minHeight: "100vh",
                     }}
                 >
                     <Form
@@ -187,8 +187,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                         layout="vertical"
                         style={{
                             maxWidth: "1000px",
-                            height:"700px",
-                            width: "200%",
+                            width: "100%",
                             padding: "20px",
                             backgroundColor: "#f0f2f5",
                             borderRadius: "8px",
