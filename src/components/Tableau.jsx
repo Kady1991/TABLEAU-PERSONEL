@@ -101,11 +101,12 @@ function Tableau() {
           }}
         >
           {/* Autres éléments d'action */}
-
+    
           <FormService personId={params.row.personneID} />
           <Detail onClick={handleClick} rowData={params.row.personneID} />
           <EditMemberForm
             IDPersonne={params.row.personneID}
+            
             //personIdServ={params.row.personneID}
           />
           <Delete
@@ -126,6 +127,7 @@ function Tableau() {
         </div>
       ),
     },
+    
 
     { field: "NomPersonne", headerName: "NOM", width: 200 },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 200 },
