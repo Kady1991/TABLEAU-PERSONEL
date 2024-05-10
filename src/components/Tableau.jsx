@@ -12,7 +12,8 @@ import RestoreAction from "../layout/RestoreAction.jsx";
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_Personne/api/Personne";
+  const linkGetAllPersonnel =
+    "https://server-iis.uccle.intra/API_Personne/api/Personne";
   //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
   const fetchData = () => {
     fetch(linkGetAllPersonnel)
@@ -23,7 +24,7 @@ function Tableau() {
           id: personne.IDPersonne,
           personneID: personne.PersonneID,
         }));
-        
+
         setPersonnes(personnesData);
         setLoading(false);
       })
@@ -103,7 +104,10 @@ function Tableau() {
 
           <FormService personId={params.row.personneID} />
           <Detail onClick={handleClick} rowData={params.row.personneID} />
-          <EditMemberForm />
+          <EditMemberForm
+            IDPersonne={params.row.personneID}
+            //personIdServ={params.row.personneID}
+          />
           <Delete
             IDPersonne={params.row.personneID}
             nomPersonne={params.row.NomPersonne}
