@@ -28,7 +28,8 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [selectedGradeDetails, setSelectedGradeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(null); // Initialiser la date à null
+
 
   /*   useEffect(() => {
     //console.log("AdresseComplete:", personData?.AdresseComplete);
@@ -125,14 +126,14 @@ const EditMemberForm = ({ IDPersonne }) => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const option = {
-        day: "numeric",
-        month: "2-digit",
-        year: "numeric",
-      };
-      const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-        values.dateEntree
-      );
+      // const option = {
+      //   day: "numeric",
+      //   month: "2-digit",
+      //   year: "numeric",
+      // };
+      // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+      //   values.dateEntree
+      // );
 
       const formData = {
         IDPersonne: personData?.IDPersonne,
@@ -258,14 +259,19 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-              <Form.Item
-                label="Date"
-                name="DateEntreeDate"
-                value={personData?.DateEntreeDate}
-                rules={[{ required: true, message: "Veuillez choisir une date" }]}
-              >
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
+              <Col span={12}>
+                <Form.Item
+                  label="Date"
+                  name="DateEntreeDate"
+                  rules={[{ required: true, message: "Veuillez choisir une date" }]}
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    value={startDate} // Utilisation de la valeur de la date
+                    onChange={(date) => setStartDate(date)} // Mise à jour de la date
+                  />
+                </Form.Item>
+              </Col>
 
 
 
