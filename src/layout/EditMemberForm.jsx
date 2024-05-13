@@ -22,10 +22,10 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [grades, setGrades] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [otherServices, setOtherServices] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
   const [selectedGradeDetails, setSelectedGradeDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
