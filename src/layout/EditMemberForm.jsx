@@ -250,7 +250,7 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
 
-              <DatePicker
+              <DatePicker 
                 label="Date d'entrée"
                 name="DateEntree"
                 value={
