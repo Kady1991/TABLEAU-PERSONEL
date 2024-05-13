@@ -180,7 +180,6 @@ const EditMemberForm = ({ IDPersonne }) => {
           fontSize: "20px",
           cursor: "pointer",
           color: "#095e74",
-          
         }}
         onClick={handleOpenModal}
       />
@@ -189,7 +188,7 @@ const EditMemberForm = ({ IDPersonne }) => {
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
-        style={{ textAlign: "center", minHeight: "70vh", minWidth: "70vh",}}
+        style={{ textAlign: "center", minHeight: "70vh", minWidth: "70vh" }}
         centered
       >
         <div>
@@ -255,23 +254,11 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-
-              <DatePicker
               <Form.Item
                 style={{ width: "100%" }}
                 label="Date d'entrée"
-                name="DateEntree"
-                value={
-                  personData?.DateEntreeDate
-                    ? moment(personData.DateEntreeDate, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
-                    : undefined
-                }
-                style={{ width: "100%" }}
-                format="YYYY-MM-DD"
-              />
-
-
                 name="DateEntreeDate"
+                value={personData?.DateEntreeDate}
               >
                 <DatePicker
                   name="DateEntreeDate"
@@ -282,7 +269,7 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Form.Item>
 
               <Form.Item
-                style={{ width: "100%",marginTop:"15px",  }}
+                style={{ width: "100%", marginTop: "15px" }}
                 label="Grade"
                 name="WWGradeID"
                 value={personData?.WWGradeID}
@@ -306,7 +293,6 @@ const EditMemberForm = ({ IDPersonne }) => {
                   ))}
                 </Select>
               </Form.Item>
-
 
               <Form.Item
                 style={{ width: "100%" }}
