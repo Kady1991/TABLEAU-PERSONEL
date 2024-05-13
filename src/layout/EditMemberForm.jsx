@@ -28,63 +28,70 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
-  useEffect(() => {
+  /*   useEffect(() => {
     //console.log("AdresseComplete:", personData?.AdresseComplete);
-  }, [personData]);
+  }, [personData]); */
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (IDPersonne) {
-        try {
-          const personResponse = await axios.get(
-            `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`
-          );
-          //const personResponse = await axios.get(
-          //  `https://localhost:44333/api/Personne/${IDPersonne}`
-          // );
-          setPersonData(personResponse.data);
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération des données de la personne:",
-            error
-          );
-        }
-      }
+    fetchData();
+  }, [IDPersonne, form, isModalVisible]);
 
+  const fetchData = async () => {
+    if (!isModalVisible) return;
+    if (IDPersonne) {
+      console.log(IDPersonne);
       try {
-        const gradesResponse = await axios.get(
-          `https://server-iis.uccle.intra/API_Personne/api/wwgrades`
+        const personResponse = await axios.get(
+          `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`
         );
-        setGrades(gradesResponse.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des grades:", error);
-      }
-
-      try {
-        const addressesResponse = await axios.get(
-          `https://server-iis.uccle.intra/API_Personne/api/Adresses`
-        );
-        setAddresses(addressesResponse.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des adresses:", error);
-      }
-
-      try {
-        const servicesResponse = await axios.get(
-          `https://server-iis.uccle.intra/API_Personne/api/affectation/services`
-        );
-        setOtherServices(servicesResponse.data);
+        //const personResponse = await axios.get(
+        //  `https://localhost:44333/api/Personne/${IDPersonne}`
+        // );
+        personResponse.data.DateEntreeDate = personResponse?.data
+          ?.DateEntreeDate
+          ? moment(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
+          : undefined;
+        setPersonData(personResponse.data);
+        form.setFieldsValue(personResponse.data);
+        console.log(personResponse.data);
       } catch (error) {
         console.error(
-          "Erreur lors de la récupération des autres services:",
+          "Erreur lors de la récupération des données de la personne:",
           error
         );
       }
-    };
+    }
 
-    fetchData();
-  }, [IDPersonne, form]);
+    try {
+      const gradesResponse = await axios.get(
+        `https://server-iis.uccle.intra/API_Personne/api/wwgrades`
+      );
+      setGrades(gradesResponse.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des grades:", error);
+    }
 
+    try {
+      const addressesResponse = await axios.get(
+        `https://server-iis.uccle.intra/API_Personne/api/Adresses`
+      );
+      setAddresses(addressesResponse.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des adresses:", error);
+    }
+
+    try {
+      const servicesResponse = await axios.get(
+        `https://server-iis.uccle.intra/API_Personne/api/affectation/services`
+      );
+      setOtherServices(servicesResponse.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des autres services:",
+        error
+      );
+    }
+  };
   const handleOpenModal = () => {
     setIsModalVisible(true);
   };
@@ -114,7 +121,6 @@ const EditMemberForm = ({ IDPersonne }) => {
 
   // Logique de soumission du formulaire
   const handleSubmit = async (values) => {
-    setLoading(true);
     setLoading(true);
     try {
       // const option = {
@@ -190,7 +196,7 @@ const EditMemberForm = ({ IDPersonne }) => {
           <Form
             form={form}
             onFinish={handleSubmit}
-            initialValues={personData}
+            values={personData}
             layout="vertical"
             style={{
               maxWidth: "1000px",
@@ -251,6 +257,8 @@ const EditMemberForm = ({ IDPersonne }) => {
 
 
               <DatePicker
+              <Form.Item
+                style={{ width: "100%" }}
                 label="Date d'entrée"
                 name="DateEntree"
                 value={
@@ -263,6 +271,15 @@ const EditMemberForm = ({ IDPersonne }) => {
               />
 
 
+                name="DateEntreeDate"
+              >
+                <DatePicker
+                  name="DateEntreeDate"
+                  value={personData?.DateEntreeDate}
+                  style={{ width: "100%" }}
+                  format="DD-MM-YYYY"
+                />
+              </Form.Item>
 
               <Form.Item
                 style={{ width: "100%",marginTop:"15px",  }}
