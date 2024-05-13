@@ -174,7 +174,7 @@ const EditMemberForm = ({ IDPersonne }) => {
           fontSize: "20px",
           cursor: "pointer",
           color: "#095e74",
-          marginBottom: "10px",
+          
         }}
         onClick={handleOpenModal}
       />
@@ -183,17 +183,10 @@ const EditMemberForm = ({ IDPersonne }) => {
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
-        style={{ textAlign: "center" }}
+        style={{ textAlign: "center", minHeight: "70vh", minWidth: "70vh",}}
         centered
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
+        <div>
           <Form
             form={form}
             onFinish={handleSubmit}
@@ -272,7 +265,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
 
               <Form.Item
-                style={{ width: "100%" }}
+                style={{ width: "100%",marginTop:"15px",  }}
                 label="Grade"
                 name="WWGradeID"
                 value={personData?.WWGradeID}
