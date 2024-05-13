@@ -233,7 +233,7 @@ const FormService = ({ personId }) => {
                                     </Option>
                                     {addresses.map(address => (
                                         <Option key={address.IDAdresse} value={address.IDAdresse}>
-                                            {address.NomRueFr} {address.NomRueNl}
+                                            {address.AddresseComplete}
                                         </Option>
                                     ))}
                                 </Select>
