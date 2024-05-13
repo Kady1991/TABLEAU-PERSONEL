@@ -1,16 +1,7 @@
 import React, { useState, useEffect, } from "react";
-import {
-    Modal,
-    Form,
-    Input,
-    Button,
-    Radio,
-    Row,
-    Col,
-    DatePicker,
-    Select,
-} from "antd";
+import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select, } from "antd";
 import { FiEdit } from "react-icons/fi";
+import moment from 'moment';
 import axios from "axios";
 
 const { Option } = Select;
@@ -27,6 +18,13 @@ const EditMemberForm = ({ IDPersonne }) => {
     const [selectedGradeDetails, setSelectedGradeDetails] = useState(null);
     const [form] = Form.useForm();
 
+
+
+    useEffect(() => {
+        console.log("Date d'entrée:", personData?.DateEntree);
+    }, [personData]);
+    
+    
     useEffect(() => {
         const fetchData = async () => {
             if (IDPersonne) {
@@ -99,19 +97,25 @@ const EditMemberForm = ({ IDPersonne }) => {
         setSelectedGradeDetails(selectedGrade);
     };
 
+
+    //verifier si la date est correcte
+    const isValidDate = (dateString) => {
+        return moment(dateString, 'YYYY-MM-DD', true).isValid();
+    };
+
     // Logique de soumission du formulaire
     const handleSubmit = async (values) => {
         setLoading(true);
         setLoading(true);
         try {
-            const option = {
-                day: "numeric",
-                month: "2-digit",
-                year: "numeric",
-            };
-            const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-                values.dateEntree
-            );
+            // const option = {
+            //     day: "numeric",
+            //     month: "2-digit",
+            //     year: "numeric",
+            // };
+            // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+            //     values.dateEntree
+            // );
 
             const formData = {
                 NomPersonne: values.nom,
@@ -165,12 +169,12 @@ const EditMemberForm = ({ IDPersonne }) => {
                 onClick={handleOpenModal}
             />
             <Modal
-               title="EDITER"
-              open={isModalVisible}
-               onCancel={handleCloseModal}
-               footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
-               style={{ textAlign: "center" }}
-               centered
+                title="EDITER"
+                open={isModalVisible}
+                onCancel={handleCloseModal}
+                footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
+                style={{ textAlign: "center" }}
+                centered
             >
                 <div
                     style={{
@@ -242,18 +246,18 @@ const EditMemberForm = ({ IDPersonne }) => {
                                 </Form.Item>
                             </Col>
 
-                            <Form.Item style={{ width: "100%" }}
+                            <Form.Item
+                                style={{ width: "100%" }}
                                 label="Date d'entrée"
                                 name="DateEntree"
                                 initialValue={
                                     personData?.DateEntree
-                                        ? Intl.DateTimeFormat(personData.DateEntree, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
+                                        ? moment(personData.DateEntree, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
                                         : undefined
                                 }
                             >
-                                <DatePicker style={{ width: "100%" }} />
+                                <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
                             </Form.Item>
-
 
 
                             <Form.Item
