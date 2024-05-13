@@ -29,7 +29,7 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    console.log("Date d'entrée:", personData?.DateEntreeDate);
+    //console.log("AdresseComplete:", personData?.AdresseComplete);
   }, [personData]);
 
   useEffect(() => {
@@ -126,20 +126,21 @@ const EditMemberForm = ({ IDPersonne }) => {
       //     values.dateEntree
       // );
 
-      const formData = {
+      /*  const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
         Email: values.email,
         TelPro: values.telephone == undefined ? null : values.telephone,
-        DateEntree: value.DateEntreeDate,
-        WWGradeID: values.grade,
-        AdresseID: values.adresse,
-        ServiceID: values.service,
+        DateEntree: values.DateEntreeDate,
+        WWGradeID: values.WWGradeID,
+        AdresseID: values.AdresseID,
+        AdresseComplete: values.AdresseComplete,
+        ServiceID: values.ServiceID,
         SiFrancais: values.siFrancais,
-        SiServicePrincipal: true,
-        SiTypePersonnel: values.siPersonnel,
-      };
-      console.log(formData);
+        SiServicePrincipal: values.SiServicePrincipal,
+        SiTypePersonnel: values.SiTypePersonnel,
+      };  */
+      //console.log(formData);
       //const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`;
       const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
@@ -212,6 +213,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Nom"
                   name="NomPersonne"
+                  value={personData?.NomPersonne}
                   rules={[{ required: true }]}
                 >
                   <Input />
@@ -221,6 +223,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Prénom"
                   name="PrenomPersonne"
+                  value={personData?.PrenomPersonne}
                   rules={[{ required: true }]}
                 >
                   <Input />
@@ -239,7 +242,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Téléphone"
                   name="TelPro"
-                  initialValue={personData?.TelPro}
+                  value={personData?.TelPro}
                 >
                   <Input />
                 </Form.Item>
@@ -248,7 +251,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="E-mail"
                   name="Email"
-                  initialValue={personData?.Email}
+                  value={personData?.Email}
                   rules={[
                     {
                       required: true,
@@ -273,6 +276,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 }
               > */}
               <DatePicker
+                name="DateEntree"
                 value={
                   personData?.DateEntreeDate
                     ? moment(personData.DateEntreeDate, "YYYY-MM-DD") // Assurez-vous que la date est au bon format
@@ -287,7 +291,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 style={{ width: "100%" }}
                 label="Grade"
                 name="WWGradeID"
-                initialValue={personData?.WWGradeID}
+                value={personData?.WWGradeID}
                 rules={[
                   { required: true, message: "Veuillez sélectionner un grade" },
                 ]}
@@ -312,8 +316,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               <Form.Item
                 style={{ width: "100%" }}
                 label="Adresse"
-                name="NomRueFr"
-                initialValue={personData?.AdresseID}
+                name="AdresseID"
+                value={personData?.AdresseID}
                 rules={[
                   {
                     required: true,
@@ -332,7 +336,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 >
                   {addresses.map((address) => (
                     <Option key={address.IDAdresse} value={address.IDAdresse}>
-                      {address.NomRueFr} {address.NomRueNl}
+                      {address.AdresseComplete}
                     </Option>
                   ))}
                 </Select>
@@ -357,7 +361,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   </Option>
                   {otherServices.map((service) => (
                     <Option key={service.IDService} value={service.IDService}>
-                      {service.NomServiceFr} {service.NomServiceNl}
+                      {service.NomServiceFr}
                     </Option>
                   ))}
                 </Select>
@@ -366,7 +370,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Si Français"
                   name="SiFrancais"
-                  initialValue={personData?.SiFrancais}
+                  value={personData?.SiFrancais}
                   rules={[
                     {
                       required: true,
@@ -383,8 +387,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               <Col span={12}>
                 <Form.Item
                   label="Si Personnel"
-                  name="siPersonnel"
-                  initialValue={true}
+                  name="SiTypePersonnel"
+                  value={personData?.SiTypePersonnel}
                   rules={[
                     {
                       required: true,
