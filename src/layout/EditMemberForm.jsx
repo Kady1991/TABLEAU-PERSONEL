@@ -168,6 +168,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 }}
                 onClick={handleOpenModal}
             />
+            
             <Modal
                 title="EDITER"
                 open={isModalVisible}
