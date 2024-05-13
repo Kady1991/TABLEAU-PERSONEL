@@ -229,15 +229,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   <Input />
                 </Form.Item>
               </Col>
-              {/* <Col span={12}>
-                                <Form.Item
-                                    label="Service principal"
-                                    name="NomServiceFr"
-                                    rules={[{ required: true }]}
-                                >
-                                    <Input />
-                                </Form.Item>
-                            </Col> */}
+
               <Col span={12}>
                 <Form.Item
                   label="Téléphone"
@@ -264,18 +256,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-              {/*   <Form.Item
-                style={{ width: "100%" }}
-                label="Date d'entrée"
-                name="DateEntree"
-                initialValue={
-                  //personData?.DateEntreeDate
-                  //? moment(personData.DateEntreeDate, "YYYY-MM-DD") // Assurez-vous que //la date est au bon format
-                  //: //undefined
-                  Date.now()
-                }
-              > */}
+
               <DatePicker
+                label="Date d'entrée"
                 name="DateEntree"
                 value={
                   personData?.DateEntreeDate
@@ -285,7 +268,8 @@ const EditMemberForm = ({ IDPersonne }) => {
                 style={{ width: "100%" }}
                 format="YYYY-MM-DD"
               />
-              {/* </Row></Form.Item> */}
+
+
 
               <Form.Item
                 style={{ width: "100%" }}
@@ -312,6 +296,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   ))}
                 </Select>
               </Form.Item>
+
 
               <Form.Item
                 style={{ width: "100%" }}
