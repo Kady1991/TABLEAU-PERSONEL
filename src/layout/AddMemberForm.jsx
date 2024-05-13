@@ -273,7 +273,7 @@ const AddMemberForm = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
-                    name="dateEntree"
+                    name="DateEntreeDate"
                     label="Date"
                     rules={[
                       {

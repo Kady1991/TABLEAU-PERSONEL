@@ -14,6 +14,7 @@ import { FiEdit } from "react-icons/fi";
 import moment from "moment";
 import axios from "axios";
 
+
 const { Option } = Select;
 
 const EditMemberForm = ({ IDPersonne }) => {
@@ -27,6 +28,7 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [selectedGradeDetails, setSelectedGradeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const [startDate, setStartDate] = useState(new Date());
 
   /*   useEffect(() => {
     //console.log("AdresseComplete:", personData?.AdresseComplete);
@@ -115,22 +117,22 @@ const EditMemberForm = ({ IDPersonne }) => {
   };
 
   //verifier si la date est correcte
-  const isValidDate = (dateString) => {
-    return moment(dateString, "YYYY-MM-DD", true).isValid();
-  };
+  // const isValidDate = (dateString) => {
+  //   return moment(dateString, "YYYY-MM-DD", true).isValid();
+  // };
 
   // Logique de soumission du formulaire
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // const option = {
-      //     day: "numeric",
-      //     month: "2-digit",
-      //     year: "numeric",
-      // };
-      // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-      //     values.dateEntree
-      // );
+      const option = {
+        day: "numeric",
+        month: "2-digit",
+        year: "numeric",
+      };
+      const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
+        values.dateEntree
+      );
 
       /*  const formData = {
         NomPersonne: values.nom,
@@ -255,18 +257,15 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Form.Item
-                style={{ width: "100%" }}
-                label="Date d'entrée"
+                label="Date"
                 name="DateEntreeDate"
                 value={personData?.DateEntreeDate}
+                rules={[{ required: true, message: "Veuillez choisir une date" }]}
               >
-                <DatePicker
-                  name="DateEntreeDate"
-                  value={personData?.DateEntreeDate}
-                  style={{ width: "100%" }}
-                  format="DD-MM-YYYY"
-                />
+                <DatePicker style={{ width: "100%" }} />
               </Form.Item>
+
+
 
               <Form.Item
                 style={{ width: "100%", marginTop: "15px" }}
