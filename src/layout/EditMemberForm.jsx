@@ -134,35 +134,37 @@ const EditMemberForm = ({ IDPersonne }) => {
         values.dateEntree
       );
 
-      /*  const formData = {
-        NomPersonne: values.nom,
-        PrenomPersonne: values.prenom,
-        Email: values.email,
-        TelPro: values.telephone == undefined ? null : values.telephone,
+      const formData = {
+        IDPersonne: personData?.IDPersonne,
+        NomPersonne: values.NomPersonne,
+        PrenomPersonne: values.PrenomPersonne,
+        Email: values.Email,
+        TelPro: values.TelPro == undefined ? null : values.TelPro,
         DateEntree: values.DateEntreeDate,
         WWGradeID: values.WWGradeID,
         AdresseID: values.AdresseID,
-        AdresseComplete: values.AdresseComplete,
         ServiceID: values.ServiceID,
-        SiFrancais: values.siFrancais,
+        SiFrancais: values.SiFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
         SiTypePersonnel: values.SiTypePersonnel,
-      };  */
+      };
       //console.log(formData);
-      const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`;
-      //const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
+      //const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`;
+      const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
-      const response = await axios.put(linkEditPersonne, values);
+      const response = await axios.put(linkEditPersonne, formData);
 
-      if (!response.data) {
+      if (response.status != 200) {
         throw new Error("Erreur lors de l'envoi des données");
       }
       // Afficher une alerte lorsque l'ajout est réussi
       alert("Ajout réussi !");
-      console.log("Nouveau service ajouté avec succès");
+      console.log("Les modifications sont faites avec succès");
       // Fermer le formulaire après l'ajout réussi
       setFormSubmitted(true);
+      handleCloseModal();
     } catch (error) {
+      console.log(error);
       console.error("Erreur lors de l'envoi des données", error);
     } finally {
       setLoading(false);
@@ -324,8 +326,9 @@ const EditMemberForm = ({ IDPersonne }) => {
 
               <Form.Item
                 style={{ width: "100%" }}
-                name="NomServiceFr"
+                name="ServiceID"
                 label="Service"
+                value={personData?.ServiceID}
                 rules={[
                   { required: true, message: "Veuillez choisir le service" },
                 ]}
@@ -336,9 +339,6 @@ const EditMemberForm = ({ IDPersonne }) => {
                   optionFilterProp="children"
                   onChange={handleServiceSelection}
                 >
-                  <Option key="placeholder" value="" disabled>
-                    Sélectionner un service
-                  </Option>
                   {otherServices.map((service) => (
                     <Option key={service.IDService} value={service.IDService}>
                       {service.NomServiceFr}
