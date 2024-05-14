@@ -263,7 +263,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-              {/* <Col span={12}> */}
+              <Col span={12}>
               <Form.Item
                 style={{ width: "100%" }}
                 label="Date"
@@ -271,13 +271,13 @@ const EditMemberForm = ({ IDPersonne }) => {
                 rules={[{ required: true, message: "Veuillez choisir une date" }]}
               >
                 <DatePicker
-                  style={{ width: "100%" }}
+                  style={{ width: "99%" }}
                   // defaultValue={personData ? dayjs(personData.DateEntreeDate) : null}
                 />
               </Form.Item>
-              {/* </Col> */}
+              </Col>
 
-
+              <Col span={12}>
               <Form.Item
                 style={{ width: "100%" }}
                 label="Grade"
@@ -303,7 +303,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                   ))}
                 </Select>
               </Form.Item>
+              </Col>
 
+              <Col span={12}>
               <Form.Item
                 style={{ width: "100%" }}
                 label="Adresse"
@@ -332,7 +334,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                   ))}
                 </Select>
               </Form.Item>
+              </Col>
 
+              <Col span={12}>
               <Form.Item
                 style={{ width: "100%" }}
                 name="ServiceID"
@@ -355,6 +359,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   ))}
                 </Select>
               </Form.Item>
+              </Col>
               <Col span={12}>
                 <Form.Item
                   label="Si Français"
