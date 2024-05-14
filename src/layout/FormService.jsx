@@ -123,12 +123,13 @@ const FormService = ({ personId }) => {
 
     return (
         <>
-            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '20px', cursor: 'pointer', color: '#1E7FCB' }} onClick={handleOpenModal} />
+            <PiBuildingLight title='Ajouter un service' style={{marginBottom:10, fontSize: '20px', cursor: 'pointer', color: '#1E7FCB' }} onClick={handleOpenModal} />
             <Modal
                 title="Ajouter un Service supplémentaire"
                 open={isModalVisible}
                 onCancel={handleCloseModal}
-                style={{ textAlign: "center" }}
+                footer={null}
+                style={{ textAlign: "center", minHeight: "60vh", minWidth: "70vh", }}
                 centered
 
 
@@ -138,7 +139,7 @@ const FormService = ({ personId }) => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        minHeight: '100vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
+                        minHeight: '50vh', // Ajuste la hauteur de la modal pour occuper tout l'écran
                     }}
                 >
                     <Form
@@ -146,7 +147,7 @@ const FormService = ({ personId }) => {
                         initialValues={personData}
                         layout="vertical"
                         style={{
-                            maxWidth: "800px",
+                            maxWidth: "50vw",
                             width: "100%",
                             padding: "20px",
                             backgroundColor: "#f0f2f5",

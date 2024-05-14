@@ -122,8 +122,9 @@ const AddMemberForm = () => {
   return (
     <div>
       {/* Affiche le bouton pour ouvrir le formulaire */}
-      <Button  style={{ backgroundColor: "#095c83", height:"2.4rem", fontStyle:"bold"
-       }} type="primary" onClick={openForm} icon={<PlusOutlined />}>
+      <Button style={{
+        backgroundColor: "#095c83", height: "2.4rem", fontStyle: "bold"
+      }} type="primary" onClick={openForm} icon={<PlusOutlined />}>
         CREER MEMBRE
       </Button >
 
@@ -139,13 +140,18 @@ const AddMemberForm = () => {
             padding: "20px",
             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             borderRadius: "8px",
-            maxWidth: "600px",
-            width: "100%",
+            minHeight: "50vh", minWidth: "70vh",
+           
           }}
         >
           {/* croix de la fermeture du formulaire */}
           <div style={{ textAlign: "right", marginBottom: "20px" }}>
             <CloseOutlined onClick={closeForm} style={{ cursor: "pointer" }} />
+          </div>
+
+          {/* Titre du formulaire */}
+          <div style={{ marginBottom: "50px", textAlign: "center", fontSize: "1.2rem", fontWeight: "bold" }}>
+            Ajouter un nouveau membre
           </div>
 
           {loadingData ? (
@@ -156,9 +162,8 @@ const AddMemberForm = () => {
               layout="vertical"
               onFinish={handleSubmit}
               style={{
-                maxWidth: "600px",
-                width: "100%",
-                padding: "20px",
+                minHeight: "70vh", minWidth: "70vh",
+                padding: "30px",
                 backgroundColor: "#f0f2f5",
                 borderRadius: "8px",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
@@ -413,7 +418,7 @@ const AddMemberForm = () => {
                 >
                   Valider
                 </Button>
-                <Button onClick={closeForm} style={{ position: "relative", zIndex: "9999", margin:8 }}>
+                <Button onClick={closeForm} style={{ position: "relative", zIndex: "9999", margin: 8 }}>
                   Annuler
                 </Button>
               </Form.Item>

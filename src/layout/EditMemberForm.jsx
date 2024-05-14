@@ -195,7 +195,7 @@ const EditMemberForm = ({ IDPersonne }) => {
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null} // Supprimer le footer pour ne pas afficher les boutons OK et Cancel
-        style={{ textAlign: "center", minHeight: "70vh", minWidth: "70vh" }}
+        style={{ textAlign: "center", minHeight: "70vh", minWidth: "80vh" }}
         centered
       >
         <div>
@@ -206,7 +206,7 @@ const EditMemberForm = ({ IDPersonne }) => {
             layout="vertical"
             className="left-align-form" // Ajoutez une classe CSS personnalisée
             style={{
-              maxWidth: "1000px",
+              maxWidth: "700px",
               width: "100%",
               padding: "20px",
               backgroundColor: "#f0f2f5",
@@ -439,6 +439,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  margin: 30
                 }}
               >
                 <Button style={{ margin: 10 }} type="primary" htmlType="submit">
