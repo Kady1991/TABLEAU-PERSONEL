@@ -87,7 +87,7 @@ const Delete = ({
       <MdDeleteForever
         title="Archiver"
         onClick={handleClick}
-        style={{ cursor: "pointer", color: "red", fontSize: "22px", marginTop:"10px" }}
+        style={{ cursor: "pointer", color: "red", fontSize: "20px", marginTop:"10px" }}
       />
     </div>
   );

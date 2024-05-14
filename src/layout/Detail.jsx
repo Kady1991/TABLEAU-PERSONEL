@@ -27,7 +27,7 @@ const Detail = ({
             <GoListOrdered
                 title="Voir les détails"
                 onClick={handleClick}
-                style={{ fontSize: 20, cursor: 'pointer', marginTop:"15px", color:"green" }} // Définit la taille de l'icône et le curseur
+                style={{ fontSize: "18px", cursor: 'pointer', marginTop:"10px", color:"green" }} // Définit la taille de l'icône et le curseur
             />
 
             {/* Fenêtre détaillée */}

@@ -123,7 +123,7 @@ const FormService = ({ personId }) => {
 
     return (
         <>
-            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '20px', cursor: 'pointer', color: '#1E7FCB' }} onClick={handleOpenModal} />
+            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '18px', cursor: 'pointer',marginBottom: "10px", color: '#1E7FCB' }} onClick={handleOpenModal} />
             <Modal
                 title="Ajouter un Service supplémentaire"
                 open={isModalVisible}

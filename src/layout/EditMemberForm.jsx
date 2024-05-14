@@ -14,7 +14,7 @@ import { FiEdit } from "react-icons/fi";
 import axios from "axios";
 import dayjs from "dayjs";
 
-// import moment from "moment";
+
 
 
 const { Option } = Select;
@@ -33,9 +33,7 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [startDate, setStartDate] = useState(null); // Initialiser la date à null
 
 
-  /*   useEffect(() => {
-    //console.log("AdresseComplete:", personData?.AdresseComplete);
-  }, [personData]); */
+
 
   useEffect(() => {
     fetchData();
@@ -120,10 +118,7 @@ const EditMemberForm = ({ IDPersonne }) => {
     setSelectedGradeDetails(selectedGrade);
   };
 
-  //verifier si la date est correcte
-  // const isValidDate = (dateString) => {
-  //   return moment(dateString, "YYYY-MM-DD", true).isValid();
-  // };
+ 
 
   // Logique de soumission du formulaire
   const handleSubmit = async (values) => {
@@ -137,6 +132,8 @@ const EditMemberForm = ({ IDPersonne }) => {
       // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
       //   values.dateEntree
       // );
+
+
       const DateEntreeDate = values["DateEntreeDate"];
       const formData = {
         IDPersonne: personData?.IDPersonne,
@@ -152,9 +149,12 @@ const EditMemberForm = ({ IDPersonne }) => {
         SiServicePrincipal: values.SiServicePrincipal,
         SiTypePersonnel: values.SiTypePersonnel,
       };
+
       //console.log(formData);
+
       const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/edit?id=${IDPersonne}`;
       // const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
+
 
       const response = await axios.put(linkEditPersonne, formData);
 
@@ -175,19 +175,24 @@ const EditMemberForm = ({ IDPersonne }) => {
     }
   };
 
-  if (formSubmitted) {
-    // Si le formulaire a été soumis avec succès, ne rend pas le formulaire
-    return null;
-  }
+  // if (formSubmitted) {
+    
+  //   return null;
+  // }
 
+
+// if (!formSubmitted) {
+  // Si le formulaire n'a pas été soumis
   return (
     <>
       <FiEdit
         title="Editer"
         style={{
-          fontSize: "20px",
+          fontSize: "18px",
           cursor: "pointer",
           color: "#095e74",
+          marginBottom: "10px",
+          
         }}
         onClick={handleOpenModal}
       />
@@ -203,7 +208,7 @@ const EditMemberForm = ({ IDPersonne }) => {
           <Form
             form={form}
             onFinish={handleSubmit}
-            values={personData} // Utilisez initialValues ici
+            values={personData} // Utilisez values ici
             layout="vertical"
             style={{
               maxWidth: "1000px",
@@ -443,5 +448,6 @@ const EditMemberForm = ({ IDPersonne }) => {
     </>
   );
 };
-
+// return null;
+// };
 export default EditMemberForm;
