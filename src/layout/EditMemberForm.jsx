@@ -153,8 +153,8 @@ const EditMemberForm = ({ IDPersonne }) => {
         SiTypePersonnel: values.SiTypePersonnel,
       };
       //console.log(formData);
-      //const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`;
-      const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
+      const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/edit?id=${IDPersonne}`;
+      // const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
       const response = await axios.put(linkEditPersonne, formData);
 
