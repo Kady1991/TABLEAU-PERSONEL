@@ -133,7 +133,7 @@ function Tableau() {
     { field: "PrenomPersonne", headerName: "PRENOM", width: 200 },
     { field: "Email", headerName: "E-mail", width: 250 },
     { field: "TelPro", headerName: "TEL", width: 150 },
-    { field: "SiFrancaisSting", headerName: "RÔLE", width: 150, hide: true },
+    { field: "SiFrancaisString", headerName: "RÔLE", width: 150, hide: true },
     {
       field: "DateEntree",
       headerName: "ENTREE SERVICE",

@@ -8,7 +8,7 @@ const Export = ({ personnes, className }) => {
       // { field: 'IDPersonne', headerName: 'ID', width: 100 }, PAS BESOIND DE ID DANS L'EXPORT
       { field: "NomPersonne", headerName: "NOM", width: 250 },
       { field: "PrenomPersonne", headerName: "PRENOM", width: 250 },
-      { field: "SiFrancaisSting", headerName: "RÔLE", width: 250 },
+      { field: "SiFrancaisString", headerName: "RÔLE", width: 250 },
       { field: "Email", headerName: "E-mail", width: 250 },
       { field: "DateEntree", headerName: "ENTREE SERVICE", width: 250 },
       { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 250 },
@@ -94,15 +94,14 @@ const Export = ({ personnes, className }) => {
 
   return (
     <Button
-    variant="contained"
-    startIcon={<FileDownloadIcon />}
-    onClick={handleExportCsv}
-    className={className}
-    style={{ backgroundColor: "#095c83" }}
-  >
-    Exporter
-  </Button>
-  
+      variant="contained"
+      startIcon={<FileDownloadIcon />}
+      onClick={handleExportCsv}
+      className={className}
+      style={{ backgroundColor: "#095c83" }}
+    >
+      Exporter
+    </Button>
   );
 };
 
