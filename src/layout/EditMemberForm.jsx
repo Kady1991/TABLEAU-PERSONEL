@@ -11,8 +11,10 @@ import {
   Select,
 } from "antd";
 import { FiEdit } from "react-icons/fi";
-import moment from "moment";
 import axios from "axios";
+import dayjs from "dayjs";
+
+// import moment from "moment";
 
 
 const { Option } = Select;
@@ -52,8 +54,9 @@ const EditMemberForm = ({ IDPersonne }) => {
         // );
         personResponse.data.DateEntreeDate = personResponse?.data
           ?.DateEntreeDate
-          ? moment(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
+          ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
           : undefined;
+
         setPersonData(personResponse.data);
         form.setFieldsValue(personResponse.data);
         console.log(personResponse.data);
@@ -134,7 +137,7 @@ const EditMemberForm = ({ IDPersonne }) => {
       // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
       //   values.dateEntree
       // );
-
+      const DateEntreeDate = values["DateEntreeDate"];
       const formData = {
         IDPersonne: personData?.IDPersonne,
         NomPersonne: values.NomPersonne,
@@ -200,7 +203,7 @@ const EditMemberForm = ({ IDPersonne }) => {
           <Form
             form={form}
             onFinish={handleSubmit}
-            values={personData}
+            values={personData} // Utilisez initialValues ici
             layout="vertical"
             style={{
               maxWidth: "1000px",
@@ -211,12 +214,13 @@ const EditMemberForm = ({ IDPersonne }) => {
               boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             }}
           >
+
             <Row gutter={[16]}>
               <Col span={12}>
                 <Form.Item
                   label="Nom"
                   name="NomPersonne"
-                  value={personData?.NomPersonne}
+                  // value={personData?.NomPersonne}
                   rules={[{ required: true }]}
                 >
                   <Input />
@@ -226,7 +230,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Prénom"
                   name="PrenomPersonne"
-                  value={personData?.PrenomPersonne}
+                  // value={personData?.PrenomPersonne}
                   rules={[{ required: true }]}
                 >
                   <Input />
@@ -237,7 +241,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Téléphone"
                   name="TelPro"
-                  value={personData?.TelPro}
+                  // value={personData?.TelPro}
                 >
                   <Input />
                 </Form.Item>
@@ -246,7 +250,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="E-mail"
                   name="Email"
-                  value={personData?.Email}
+                  // value={personData?.Email}
                   rules={[
                     {
                       required: true,
@@ -259,27 +263,26 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-              <Col span={12}>
-                <Form.Item
-                  label="Date"
-                  name="DateEntreeDate"
-                  rules={[{ required: true, message: "Veuillez choisir une date" }]}
-                >
-                  <DatePicker
-                    style={{ width: "100%" }}
-                    value={startDate} // Utilisation de la valeur de la date
-                    onChange={(date) => setStartDate(date)} // Mise à jour de la date
-                  />
-                </Form.Item>
-              </Col>
-
+              {/* <Col span={12}> */}
+              <Form.Item
+                style={{ width: "100%" }}
+                label="Date"
+                name="DateEntreeDate"
+                rules={[{ required: true, message: "Veuillez choisir une date" }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  // defaultValue={personData ? dayjs(personData.DateEntreeDate) : null}
+                />
+              </Form.Item>
+              {/* </Col> */}
 
 
               <Form.Item
-                style={{ width: "100%", marginTop: "15px" }}
+                style={{ width: "100%" }}
                 label="Grade"
                 name="WWGradeID"
-                value={personData?.WWGradeID}
+                // value={personData?.WWGradeID}
                 rules={[
                   { required: true, message: "Veuillez sélectionner un grade" },
                 ]}
@@ -305,7 +308,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 style={{ width: "100%" }}
                 label="Adresse"
                 name="AdresseID"
-                value={personData?.AdresseID}
+                // value={personData?.AdresseID}
                 rules={[
                   {
                     required: true,
@@ -334,7 +337,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 style={{ width: "100%" }}
                 name="ServiceID"
                 label="Service"
-                value={personData?.ServiceID}
+                // value={personData?.ServiceID}
                 rules={[
                   { required: true, message: "Veuillez choisir le service" },
                 ]}
@@ -356,7 +359,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Si Français"
                   name="SiFrancais"
-                  value={personData?.SiFrancais}
+                  // value={personData?.SiFrancais}
                   rules={[
                     {
                       required: true,
@@ -374,7 +377,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Si Personnel"
                   name="SiTypePersonnel"
-                  value={personData?.SiTypePersonnel}
+                  // value={personData?.SiTypePersonnel}
                   rules={[
                     {
                       required: true,
