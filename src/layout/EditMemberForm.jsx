@@ -273,7 +273,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 style={{ width: "100%" }}
                 label="Date"
                 name="DateEntreeDate"
-                rules={[{ required: true, message: "Veuillez choisir une date" }]}
+                rules={[{ required: false, message: "Veuillez choisir une date" }]}
               >
                 <DatePicker
                   style={{ width: "99%" }}
