@@ -51,7 +51,7 @@ const FormService = ({ personId }) => {
 
         fetchData();
     }, [personId]);
-    
+
     const handleOpenModal = () => {
         setIsModalVisible(true);
     };
@@ -88,11 +88,11 @@ const FormService = ({ personId }) => {
                 TelPro: values.telephone == undefined ? null : values.telephone,
                 DateEntree: dateEntree,
                 WWGradeID: values.grade,
-                AdresseID: values.adresse,
+                AdresseID: values.AdresseID,
                 ServiceID: values.service,
                 SiFrancais: values.siFrancais,
-                SiServicePrincipal: true,
-                SiTypePersonnel: values.siPersonnel,
+                SiServicePrincipal: values.SiServicePrincipal,
+                SiTypePersonnel: values.SiTypePersonnel,
             };
             console.log(formData);
             const response = await axios.post(
@@ -123,7 +123,7 @@ const FormService = ({ personId }) => {
 
     return (
         <>
-            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '18px', cursor: 'pointer',marginBottom: "10px", color: '#1E7FCB' }} onClick={handleOpenModal} />
+            <PiBuildingLight title='Ajouter un service' style={{ fontSize: '20px', cursor: 'pointer', color: '#1E7FCB' }} onClick={handleOpenModal} />
             <Modal
                 title="Ajouter un Service supplémentaire"
                 open={isModalVisible}
@@ -188,7 +188,7 @@ const FormService = ({ personId }) => {
                                     <DatePicker style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
-                           
+
                             <Form.Item
                                 style={{ width: "100%" }}
                                 name="grade"
@@ -213,7 +213,7 @@ const FormService = ({ personId }) => {
                                     ))}
                                 </Select>
                             </Form.Item>
-                           
+
                             <Form.Item
                                 style={{ width: "100%" }}
                                 name="adresse"
@@ -231,13 +231,17 @@ const FormService = ({ personId }) => {
                                     <Option key="placeholder" value="" disabled>
                                         Sélectionner une adresse
                                     </Option>
-                                    {addresses.map(address => (
-                                        <Option key={address.IDAdresse} value={address.IDAdresse}>
-                                            {address.AddresseComplete}
+                                    {addresses.map((adresse) => ( // Ici, j'ai corrigé `adresseData` en `addresses`
+                                        <Option
+                                            key={adresse.IDAdresse}
+                                            value={adresse.IDAdresse}
+                                        >
+                                            {adresse.AdresseComplete}
                                         </Option>
                                     ))}
                                 </Select>
                             </Form.Item>
+
 
                             <Form.Item
                                 style={{ width: "100%" }}

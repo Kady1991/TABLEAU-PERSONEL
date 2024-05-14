@@ -112,13 +112,13 @@ const EditMemberForm = ({ IDPersonne }) => {
   };
 
   const handleGradeSelection = (value) => {
-    const selectedGrade = otherGrades.find(
+    const selectedGrade = grades.find(
       (grade) => grade.WWGradeID === value
     );
     setSelectedGradeDetails(selectedGrade);
   };
 
- 
+
 
   // Logique de soumission du formulaire
   const handleSubmit = async (values) => {
@@ -142,7 +142,7 @@ const EditMemberForm = ({ IDPersonne }) => {
         Email: values.Email,
         TelPro: values.TelPro == undefined ? null : values.TelPro,
         DateEntree: values.DateEntreeDate,
-        WWGradeID: values.WWGradeID,
+        WWGradeID: values.WWGradeID == undefined ? null : values.NomWWGradeFr,
         AdresseID: values.AdresseID,
         ServiceID: values.ServiceID,
         SiFrancais: values.SiFrancais,
@@ -175,14 +175,7 @@ const EditMemberForm = ({ IDPersonne }) => {
     }
   };
 
-  // if (formSubmitted) {
-    
-  //   return null;
-  // }
 
-
-// if (!formSubmitted) {
-  // Si le formulaire n'a pas été soumis
   return (
     <>
       <FiEdit
@@ -192,7 +185,7 @@ const EditMemberForm = ({ IDPersonne }) => {
           cursor: "pointer",
           color: "#095e74",
           marginBottom: "10px",
-          
+
         }}
         onClick={handleOpenModal}
       />
@@ -246,7 +239,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Téléphone"
                   name="TelPro"
-                  // value={personData?.TelPro}
+                // value={personData?.TelPro}
                 >
                   <Input />
                 </Form.Item>
@@ -269,101 +262,103 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Col span={12}>
-              <Form.Item
-                style={{ width: "100%" }}
-                label="Date"
-                name="DateEntreeDate"
-                rules={[{ required: false, message: "Veuillez choisir une date" }]}
-              >
-                <DatePicker
-                  style={{ width: "99%" }}
+                <Form.Item
+                  style={{ width: "100%" }}
+                  label="Date"
+                  name="DateEntreeDate"
+                  rules={[{ required: false, message: "Veuillez choisir une date" }]}
+                >
+                  <DatePicker
+                    style={{ width: "99%" }}
                   // defaultValue={personData ? dayjs(personData.DateEntreeDate) : null}
-                />
-              </Form.Item>
+                  />
+                </Form.Item>
               </Col>
 
               <Col span={12}>
-              <Form.Item
-                style={{ width: "100%" }}
-                label="Grade"
-                name="WWGradeID"
-                // value={personData?.WWGradeID}
-                rules={[
-                  { required: true, message: "Veuillez sélectionner un grade" },
-                ]}
-              >
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
+                <Form.Item
+                  style={{ width: "100%" }}
+                  label="Grade"
+                  name="WWGradeID"
+                  rules={[
+                    { required: true, message: "Veuillez sélectionner un grade" },
+                  ]}
                 >
-                  {grades.map((grade) => (
-                    <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                      {grade.NomWWGradeFr}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                  <Select
+                    showSearch
+                  // optionFilterProp="children"
+                  // filterOption={(input, option) =>
+                  //   option.children
+                  //     .toLowerCase()
+                  //     .indexOf(input.toLowerCase()) >= 0
+                  // }
+                  >
+                    {/* Filtrer les grades avec un ID différent de zéro */}
+                    {grades.map((grade) => (
+                      <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                        {grade.NomWWGradeFr}
+                      </Option>
+                    ))}
+                    {/* Option vide si aucun grade sélectionné */}
+                    <Option value=" "> </Option>
+                  </Select>
+                </Form.Item>
               </Col>
 
               <Col span={12}>
-              <Form.Item
-                style={{ width: "100%" }}
-                label="Adresse"
-                name="AdresseID"
-                // value={personData?.AdresseID}
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez sélectionner une adresse",
-                  },
-                ]}
-              >
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
+                <Form.Item
+                  style={{ width: "100%" }}
+                  label="Adresse"
+                  name="AdresseID"
+                  // value={personData?.AdresseID}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez sélectionner une adresse",
+                    },
+                  ]}
                 >
-                  {addresses.map((address) => (
-                    <Option key={address.IDAdresse} value={address.IDAdresse}>
-                      {address.AdresseComplete}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {addresses.map((address) => (
+                      <Option key={address.IDAdresse} value={address.IDAdresse}>
+                        {address.AdresseComplete}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
               </Col>
 
               <Col span={12}>
-              <Form.Item
-                style={{ width: "100%" }}
-                name="ServiceID"
-                label="Service"
-                // value={personData?.ServiceID}
-                rules={[
-                  { required: true, message: "Veuillez choisir le service" },
-                ]}
-              >
-                <Select
-                  allowClear
-                  showSearch
-                  optionFilterProp="children"
-                  onChange={handleServiceSelection}
+                <Form.Item
+                  style={{ width: "100%" }}
+                  name="ServiceID"
+                  label="Service"
+                  // value={personData?.ServiceID}
+                  rules={[
+                    { required: true, message: "Veuillez choisir le service" },
+                  ]}
                 >
-                  {otherServices.map((service) => (
-                    <Option key={service.IDService} value={service.IDService}>
-                      {service.NomServiceFr}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                  <Select
+                    allowClear
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleServiceSelection}
+                  >
+                    {otherServices.map((service) => (
+                      <Option key={service.IDService} value={service.IDService}>
+                        {service.NomServiceFr}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
