@@ -142,7 +142,7 @@ const EditMemberForm = ({ IDPersonne }) => {
         Email: values.Email,
         TelPro: values.TelPro == undefined ? null : values.TelPro,
         DateEntree: values.DateEntreeDate,
-        WWGradeID: values.WWGradeID == undefined ? null : values.NomWWGradeFr,
+        WWGradeID: values.WWGradeID,
         AdresseID: values.AdresseID,
         ServiceID: values.ServiceID,
         SiFrancais: values.SiFrancais,
@@ -152,7 +152,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
       //console.log(formData);
 
-      const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/Personne/edit?id=${IDPersonne}`;
+      const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/personne/edit?id=${IDPersonne}`;
       // const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
 
@@ -276,33 +276,29 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Col span={12}>
-                <Form.Item
-                  style={{ width: "100%" }}
-                  label="Grade"
-                  name="WWGradeID"
-                  rules={[
-                    { required: true, message: "Veuillez sélectionner un grade" },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                  // optionFilterProp="children"
-                  // filterOption={(input, option) =>
-                  //   option.children
-                  //     .toLowerCase()
-                  //     .indexOf(input.toLowerCase()) >= 0
-                  // }
+              <Form.Item
+                    name="grade"
+                    label="Grade"
+                    rules={[
+                      { required: false, message: "Veuillez choisir le grade" },
+                    ]}
                   >
-                    {/* Filtrer les grades avec un ID différent de zéro */}
-                    {grades.map((grade) => (
-                      <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                        {grade.NomWWGradeFr}
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
+                    >
+                      <Option key="placeholder" value="" disabled>
+                        Sélectionner un grade
                       </Option>
-                    ))}
-                    {/* Option vide si aucun grade sélectionné */}
-                    <Option value=" "> </Option>
-                  </Select>
-                </Form.Item>
+                      {grades.map((grade) => (
+                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                          {grade.NomWWGradeFr}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
               </Col>
 
               <Col span={12}>
