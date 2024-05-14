@@ -13,6 +13,7 @@ import {
 import { FiEdit } from "react-icons/fi";
 import axios from "axios";
 import dayjs from "dayjs";
+import "../index.css";
 
 
 
@@ -203,6 +204,7 @@ const EditMemberForm = ({ IDPersonne }) => {
             onFinish={handleSubmit}
             values={personData} // Utilisez values ici
             layout="vertical"
+            className="left-align-form" // Ajoutez une classe CSS personnalisée
             style={{
               maxWidth: "1000px",
               width: "100%",
@@ -210,6 +212,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               backgroundColor: "#f0f2f5",
               borderRadius: "8px",
               boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+              
+              
             }}
           >
 
@@ -324,7 +328,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                     }
                   >
                     {addresses.map((address) => (
-                      <Option key={address.IDAdresse} value={address.IDAdresse}>
+                      <Option  key={address.IDAdresse} value={address.IDAdresse}>
                         {address.AdresseComplete}
                       </Option>
                     ))}
@@ -356,7 +360,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                   </Select>
                 </Form.Item>
               </Col>
+              
               <Col span={12}>
+              <div style={{ textAlign: 'left' }}>
                 <Form.Item
                   label="Si Français"
                   name="SiFrancais"
@@ -373,25 +379,33 @@ const EditMemberForm = ({ IDPersonne }) => {
                     <Radio value={false}>Nl</Radio>
                   </Radio.Group>
                 </Form.Item>
+                </div>
               </Col>
-              <Col span={12}>
-                <Form.Item
-                  label="Si Personnel"
-                  name="SiTypePersonnel"
-                  // value={personData?.SiTypePersonnel}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner une option",
-                    },
-                  ]}
-                >
-                  <Radio.Group>
-                    <Radio value={true}>Oui</Radio>
-                    <Radio value={false}>Non</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
+             
+  <Col span={12} >
+    <div style={{ textAlign: 'left' }}>
+      <Form.Item
+        label="Si Personnel"
+        name="SiTypePersonnel"
+        // value={personData?.SiTypePersonnel}
+        rules={[
+          {
+            required: true,
+            message: "Veuillez sélectionner une option",
+          },
+        ]}
+      
+       
+      >
+        <Radio.Group>
+          <Radio value={true}>Oui</Radio>
+          <Radio value={false}>Non</Radio>
+        </Radio.Group>
+      </Form.Item>
+    </div>
+  </Col>
+
+
             </Row>
             {selectedServiceDetails && (
               <div

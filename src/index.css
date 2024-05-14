@@ -22,3 +22,9 @@ body {
   color: #ff0202; /* ou toute autre couleur grise */
   background-color: #b6d2df; /* Couleur de fond de l'en-tête */
 }
+
+
+/*  style pour afficher le le texte du menu deroulant sur la gauche */
+.left-align-form .ant-form-item-control-input-content {
+  text-align: left;
+}
