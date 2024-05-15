@@ -16,41 +16,45 @@ const AddMemberForm = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
+  const [typePersonnelData, setTypePersonnelData] = useState([]);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
+
   useEffect(() => {
-  setLoadingData(true);
-  const fetchData = async () => {
-    try {
-      const gradesResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_Personne/api/wwgrades"
-      );
-      setGrades(gradesResponse.data);
+    setLoadingData(true);
+    const fetchData = async () => {
+      try {
+        const gradesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/wwgrades"
+        );
+        setGrades(gradesResponse.data);
 
-      const servicesResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_Personne/api/affectation/services"
-      );
-      setServices(servicesResponse.data);
+        const servicesResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/affectation/services"
+        );
+        setServices(servicesResponse.data);
 
-      const addressResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_Personne/api/Adresses"
-      );
-      setAddressData(addressResponse.data);
+        const addressResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/Adresses"
+        );
+        setAddressData(addressResponse.data);
 
-      // Récupérer la liste des types de personnel depuis votre API
-      const typePersonnelResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
-      );
-      setTypePersonnelList(typePersonnelResponse.data);
-    } catch (error) {
-      console.error("Erreur lors du chargement des données:", error);
-    } finally {
-      setLoadingData(false);
-    }
-  };
+        // Récupérer la liste des types de personnel depuis votre API
+        const typePersonnelResponse = await axios.get(
+          "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
+        );
+        setTypePersonnelList(typePersonnelResponse.data);
 
-  fetchData();
-}, []);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   // logique de gestion de la sélection du service ici
   const handleServiceSelection = async (IDService) => {
@@ -93,20 +97,21 @@ const AddMemberForm = () => {
         SiFrancais: values.siFrancais,
         SiServicePrincipal: true,
         SiTypePersonnel: values.siPersonnel,
+        TypePersonnelID: values.TypePersonnelID,
       };
 
       // Vérification de la soumission du formulaire
       console.log("Données du formulaire soumises:", formData);
 
-      //const response = await axios.post(
-      //  "https://server-iis.uccle.intra/API_Personne/api/Personne",
-      //  formData
-      //);
-
       const response = await axios.post(
-        "https://localhost:44333/api/Personne",
-        formData
+       "https://server-iis.uccle.intra/API_Personne/api/Personne",
+       formData
       );
+
+     // const response = await axios.post(
+     //   "https://localhost:44333/api/Personne",
+      //  formData
+     // );
 
       console.log("Réponse de l'API:", response.data);
       if (response.data === "Success") {
@@ -405,6 +410,89 @@ const AddMemberForm = () => {
                 </Col>
               </Row>
 
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div style={{ display: "flex", justifyContent:"space-between" }}>
+                    <Form.Item
+                      name="siPersonnel"
+                      label="Personnel"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Veuillez choisir si le membre est personnel",
+                        },
+                      ]}
+                    >
+                      <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                        <Radio value={true}>Oui</Radio>
+                        <Radio value={false}>Non</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </div>
+                  {isPersonnelSelected && (
+                    <Form.Item
+                      name="TypePersonnelID"
+                      label="Type de personnel"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Veuillez choisir le type de personnel",
+                        },
+                      ]}
+                    >
+                      <Select
+                        style={{ width: "100%" }}
+                        allowClear
+                        showSearch
+                        optionFilterProp="children"
+                      >
+                        {typePersonnelList.map(typePersonnel => (
+                          <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
+                            {typePersonnel.NomTypePersonnelFr}
+                          </Option>
+                        ))}
+                      </Select>
+
+                    </Form.Item>
+                  )}
+                </Col>
+
+                <Col span={12}>
+                  <div style={{ display: "flex", justifyContent:"space-between" }}>
+                    <Form.Item
+                      name="siFrancais"
+                      label="Français"
+                      rules={[
+                        { required: true, message: "Veuillez choisir la langue" },
+                      ]}
+                    >
+                      <Radio.Group>
+                        <Radio value={true}>FR</Radio>
+                        <Radio value={false}>Nl</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </div>
+                </Col>
+              </Row>
+
+
+              <Form.Item style={{ display:"flex", justifyContent:"space-evenly"  }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  style={{ position: "relative", zIndex: "9999" }}
+                >
+                  Valider
+                </Button>
+                <Button
+                  onClick={closeForm}
+                  style={{ position: "relative", zIndex: "9999", margin: 8 }}
+                >
+                  Annuler
+                </Button>
+              </Form.Item>
+              
               {selectedServiceDetails && (
                 <div
                   style={{
@@ -413,7 +501,7 @@ const AddMemberForm = () => {
                     gap: 1, // Espacement entre les éléments
                   }}
                 >
-                  <div style={{ textAlign: "right" }}>
+                  <div style={{ textAlign: "left" }}>
                     <p>
                       <span style={{ fontWeight: "bold" }}>
                         Chef du Service:
@@ -435,88 +523,6 @@ const AddMemberForm = () => {
                 </div>
               )}
 
-              <Row gutter={16}>
-              <Col span={12}>
-  <div style={{ display: "flex", justifyContent: "center" }}>
-    <Form.Item
-      name="siPersonnel"
-      label="Personnel"
-      rules={[
-        {
-          required: true,
-          message: "Veuillez choisir si le membre est personnel",
-        },
-      ]}
-    >
-      <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
-        <Radio value={true}>Oui</Radio>
-        <Radio value={false}>Non</Radio>
-      </Radio.Group>
-    </Form.Item>
-  </div>
-  {isPersonnelSelected && (
-    <Form.Item
-      name="typePersonnel"
-      label="Type de personnel"
-      rules={[
-        {
-          required: true,
-          message: "Veuillez choisir le type de personnel",
-        },
-      ]}
-    >
-      <Select
-        style={{ width: "100%" }}
-        allowClear
-        showSearch
-        optionFilterProp="children"
-      >
-        {/* Afficher les options récupérées de l'API */}
-        {typePersonnelList.map((type) => (
-          <Select.Option key={type.id} value={type.id}>
-            {type.nom}
-          </Select.Option>
-        ))}
-      </Select>
-    </Form.Item>
-  )}
-</Col>
-
-                <Col span={12}>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <Form.Item
-                      name="siFrancais"
-                      label="Français"
-                      rules={[
-                        { required: true, message: "Veuillez choisir la langue" },
-                      ]}
-                    >
-                      <Radio.Group>
-                        <Radio value={true}>FR</Radio>
-                        <Radio value={false}>Nl</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </div>
-                </Col>
-              </Row>
-
-
-              <Form.Item style={{ textAlign: "center", marginTop: "20px" }}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  style={{ position: "relative", zIndex: "9999" }}
-                >
-                  Valider
-                </Button>
-                <Button
-                  onClick={closeForm}
-                  style={{ position: "relative", zIndex: "9999", margin: 8 }}
-                >
-                  Annuler
-                </Button>
-              </Form.Item>
             </Form>
           )}
         </div>

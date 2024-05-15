@@ -32,6 +32,10 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [startDate, setStartDate] = useState(null); // Initialiser la date à null
+  const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
+  const [typePersonnelData, setTypePersonnelData] = useState([]);
+  const [typePersonnelList, setTypePersonnelList] = useState([]);
+
 
 
 
@@ -85,6 +89,16 @@ const EditMemberForm = ({ IDPersonne }) => {
       console.error("Erreur lors de la récupération des adresses:", error);
     }
 
+    // Récupérer la liste des types de personnel depuis votre API
+    try {
+      const typePersonnelResponse = await axios.get(
+        "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
+      );
+      setTypePersonnelList(typePersonnelResponse.data);
+
+    } catch (error) {
+      console.error("Erreur lors du chargement des données:", error);
+    }
     try {
       const servicesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_Personne/api/affectation/services`
@@ -149,6 +163,7 @@ const EditMemberForm = ({ IDPersonne }) => {
         SiFrancais: values.SiFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
         SiTypePersonnel: values.SiTypePersonnel,
+        TypePersonnelID: values.TypePersonnelID,
       };
 
       //console.log(formData);
@@ -176,6 +191,11 @@ const EditMemberForm = ({ IDPersonne }) => {
     }
   };
 
+
+  // Fonction pour gérer le changement de sélection du statut "Personnel"
+  const handlePersonnelSelection = (value) => {
+    setIsPersonnelSelected(value); // Met à jour l'état pour indiquer si "Oui" ou "Non" est sélectionné
+  }
 
   return (
     <>
@@ -212,8 +232,10 @@ const EditMemberForm = ({ IDPersonne }) => {
               backgroundColor: "#f0f2f5",
               borderRadius: "8px",
               boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-
-
+            }}
+            initialValues={{
+              siPersonnel: false,
+              siFrancais: true,
             }}
           >
 
@@ -365,17 +387,60 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
+
               <Col span={12}>
-                <div style={{ textAlign: 'left' }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <Form.Item
-                    label="Si Français"
-                    name="SiFrancais"
-                    // value={personData?.SiFrancais}
+                    name="siPersonnel"
+                    label="Personnel"
                     rules={[
                       {
                         required: true,
-                        message: "Veuillez sélectionner une option",
+                        message: "Veuillez choisir si le membre est personnel",
                       },
+                    ]}
+                  >
+                    <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                      <Radio value={true}>Oui</Radio>
+                      <Radio value={false}>Non</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+                {isPersonnelSelected && (
+                  <Form.Item
+                    name="TypePersonnelID"
+                    label="Type de personnel"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez choisir le type de personnel",
+                      },
+                    ]}
+                  >
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
+                    >
+                      {typePersonnelList.map(typePersonnel => (
+                        <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
+                          {typePersonnel.NomTypePersonnelFr}
+                        </Option>
+                      ))}
+                    </Select>
+
+                  </Form.Item>
+                )}
+              </Col>
+
+              <Col span={12}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Form.Item
+                    name="siFrancais"
+                    label="Français"
+                    rules={[
+                      { required: true, message: "Veuillez choisir la langue" },
                     ]}
                   >
                     <Radio.Group>
@@ -385,31 +450,6 @@ const EditMemberForm = ({ IDPersonne }) => {
                   </Form.Item>
                 </div>
               </Col>
-
-              <Col span={12} >
-                <div style={{ textAlign: 'left' }}>
-                  <Form.Item
-                    label="Si Personnel"
-                    name="SiTypePersonnel"
-                    // value={personData?.SiTypePersonnel}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez sélectionner une option",
-                      },
-                    ]}
-
-
-                  >
-                    <Radio.Group>
-                      <Radio value={true}>Oui</Radio>
-                      <Radio value={false}>Non</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </div>
-              </Col>
-
-
             </Row>
             {selectedServiceDetails && (
               <div
