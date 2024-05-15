@@ -38,7 +38,7 @@ const Delete = ({
 
     // Demande de confirmation avant d'archiver la personne
     const confirmation = window.confirm(
-      `Voulez-vous vraiment archiver cette personne ?\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}`
+      `Voulez-vous vraiment archiver cette personne ?\nID: ${IDPersonne} \nNom:  ${nomPersonne} \nPrénom:  ${prenomPersonne} \nEmail:  ${email}`
     );
     if (!confirmation) return; // Arrête le processus si l'utilisateur annule
 
@@ -55,7 +55,7 @@ const Delete = ({
       onSuccess(email);
 
       // Afficher une alerte de succès
-      alert(`La personne ${IDPersonne} ${prenomPersonne} ${nomPersonne} a été archivée avec succès.`);
+      alert(`La personne ${IDPersonne} ${prenomPersonne} ${nomPersonne}${email}  a été archivée avec succès.`);
       console.log("La valeur de SiArchive a été mise à jour avec succès.");
       setIsArchived(true); // Mettre à jour l'état local pour indiquer que la personne est maintenant archivée
 
@@ -87,7 +87,7 @@ const Delete = ({
       <MdDeleteForever
         title="Archiver"
         onClick={handleClick}
-        style={{ cursor: "pointer", color: "red", fontSize: "20px", marginTop:"10px" }}
+        style={{ cursor: "pointer", color: "red", fontSize: "22px", marginTop:"10px" }}
       />
     </div>
   );

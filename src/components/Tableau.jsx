@@ -37,9 +37,10 @@ function Tableau() {
       });
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // pour ne pas garder les données encoder sur le formulaire d'ajout
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     // Effect for fetching data after successful deletion or addition

@@ -44,7 +44,7 @@ const AddMemberForm = () => {
 
     fetchData();
   }, []);
-
+  // logique de gestion de la sélection du service ici
   const handleServiceSelection = async (IDService) => {
     try {
       const response = await axios.get(
@@ -60,6 +60,8 @@ const AddMemberForm = () => {
     }
   };
 
+
+  // logique pour soumettre le formulaire 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -110,14 +112,32 @@ const AddMemberForm = () => {
     }
     setFormSubmitted(true);
   };
-
+  // logique pour fermer le formulaire ici
   const openForm = () => {
     setIsFormOpen(true);
+    form.resetFields();
   };
 
   const closeForm = () => {
     setIsFormOpen(false);
   };
+
+  // Fonction pour générer l'e-mail à partir du prénom et du nom
+  const generateEmail = (prenom, nom) => {
+    const firstLetterPrenom = prenom.charAt(0).toLowerCase();
+    const nomLowerCase = nom.toLowerCase();
+    return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
+  };
+
+  // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
+  const handleNameChange = (e) => {
+    const prenom = form.getFieldValue('prenom');
+    const nom = form.getFieldValue('nom'); // Récupérer la valeur du champ nom
+    const email = generateEmail(prenom, nom);
+    form.setFieldsValue({ email });
+  };
+
+
 
   return (
     <div>
@@ -141,7 +161,7 @@ const AddMemberForm = () => {
             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             borderRadius: "8px",
             minHeight: "50vh", minWidth: "70vh",
-           
+
           }}
         >
           {/* croix de la fermeture du formulaire */}
@@ -219,6 +239,7 @@ const AddMemberForm = () => {
                       id="nom"
                       style={{ textTransform: "uppercase" }}
                       autoComplete="off"
+                      onChange={handleNameChange}
                     />
                   </Form.Item>
                 </Col>
@@ -240,6 +261,7 @@ const AddMemberForm = () => {
                           e.target.value =
                             value.charAt(0).toUpperCase() + value.slice(1);
                         }
+                        handleNameChange(e);
                       }}
                     />
                   </Form.Item>
