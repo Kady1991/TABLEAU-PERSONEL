@@ -3,7 +3,6 @@ import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 
-
 const { Option } = Select;
 
 const AddMemberForm = () => {
@@ -69,8 +68,7 @@ const AddMemberForm = () => {
     }
   };
 
-
-  // logique pour soumettre le formulaire 
+  // logique pour soumettre le formulaire
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -100,8 +98,13 @@ const AddMemberForm = () => {
       // Vérification de la soumission du formulaire
       console.log("Données du formulaire soumises:", formData);
 
+      //const response = await axios.post(
+      //  "https://server-iis.uccle.intra/API_Personne/api/Personne",
+      //  formData
+      //);
+
       const response = await axios.post(
-        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        "https://localhost:44333/api/Personne",
         formData
       );
 
@@ -109,7 +112,13 @@ const AddMemberForm = () => {
       if (response.data === "Success") {
         alert("Ajout réussi !");
         console.log("Nouveau membre ajouté avec succès");
-        setIsFormOpen(true); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
+        closeForm(); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire        
+      }
+      if (response.data === "Personne Exists") {
+        alert("Ce email est déjà attribué");
+        console.log("Le email est déjà attribué");
+        setIsFormOpen(true);
+        // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données", error);
@@ -117,7 +126,6 @@ const AddMemberForm = () => {
       alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
     } finally {
       setLoading(false);
-      setIsFormOpen(false);
     }
     setFormSubmitted(true);
   };
@@ -138,29 +146,35 @@ const AddMemberForm = () => {
 
   // Fonction pour générer l'e-mail à partir du prénom et du nom
   const generateEmail = (prenom, nom) => {
-    const firstLetterPrenom = prenom.charAt(0).toLowerCase();
+    const firstLetterPrenom =
+      prenom != undefined ? prenom.charAt(0).toLowerCase() : "";
     const nomLowerCase = nom.toLowerCase();
     return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
   };
 
   // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
   const handleNameChange = (e) => {
-    const prenom = form.getFieldValue('prenom');
-    const nom = form.getFieldValue('nom'); // Récupérer la valeur du champ nom
+    const prenom = form.getFieldValue("prenom");
+    const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
     const email = generateEmail(prenom, nom);
     form.setFieldsValue({ email });
   };
 
-
-
   return (
     <div>
       {/* Affiche le bouton pour ouvrir le formulaire */}
-      <Button style={{
-        backgroundColor: "#095c83", height: "2.4rem", fontStyle: "bold"
-      }} type="primary" onClick={openForm} icon={<PlusOutlined />}>
+      <Button
+        style={{
+          backgroundColor: "#095c83",
+          height: "2.4rem",
+          fontStyle: "bold",
+        }}
+        type="primary"
+        onClick={openForm}
+        icon={<PlusOutlined />}
+      >
         CREER MEMBRE
-      </Button >
+      </Button>
 
       {isFormOpen && (
         <div
@@ -174,8 +188,8 @@ const AddMemberForm = () => {
             padding: "20px",
             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             borderRadius: "8px",
-            minHeight: "50vh", minWidth: "70vh",
-
+            minHeight: "50vh",
+            minWidth: "70vh",
           }}
         >
           {/* croix de la fermeture du formulaire */}
@@ -184,7 +198,14 @@ const AddMemberForm = () => {
           </div>
 
           {/* Titre du formulaire */}
-          <div style={{ marginBottom: "50px", textAlign: "center", fontSize: "1.2rem", fontWeight: "bold" }}>
+          <div
+            style={{
+              marginBottom: "50px",
+              textAlign: "center",
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+            }}
+          >
             Ajouter un nouveau membre
           </div>
 
@@ -196,7 +217,8 @@ const AddMemberForm = () => {
               layout="vertical"
               onFinish={handleSubmit}
               style={{
-                minHeight: "70vh", minWidth: "70vh",
+                minHeight: "70vh",
+                minWidth: "70vh",
                 padding: "30px",
                 backgroundColor: "#f0f2f5",
                 borderRadius: "8px",
@@ -488,7 +510,10 @@ const AddMemberForm = () => {
                 >
                   Valider
                 </Button>
-                <Button onClick={closeForm} style={{ position: "relative", zIndex: "9999", margin: 8 }}>
+                <Button
+                  onClick={closeForm}
+                  style={{ position: "relative", zIndex: "9999", margin: 8 }}
+                >
                   Annuler
                 </Button>
               </Form.Item>
