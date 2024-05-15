@@ -89,8 +89,13 @@ const AddMemberForm = () => {
       // Vérification de la soumission du formulaire
       console.log("Données du formulaire soumises:", formData);
 
+      //const response = await axios.post(
+      //  "https://server-iis.uccle.intra/API_Personne/api/Personne",
+      //  formData
+      //);
+
       const response = await axios.post(
-        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        "https://localhost:44333/api/Personne",
         formData
       );
 
@@ -98,7 +103,13 @@ const AddMemberForm = () => {
       if (response.data === "Success") {
         alert("Ajout réussi !");
         console.log("Nouveau membre ajouté avec succès");
-        setIsFormOpen(true); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
+        closeForm(); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire        
+      }
+      if (response.data === "Personne Exists") {
+        alert("Ce email est déjà attribué");
+        console.log("Le email est déjà attribué");
+        setIsFormOpen(true);
+        // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données", error);
@@ -106,7 +117,6 @@ const AddMemberForm = () => {
       alert("Erreur lors de l'envoi des données. Veuillez réessayer.");
     } finally {
       setLoading(false);
-      setIsFormOpen(false);
     }
     setFormSubmitted(true);
   };
