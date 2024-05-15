@@ -212,8 +212,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               backgroundColor: "#f0f2f5",
               borderRadius: "8px",
               boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-              
-              
+
+
             }}
           >
 
@@ -280,30 +280,34 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Col span={12}>
-              <Form.Item
-                    name="grade"
-                    label="Grade"
-                    rules={[
-                      { required: false, message: "Veuillez choisir le grade" },
-                    ]}
+                <Form.Item
+                  style={{ width: "100%" }}
+                  name="WWGradeID"
+                  label="Grade"
+                  rules={[
+                    { required: false, message: "Veuillez choisir le grade" },
+                  ]}
+                >
+                  <Select
+                    style={{ width: "100%" }}
+                    allowClear
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleGradeSelection}
+                    value={selectedGradeDetails ? selectedGradeDetails.WWGradeID : null} // Utilisez null lorsque aucun grade n'est sélectionné
                   >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                    >
-                      <Option key="placeholder" value="" disabled>
-                        Sélectionner un grade
+                    <Option key="placeholder" value="" disabled>
+                      Sélectionner un grade
+                    </Option>
+                    {grades.map((grade) => (
+                      <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                        {grade.NomWWGradeFr}
                       </Option>
-                      {grades.map((grade) => (
-                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                          {grade.NomWWGradeFr}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                    ))}
+                  </Select>
+                </Form.Item>
               </Col>
+
 
               <Col span={12}>
                 <Form.Item
@@ -328,7 +332,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                     }
                   >
                     {addresses.map((address) => (
-                      <Option  key={address.IDAdresse} value={address.IDAdresse}>
+                      <Option key={address.IDAdresse} value={address.IDAdresse}>
                         {address.AdresseComplete}
                       </Option>
                     ))}
@@ -360,50 +364,50 @@ const EditMemberForm = ({ IDPersonne }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              
+
               <Col span={12}>
-              <div style={{ textAlign: 'left' }}>
-                <Form.Item
-                  label="Si Français"
-                  name="SiFrancais"
-                  // value={personData?.SiFrancais}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner une option",
-                    },
-                  ]}
-                >
-                  <Radio.Group>
-                    <Radio value={true}>FR</Radio>
-                    <Radio value={false}>Nl</Radio>
-                  </Radio.Group>
-                </Form.Item>
+                <div style={{ textAlign: 'left' }}>
+                  <Form.Item
+                    label="Si Français"
+                    name="SiFrancais"
+                    // value={personData?.SiFrancais}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez sélectionner une option",
+                      },
+                    ]}
+                  >
+                    <Radio.Group>
+                      <Radio value={true}>FR</Radio>
+                      <Radio value={false}>Nl</Radio>
+                    </Radio.Group>
+                  </Form.Item>
                 </div>
               </Col>
-             
-  <Col span={12} >
-    <div style={{ textAlign: 'left' }}>
-      <Form.Item
-        label="Si Personnel"
-        name="SiTypePersonnel"
-        // value={personData?.SiTypePersonnel}
-        rules={[
-          {
-            required: true,
-            message: "Veuillez sélectionner une option",
-          },
-        ]}
-      
-       
-      >
-        <Radio.Group>
-          <Radio value={true}>Oui</Radio>
-          <Radio value={false}>Non</Radio>
-        </Radio.Group>
-      </Form.Item>
-    </div>
-  </Col>
+
+              <Col span={12} >
+                <div style={{ textAlign: 'left' }}>
+                  <Form.Item
+                    label="Si Personnel"
+                    name="SiTypePersonnel"
+                    // value={personData?.SiTypePersonnel}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez sélectionner une option",
+                      },
+                    ]}
+
+
+                  >
+                    <Radio.Group>
+                      <Radio value={true}>Oui</Radio>
+                      <Radio value={false}>Non</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+              </Col>
 
 
             </Row>
