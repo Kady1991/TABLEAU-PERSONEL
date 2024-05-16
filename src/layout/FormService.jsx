@@ -14,7 +14,9 @@ const FormService = ({ personId }) => {
     const [loading, setLoading] = useState(false);
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null); // Ajout de l'état pour stocker les détails du service sélectionné
-
+    const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
+    const [typePersonnelData, setTypePersonnelData] = useState([]);
+    const [typePersonnelList, setTypePersonnelList] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,8 +24,8 @@ const FormService = ({ personId }) => {
                 try {
                     const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
                     setPersonData(personResponse.data);
-                   
-                    
+
+
                 } catch (error) {
                     console.error('Erreur lors de la récupération des données de la personne:', error);
                 }
@@ -41,6 +43,18 @@ const FormService = ({ personId }) => {
                 setAddresses(addressesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des adresses:', error);
+            }
+
+
+            // Récupérer la liste des types de personnel depuis votre API
+            try {
+                const typePersonnelResponse = await axios.get(
+                    "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
+                );
+                setTypePersonnelList(typePersonnelResponse.data);
+
+            } catch (error) {
+                console.error("Erreur lors du chargement des données:", error);
             }
 
             try {
@@ -95,6 +109,7 @@ const FormService = ({ personId }) => {
                 SiFrancais: values.siFrancais,
                 SiServicePrincipal: values.SiServicePrincipal,
                 SiTypePersonnel: values.SiTypePersonnel,
+                TypePersonnelID: values.TypePersonnelID,
             };
             console.log(formData);
             const response = await axios.post(
@@ -146,16 +161,19 @@ const FormService = ({ personId }) => {
                 >
                     <Form
                         onFinish={handleSubmit}
-                        initialValues={personData}
+                        values={personData}
                         layout="vertical"
                         style={{
                             maxWidth: "50vw",
                             width: "100%",
-                            // padding: "20px",
                             backgroundColor: "#f0f2f5",
                             borderRadius: "8px",
                             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                            padding:"2rem",
+                            padding: "2rem",
+                        }}
+                        initialValues={{
+                            siPersonnel: false,
+                            siFrancais: true,
                         }}
                     >
                         <Row gutter={[16]}>
@@ -193,114 +211,153 @@ const FormService = ({ personId }) => {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                            <Form.Item
-                                style={{ width: "100%" }}
-                                name="grade"
-                                label="Grade"
-                                rules={[
-                                    { required: true, message: "Veuillez choisir le grade" },
-                                ]}
-                            >
-                                <Select
-
-                                    allowClear
-                                    showSearch
-                                    optionFilterProp="children"
-                                >
-                                    <Option key="placeholder" value="" disabled>
-                                        Sélectionner un grade
-                                    </Option>
-                                    {grades.map(grade => (
-                                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                                            {grade.NomWWGradeFr}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                            </Col>
-
-                            <Col span={24}>
-
-                            <Form.Item
-                                style={{ width: "100%" }}
-                                name="adresse"
-                                label="Adresse"
-                                rules={[
-                                    { required: true, message: "Veuillez choisir l'adresse" },
-                                ]}
-                            >
-                                <Select
+                                <Form.Item
                                     style={{ width: "100%" }}
-                                    allowClear
-                                    showSearch
-                                    optionFilterProp="children"
+                                    name="grade"
+                                    label="Grade"
+                                    rules={[
+                                        { required: true, message: "Veuillez choisir le grade" },
+                                    ]}
                                 >
-                                    <Option key="placeholder" value="" disabled>
-                                        Sélectionner une adresse
-                                    </Option>
-                                    {addresses.map((adresse) => ( // Ici, j'ai corrigé `adresseData` en `addresses`
-                                        <Option
-                                            key={adresse.IDAdresse}
-                                            value={adresse.IDAdresse}
-                                        >
-                                            {adresse.AdresseComplete}
+                                    <Select
+
+                                        allowClear
+                                        showSearch
+                                        optionFilterProp="children"
+                                    >
+                                        <Option key="placeholder" value="" disabled>
+                                            Sélectionner un grade
                                         </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                        {grades.map(grade => (
+                                            <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                                                {grade.NomWWGradeFr}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
                             </Col>
 
                             <Col span={24}>
-                            <Form.Item
-                                style={{ width: "100%" }}
-                                name="service"
-                                label="Service"
-                                rules={[
-                                    { required: true, message: "Veuillez choisir le service" },
-                                ]}
-                            >
-                                <Select
-                                    // style={{ width: "100%" }}
-                                    allowClear
-                                    showSearch
-                                    optionFilterProp="children"
-                                    onChange={handleServiceSelection}
+
+                                <Form.Item
+                                    style={{ width: "100%" }}
+                                    name="adresse"
+                                    label="Adresse"
+                                    rules={[
+                                        { required: true, message: "Veuillez choisir l'adresse" },
+                                    ]}
                                 >
-                                    <Option key="placeholder" value="" disabled>
-                                        Sélectionner un service
-                                    </Option>
-                                    {otherServices.map(service => (
-                                        <Option key={service.IDService} value={service.IDService}>
-                                            {service.NomServiceFr} {service.NomServiceNl}
+                                    <Select
+                                        style={{ width: "100%" }}
+                                        allowClear
+                                        showSearch
+                                        optionFilterProp="children"
+                                    >
+                                        <Option key="placeholder" value="" disabled>
+                                            Sélectionner une adresse
                                         </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                        {addresses.map((adresse) => ( // Ici, j'ai corrigé `adresseData` en `addresses`
+                                            <Option
+                                                key={adresse.IDAdresse}
+                                                value={adresse.IDAdresse}
+                                            >
+                                                {adresse.AdresseComplete}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
                             </Col>
-                            {/* <Row gutter={16} justify="end"> */}
-                                <Col span={4}>
-                                <div style={{ textAlign: 'left'  }}>
-                                    <Form.Item label="Français" name="siFrancais" rules={[{ required: true }]}>
+
+                            <Col span={24}>
+                                <Form.Item
+                                    style={{ width: "100%" }}
+                                    name="service"
+                                    label="Service"
+                                    rules={[
+                                        { required: true, message: "Veuillez choisir le service" },
+                                    ]}
+                                >
+                                    <Select
+
+                                        allowClear
+                                        showSearch
+                                        optionFilterProp="children"
+                                        onChange={handleServiceSelection}
+                                    >
+                                        <Option key="placeholder" value="" disabled>
+                                            Sélectionner un service
+                                        </Option>
+                                        {otherServices.map(service => (
+                                            <Option key={service.IDService} value={service.IDService}>
+                                                {service.NomServiceFr} {service.NomServiceNl}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+
+                            <Col span={12}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item
+                                        name="siPersonnel"
+                                        label="Personnel"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Veuillez choisir si le membre est personnel",
+                                            },
+                                        ]}
+                                    >
+                                        <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                                            <Radio value={true}>Oui</Radio>
+                                            <Radio value={false}>Non</Radio>
+                                        </Radio.Group>
+                                    </Form.Item>
+                                </div>
+                                {isPersonnelSelected && (
+                                    <Form.Item
+                                        name="TypePersonnelID"
+                                        label="Type de personnel"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Veuillez choisir le type de personnel",
+                                            },
+                                        ]}
+                                    >
+                                        <Select
+                                            style={{ width: "100%" }}
+                                            allowClear
+                                            showSearch
+                                            optionFilterProp="children"
+                                        >
+                                            {typePersonnelList.map(typePersonnel => (
+                                                <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
+                                                    {typePersonnel.NomTypePersonnelFr}
+                                                </Option>
+                                            ))}
+                                        </Select>
+
+                                    </Form.Item>
+                                )}
+                            </Col>
+
+                            <Col span={12}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item
+                                        name="siFrancais"
+                                        label="Français"
+                                        rules={[
+                                            { required: true, message: "Veuillez choisir la langue" },
+                                        ]}
+                                    >
                                         <Radio.Group>
                                             <Radio value={true}>FR</Radio>
                                             <Radio value={false}>Nl</Radio>
                                         </Radio.Group>
                                     </Form.Item>
-                                    </div>
-                                </Col>
-                            {/* </Row> */}
-                            {/* <Row gutter={16}> */}
-                                <Col span={20}>
-                                <div style={{ textAlign: 'left', marginLeft:"19rem" }}>
-                                    <Form.Item label="Personnel" name="siPersonnel" rules={[{ required: true }]}>
-                                        <Radio.Group>
-                                            <Radio value={true}>Oui</Radio>
-                                            <Radio value={false}>Non</Radio>
-                                        </Radio.Group>
-                                    </Form.Item>
-                                    </div>
-                                </Col>
-                            {/* </Row> */}
+                                </div>
+                            </Col>
 
 
                         </Row>

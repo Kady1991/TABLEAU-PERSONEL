@@ -104,14 +104,14 @@ const AddMemberForm = () => {
       console.log("Données du formulaire soumises:", formData);
 
       const response = await axios.post(
-       "https://server-iis.uccle.intra/API_Personne/api/Personne",
-       formData
+        "https://server-iis.uccle.intra/API_Personne/api/Personne",
+        formData
       );
 
-     // const response = await axios.post(
-     //   "https://localhost:44333/api/Personne",
+      // const response = await axios.post(
+      //   "https://localhost:44333/api/Personne",
       //  formData
-     // );
+      // );
 
       console.log("Réponse de l'API:", response.data);
       if (response.data === "Success") {
@@ -230,7 +230,7 @@ const AddMemberForm = () => {
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
               initialValues={{
-                siPersonnel: false,
+                TypePersonnelID: false,
                 siFrancais: true,
               }}
             >
@@ -412,10 +412,10 @@ const AddMemberForm = () => {
 
               <Row gutter={16}>
                 <Col span={12}>
-                  <div style={{ display: "flex", justifyContent:"space-between" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Form.Item
-                      name="siPersonnel"
-                      label="Personnel"
+                      name="TypePersonnelID"
+                      label="Type de personnel"
                       rules={[
                         {
                           required: true,
@@ -458,7 +458,7 @@ const AddMemberForm = () => {
                 </Col>
 
                 <Col span={12}>
-                  <div style={{ display: "flex", justifyContent:"space-between" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Form.Item
                       name="siFrancais"
                       label="Français"
@@ -476,7 +476,7 @@ const AddMemberForm = () => {
               </Row>
 
 
-              <Form.Item style={{ display:"flex", justifyContent:"space-evenly"  }}>
+              <Form.Item style={{ display: "flex", justifyContent: "space-evenly" }}>
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -492,7 +492,7 @@ const AddMemberForm = () => {
                   Annuler
                 </Button>
               </Form.Item>
-              
+
               {selectedServiceDetails && (
                 <div
                   style={{
