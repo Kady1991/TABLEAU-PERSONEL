@@ -15,9 +15,11 @@ const AddMemberForm = () => {
   const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
+  const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Par défaut, false
   const [typePersonnelData, setTypePersonnelData] = useState([]);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
+
+
 
 
   useEffect(() => {
@@ -230,7 +232,7 @@ const AddMemberForm = () => {
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
               initialValues={{
-                siPersonnel: false,
+                siPersonnel: false, // Mettre à false pour que "Non" soit sélectionné par défaut
                 siFrancais: true,
               }}
             >
@@ -331,11 +333,11 @@ const AddMemberForm = () => {
                   >
                     <Select
                       style={{ width: "100%" }}
-                      allowClear
+                      allowClear // Permet à l'utilisateur de supprimer la sélection actuelle
                       showSearch
                       optionFilterProp="children"
                     >
-                      <Option key="placeholder" value="" disabled>
+                      <Option key="placeholder" value="" >
                         Sélectionner un grade
                       </Option>
                       {grades.map((grade) => (
@@ -346,6 +348,8 @@ const AddMemberForm = () => {
                     </Select>
                   </Form.Item>
                 </Col>
+
+
               </Row>
               <Row gutter={16}>
                 <Col span={12}>
@@ -413,51 +417,53 @@ const AddMemberForm = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <Form.Item
-                    name="SiTypePersonnel"
-                    label="Personnel"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez choisir si le membre est personnel",
-                      },
-                    ]}
-                  >
-                    <Radio.Group
-                      onChange={(e) => handlePersonnelSelection(e.target.value)}
+                    <Form.Item
+                      name="SiTypePersonnel"
+                      label="Personnel"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Veuillez choisir si le membre est personnel",
+                        },
+                      ]}
                     >
-                      <Radio value={true}>Oui</Radio>
-                      <Radio value={false}>Non</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </div>
-                {isPersonnelSelected && (
-                  <Form.Item
-                    name="TypePersonnelID"
-                    label="Type de personnel"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez choisir le type de personnel",
-                      },
-                    ]}
-                  >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
+                      <Radio.Group
+                        onChange={(e) => handlePersonnelSelection(e.target.value)}
+                      >
+                        <Radio value={true}>Oui</Radio>
+                        <Radio value={false}>Non</Radio>
+                      </Radio.Group>
+
+                    </Form.Item>
+                  </div>
+                  {isPersonnelSelected && (
+                    <Form.Item
+                      name="TypePersonnelID"
+                      label="Type de personnel"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Veuillez choisir le type de personnel",
+                        },
+                      ]} // Ajoutez une virgule ici
                     >
-                      {typePersonnelList.map((typePersonnel) => (
-                        <Option
-                          key={typePersonnel.IDTypePersonnel}
-                          value={typePersonnel.IDTypePersonnel}
-                        >
-                          {typePersonnel.NomTypePersonnelFr}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                      <Select
+                        style={{ width: "100%" }}
+                        allowClear
+                        showSearch
+                        optionFilterProp="children"
+                      >
+                        {typePersonnelList.map((typePersonnel) => (
+                          <Option
+                            key={typePersonnel.IDTypePersonnel}
+                            value={typePersonnel.IDTypePersonnel}
+                          >
+                            {typePersonnel.NomTypePersonnelFr}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
                   )}
                 </Col>
 

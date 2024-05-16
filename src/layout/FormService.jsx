@@ -17,6 +17,7 @@ const FormService = ({ personId }) => {
     const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
     const [typePersonnelData, setTypePersonnelData] = useState([]);
     const [typePersonnelList, setTypePersonnelList] = useState([]);
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -81,6 +82,11 @@ const FormService = ({ personId }) => {
         const selectedService = otherServices.find(service => service.IDService === value);
         setSelectedServiceDetails(selectedService);
     };
+
+    const handlePersonnelSelection = (value) => {
+    setIsPersonnelSelected(value);
+};
+
 
 
     // Logique de soumission du formulaire
@@ -172,6 +178,9 @@ const FormService = ({ personId }) => {
                             padding: "2rem",
                         }}
                         initialValues={{
+                            NomPersonne: personData ? personData.NomPersonne : '', // Assurez-vous que personData est défini et extrayez le nom si possible
+                            PrenomPersonne: personData ? personData.PrenomPersonne : '', // Assurez-vous que personData est défini et extrayez le prénom si possible
+                            NomServiceFr: personData ? personData.NomServiceFr:'',
                             siPersonnel: false,
                             siFrancais: true,
                         }}
