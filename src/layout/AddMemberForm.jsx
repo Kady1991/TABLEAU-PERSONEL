@@ -95,8 +95,8 @@ const AddMemberForm = () => {
         AdresseID: values.adresse,
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
-        SiServicePrincipal: true,
-        SiTypePersonnel: values.siPersonnel,
+        SiServicePrincipal: values.SiServicePrincipal,
+        SiTypePersonnel: values.SiTypePersonnel,
         TypePersonnelID: values.TypePersonnelID,
       };
 
@@ -230,7 +230,7 @@ const AddMemberForm = () => {
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
               initialValues={{
-                TypePersonnelID: false,
+                siPersonnel: false,
                 siFrancais: true,
               }}
             >
@@ -413,47 +413,51 @@ const AddMemberForm = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <Form.Item
-                      name="TypePersonnelID"
-                      label="Type de personnel"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Veuillez choisir si le membre est personnel",
-                        },
-                      ]}
+                  <Form.Item
+                    name="SiTypePersonnel"
+                    label="Personnel"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez choisir si le membre est personnel",
+                      },
+                    ]}
+                  >
+                    <Radio.Group
+                      onChange={(e) => handlePersonnelSelection(e.target.value)}
                     >
-                      <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
-                        <Radio value={true}>Oui</Radio>
-                        <Radio value={false}>Non</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </div>
-                  {isPersonnelSelected && (
-                    <Form.Item
-                      name="TypePersonnelID"
-                      label="Type de personnel"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Veuillez choisir le type de personnel",
-                        },
-                      ]}
+                      <Radio value={true}>Oui</Radio>
+                      <Radio value={false}>Non</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+                {isPersonnelSelected && (
+                  <Form.Item
+                    name="TypePersonnelID"
+                    label="Type de personnel"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez choisir le type de personnel",
+                      },
+                    ]}
+                  >
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="children"
                     >
-                      <Select
-                        style={{ width: "100%" }}
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                      >
-                        {typePersonnelList.map(typePersonnel => (
-                          <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
-                            {typePersonnel.NomTypePersonnelFr}
-                          </Option>
-                        ))}
-                      </Select>
-
-                    </Form.Item>
+                      {typePersonnelList.map((typePersonnel) => (
+                        <Option
+                          key={typePersonnel.IDTypePersonnel}
+                          value={typePersonnel.IDTypePersonnel}
+                        >
+                          {typePersonnel.NomTypePersonnelFr}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
                   )}
                 </Col>
 
