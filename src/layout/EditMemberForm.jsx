@@ -15,9 +15,6 @@ import axios from "axios";
 import dayjs from "dayjs";
 import "../index.css";
 
-
-
-
 const { Option } = Select;
 
 const EditMemberForm = ({ IDPersonne }) => {
@@ -35,10 +32,6 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
   const [typePersonnelData, setTypePersonnelData] = useState([]);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
-
-
-
-
 
   useEffect(() => {
     fetchData();
@@ -59,6 +52,16 @@ const EditMemberForm = ({ IDPersonne }) => {
           ?.DateEntreeDate
           ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
           : undefined;
+
+        personResponse.data.WWGradeID =
+          personResponse?.data?.WWGradeID != 0
+            ? personResponse.data.WWGradeID
+            : " ";
+
+        personResponse.data.TypePersonnelID =
+          personResponse?.data?.TypePersonnelID != 0
+            ? personResponse.data.TypePersonnelID
+            : " ";
 
         setPersonData(personResponse.data);
         form.setFieldsValue(personResponse.data);
@@ -95,7 +98,6 @@ const EditMemberForm = ({ IDPersonne }) => {
         "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
       );
       setTypePersonnelList(typePersonnelResponse.data);
-
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
     }
@@ -127,13 +129,9 @@ const EditMemberForm = ({ IDPersonne }) => {
   };
 
   const handleGradeSelection = (value) => {
-    const selectedGrade = grades.find(
-      (grade) => grade.WWGradeID === value
-    );
+    const selectedGrade = grades.find((grade) => grade.WWGradeID === value);
     setSelectedGradeDetails(selectedGrade);
   };
-
-
 
   // Logique de soumission du formulaire
   const handleSubmit = async (values) => {
@@ -147,7 +145,6 @@ const EditMemberForm = ({ IDPersonne }) => {
       // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
       //   values.dateEntree
       // );
-
 
       const DateEntreeDate = values["DateEntreeDate"];
       const formData = {
@@ -169,8 +166,7 @@ const EditMemberForm = ({ IDPersonne }) => {
       //console.log(formData);
 
       const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/personne/edit?id=${IDPersonne}`;
-      // const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
-
+      //const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
       const response = await axios.put(linkEditPersonne, formData);
 
@@ -191,11 +187,10 @@ const EditMemberForm = ({ IDPersonne }) => {
     }
   };
 
-
   // Fonction pour gérer le changement de sélection du statut "Personnel"
   const handlePersonnelSelection = (value) => {
     setIsPersonnelSelected(value); // Met à jour l'état pour indiquer si "Oui" ou "Non" est sélectionné
-  }
+  };
 
   return (
     <>
@@ -206,7 +201,6 @@ const EditMemberForm = ({ IDPersonne }) => {
           cursor: "pointer",
           color: "#095e74",
           marginBottom: "10px",
-
         }}
         onClick={handleOpenModal}
       />
@@ -238,7 +232,6 @@ const EditMemberForm = ({ IDPersonne }) => {
               siFrancais: true,
             }}
           >
-
             <Row gutter={[16]}>
               <Col span={12}>
                 <Form.Item
@@ -265,7 +258,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                 <Form.Item
                   label="Téléphone"
                   name="TelPro"
-                // value={personData?.TelPro}
+                  // value={personData?.TelPro}
                 >
                   <Input />
                 </Form.Item>
@@ -292,11 +285,13 @@ const EditMemberForm = ({ IDPersonne }) => {
                   style={{ width: "100%" }}
                   label="Date"
                   name="DateEntreeDate"
-                  rules={[{ required: false, message: "Veuillez choisir une date" }]}
+                  rules={[
+                    { required: false, message: "Veuillez choisir une date" },
+                  ]}
                 >
                   <DatePicker
                     style={{ width: "99%" }}
-                  // defaultValue={personData ? dayjs(personData.DateEntreeDate) : null}
+                    // defaultValue={personData ? dayjs(personData.DateEntreeDate) : null}
                   />
                 </Form.Item>
               </Col>
@@ -316,7 +311,11 @@ const EditMemberForm = ({ IDPersonne }) => {
                     showSearch
                     optionFilterProp="children"
                     onChange={handleGradeSelection}
-                    value={selectedGradeDetails ? selectedGradeDetails.WWGradeID : null} // Utilisez null lorsque aucun grade n'est sélectionné
+                    value={
+                      selectedGradeDetails
+                        ? selectedGradeDetails.WWGradeID
+                        : null
+                    } // Utilisez null lorsque aucun grade n'est sélectionné
                   >
                     <Option key="placeholder" value="" disabled>
                       Sélectionner un grade
@@ -329,7 +328,6 @@ const EditMemberForm = ({ IDPersonne }) => {
                   </Select>
                 </Form.Item>
               </Col>
-
 
               <Col span={12}>
                 <Form.Item
@@ -387,11 +385,12 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
               </Col>
 
-
               <Col span={12}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <Form.Item
-                    name="siPersonnel"
+                    name="SiTypePersonnel"
                     label="Personnel"
                     rules={[
                       {
@@ -400,7 +399,9 @@ const EditMemberForm = ({ IDPersonne }) => {
                       },
                     ]}
                   >
-                    <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                    <Radio.Group
+                      onChange={(e) => handlePersonnelSelection(e.target.value)}
+                    >
                       <Radio value={true}>Oui</Radio>
                       <Radio value={false}>Non</Radio>
                     </Radio.Group>
@@ -423,21 +424,25 @@ const EditMemberForm = ({ IDPersonne }) => {
                       showSearch
                       optionFilterProp="children"
                     >
-                      {typePersonnelList.map(typePersonnel => (
-                        <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
+                      {typePersonnelList.map((typePersonnel) => (
+                        <Option
+                          key={typePersonnel.IDTypePersonnel}
+                          value={typePersonnel.IDTypePersonnel}
+                        >
                           {typePersonnel.NomTypePersonnelFr}
                         </Option>
                       ))}
                     </Select>
-
                   </Form.Item>
                 )}
               </Col>
 
               <Col span={12}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <Form.Item
-                    name="siFrancais"
+                    name="SiFrancais"
                     label="Français"
                     rules={[
                       { required: true, message: "Veuillez choisir la langue" },
@@ -483,7 +488,7 @@ const EditMemberForm = ({ IDPersonne }) => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  margin: 30
+                  margin: 30,
                 }}
               >
                 <Button style={{ margin: 10 }} type="primary" htmlType="submit">
