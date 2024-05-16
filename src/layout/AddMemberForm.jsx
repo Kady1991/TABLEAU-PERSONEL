@@ -19,9 +19,6 @@ const AddMemberForm = () => {
   const [typePersonnelData, setTypePersonnelData] = useState([]);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
-
-
-
   useEffect(() => {
     setLoadingData(true);
     const fetchData = async () => {
@@ -46,7 +43,6 @@ const AddMemberForm = () => {
           "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
         );
         setTypePersonnelList(typePersonnelResponse.data);
-
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
       } finally {
@@ -56,7 +52,6 @@ const AddMemberForm = () => {
 
     fetchData();
   }, []);
-
 
   // logique de gestion de la sélection du service ici
   const handleServiceSelection = async (IDService) => {
@@ -119,7 +114,7 @@ const AddMemberForm = () => {
       if (response.data === "Success") {
         alert("Ajout réussi !");
         console.log("Nouveau membre ajouté avec succès");
-        closeForm(); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire        
+        closeForm(); // Mettre à jour l'état formSubmitted pour empêcher l'affichage du formulaire
       }
       if (response.data === "Personne Exists") {
         alert("Ce email est déjà attribué");
@@ -232,11 +227,10 @@ const AddMemberForm = () => {
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
               initialValues={{
-                siPersonnel: false, // Mettre à false pour que "Non" soit sélectionné par défaut
+                SiTypePersonnel: false, // Mettre à false pour que "Non" soit sélectionné par défaut
                 siFrancais: true,
               }}
             >
-
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
@@ -337,7 +331,7 @@ const AddMemberForm = () => {
                       showSearch
                       optionFilterProp="children"
                     >
-                      <Option key="placeholder" value="" >
+                      <Option key="placeholder" value="">
                         Sélectionner un grade
                       </Option>
                       {grades.map((grade) => (
@@ -348,8 +342,6 @@ const AddMemberForm = () => {
                     </Select>
                   </Form.Item>
                 </Col>
-
-
               </Row>
               <Row gutter={16}>
                 <Col span={12}>
@@ -416,24 +408,28 @@ const AddMemberForm = () => {
 
               <Row gutter={16}>
                 <Col span={12}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <Form.Item
                       name="SiTypePersonnel"
                       label="Personnel"
                       rules={[
                         {
                           required: true,
-                          message: "Veuillez choisir si le membre est personnel",
+                          message:
+                            "Veuillez choisir si le membre est personnel",
                         },
                       ]}
                     >
                       <Radio.Group
-                        onChange={(e) => handlePersonnelSelection(e.target.value)}
+                        onChange={(e) =>
+                          handlePersonnelSelection(e.target.value)
+                        }
                       >
                         <Radio value={true}>Oui</Radio>
                         <Radio value={false}>Non</Radio>
                       </Radio.Group>
-
                     </Form.Item>
                   </div>
                   {isPersonnelSelected && (
@@ -463,17 +459,21 @@ const AddMemberForm = () => {
                         ))}
                       </Select>
                     </Form.Item>
-
                   )}
                 </Col>
 
                 <Col span={12}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <Form.Item
                       name="siFrancais"
                       label="Français"
                       rules={[
-                        { required: true, message: "Veuillez choisir la langue" },
+                        {
+                          required: true,
+                          message: "Veuillez choisir la langue",
+                        },
                       ]}
                     >
                       <Radio.Group>
@@ -485,8 +485,9 @@ const AddMemberForm = () => {
                 </Col>
               </Row>
 
-
-              <Form.Item style={{ display: "flex", justifyContent: "space-evenly" }}>
+              <Form.Item
+                style={{ display: "flex", justifyContent: "space-evenly" }}
+              >
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -532,7 +533,6 @@ const AddMemberForm = () => {
                   </div>
                 </div>
               )}
-
             </Form>
           )}
         </div>
