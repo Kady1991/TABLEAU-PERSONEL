@@ -8,6 +8,8 @@ import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
+import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
@@ -62,17 +64,17 @@ function Tableau() {
     );
   };
 
-  const handleRestoreSuccess = (restoredEmail) => {
+  const handleRestoreSuccess = (restoredId) => {
     // Mettez ici le code à exécuter en cas de succès de la restauration
     console.log(
-      `La personne avec l'email ${restoredEmail} a été restaurée avec succès.`
+      `La personne avec l'id ${restoredId} a été restaurée avec succès.`
     );
   };
 
-  const handleRestoreError = (restoredEmail) => {
+  const handleRestoreError = (restoredId) => {
     // Mettez ici le code à exécuter en cas d'erreur lors de la restauration
     console.error(
-      `Une erreur s'est produite lors de la restauration de la personne avec l'email ${restoredEmail}.`
+      `Une erreur s'est produite lors de la restauration de la personne avec l'ID ${restoredId}.`
     );
   };
 
@@ -95,6 +97,8 @@ function Tableau() {
           style={{
             display: "flex",
             alignItems: "center",
+            gap: "20px",
+            justifyContent: "center",
           }}
         >
           <div
@@ -262,6 +266,12 @@ function Tableau() {
               personnes={personnes}
               columns={columns}
               className="bouton-export"
+            />
+          </div>
+          <div className="PersonWalkingDiv">
+            <FontAwesomeIcon
+              icon={faPersonWalking}
+              className="PersonWalkingCustom"
             />
           </div>
           <div style={{ marginRight: "2rem" }}>
