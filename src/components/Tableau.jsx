@@ -23,6 +23,7 @@ function Tableau() {
           ...personne,
           id: personne.IDPersonne,
           personneID: personne.PersonneID,
+          
         }));
 
         setPersonnes(personnesData);
@@ -101,14 +102,14 @@ function Tableau() {
             visibility: params.row.SiArchive === false ? "visible" : "hidden",
           }}
         >
-          {/* Autres éléments d'action */}
+          
     
           <FormService personId={params.row.personneID} />
           <Detail onClick={handleClick} rowData={params.row.personneID} />
           <EditMemberForm
             IDPersonne={params.row.personneID}
             
-            //personIdServ={params.row.personneID}
+            
           />
           <Delete
             IDPersonne={params.row.personneID}
@@ -118,13 +119,16 @@ function Tableau() {
             onSuccess={handleDeleteSuccess}
             onError={handleDeleteError}
           />
-          {params.SiArchive && ( // Afficher RestoreAction uniquement si SiArchive est true
-            <RestoreAction
-              email={params.row.Email}
+
+          <div>
+          <RestoreAction
+            IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}
               onError={handleRestoreError}
             />
-          )}
+          </div>
+            
+       
         </div>
       ),
     },
