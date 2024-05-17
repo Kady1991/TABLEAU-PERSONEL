@@ -23,7 +23,6 @@ function Tableau() {
           ...personne,
           id: personne.IDPersonne,
           personneID: personne.PersonneID,
-          
         }));
 
         setPersonnes(personnesData);
@@ -96,43 +95,49 @@ function Tableau() {
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            gap: "20px",
-            margin: 5,
-            visibility: params.row.SiArchive === false ? "visible" : "hidden",
           }}
         >
-          
-    
-          <FormService personId={params.row.personneID} />
-          <Detail onClick={handleClick} rowData={params.row.personneID} />
-          <EditMemberForm
-            IDPersonne={params.row.personneID}
-            
-            
-          />
-          <Delete
-            IDPersonne={params.row.personneID}
-            nomPersonne={params.row.NomPersonne}
-            prenomPersonne={params.row.PrenomPersonne}
-            email={params.row.Email}
-            onSuccess={handleDeleteSuccess}
-            onError={handleDeleteError}
-          />
-
-          <div>
-          <RestoreAction
-            IDPersonne={params.row.personneID}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "20px",
+              margin: 5,
+              visibility: params.row.SiArchive === false ? "visible" : "hidden",
+            }}
+          >
+            <FormService personId={params.row.personneID} />
+            <Detail onClick={handleClick} rowData={params.row.personneID} />
+            <EditMemberForm IDPersonne={params.row.personneID} />
+            <Delete
+              IDPersonne={params.row.personneID}
+              nomPersonne={params.row.NomPersonne}
+              prenomPersonne={params.row.PrenomPersonne}
+              email={params.row.Email}
+              onSuccess={handleDeleteSuccess}
+              onError={handleDeleteError}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "20px",
+              margin: 5,
+              visibility: params.row.SiArchive === true ? "visible" : "hidden",
+            }}
+          >
+            <RestoreAction
+              IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}
               onError={handleRestoreError}
             />
           </div>
-            
-       
         </div>
       ),
     },
-    
 
     { field: "NomPersonne", headerName: "NOM", width: 200 },
     { field: "PrenomPersonne", headerName: "PRENOM", width: 200 },
