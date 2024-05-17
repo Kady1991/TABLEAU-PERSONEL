@@ -28,23 +28,28 @@ body {
 .left-align-form .ant-form-item-control-input-content {
   text-align: left;
 }
+
+/* animation icon personne en marche */
 .PersonWalkingDiv {
-  width: 20%;
+  width: 90%;
   position: relative;
+  margin: auto;
 }
+
 .PersonWalkingCustom {
   position: absolute;
   font-size: 2rem;
-  animation: personneEnMarche 10s linear infinite;
+  animation: personneEnMarche 20s linear infinite;
+  color: #6c8590 ;
+  
 }
+
 @keyframes personneEnMarche {
   0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(20px);
+    left: 0;
   }
   100% {
-    transform: translateX(0);
+    left: calc(100% - 2rem); /* La largeur de la div moins la taille de l'icône */
   }
 }
+

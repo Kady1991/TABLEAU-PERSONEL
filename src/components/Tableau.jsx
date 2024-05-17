@@ -269,12 +269,11 @@ function Tableau() {
             />
           </div>
           <div className="PersonWalkingDiv">
-            <FontAwesomeIcon
-              icon={faPersonWalking}
-              className="PersonWalkingCustom"
-            />
+            <FontAwesomeIcon icon={faPersonWalking}className="PersonWalkingCustom"/>
+            
+          
           </div>
-          <div style={{ marginRight: "2rem" }}>
+          <div style={{ marginRight: "1rem",padding:"1rem" }}>
             <AddMemberForm />
           </div>
         </div>
