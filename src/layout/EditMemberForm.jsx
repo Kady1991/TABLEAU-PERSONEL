@@ -43,7 +43,7 @@ const EditMemberForm = ({ IDPersonne }) => {
       console.log(IDPersonne);
       try {
         const personResponse = await axios.get(
-          `https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`
+          `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
         );
         //const personResponse = await axios.get(
         //  `https://localhost:44333/api/Personne/${IDPersonne}`
@@ -76,7 +76,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
     try {
       const gradesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_Personne/api/wwgrades`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`
       );
       setGrades(gradesResponse.data);
     } catch (error) {
@@ -85,7 +85,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
     try {
       const addressesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_Personne/api/Adresses`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`
       );
       setAddresses(addressesResponse.data);
     } catch (error) {
@@ -95,7 +95,7 @@ const EditMemberForm = ({ IDPersonne }) => {
     // Récupérer la liste des types de personnel depuis votre API
     try {
       const typePersonnelResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
+        "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
       );
       setTypePersonnelList(typePersonnelResponse.data);
     } catch (error) {
@@ -103,7 +103,7 @@ const EditMemberForm = ({ IDPersonne }) => {
     }
     try {
       const servicesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_Personne/api/affectation/services`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`
       );
       setOtherServices(servicesResponse.data);
     } catch (error) {
@@ -165,7 +165,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
       //console.log(formData);
 
-      const linkEditPersonne = `https://server-iis.uccle.intra/API_Personne/api/personne/edit?id=${IDPersonne}`;
+      const linkEditPersonne = `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${IDPersonne}`;
       //const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
 
       const response = await axios.put(linkEditPersonne, formData);
@@ -283,8 +283,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               <Col span={12}>
                 <Form.Item
                   style={{ width: "100%" }}
-                  label="Date"
                   name="DateEntreeDate"
+                  label="Date"
                   rules={[
                     { required: false, message: "Veuillez choisir une date" },
                   ]}

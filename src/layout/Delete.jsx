@@ -20,7 +20,7 @@ const Delete = ({
   const checkArchivedStatus = async () => {
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_Personne/api/personne?email=${email}`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
       );
       const { SiArchive } = response.data; // Supposons que SiArchive est un champ dans la réponse qui indique si la personne est archivée ou non
       setIsArchived(SiArchive);
@@ -45,7 +45,7 @@ const Delete = ({
     try {
       // Mettre à jour la valeur de SiArchive dans l'API
       await axios.put(
-        `https://server-iis.uccle.intra/API_Personne/api/personne/delete?email=${email}`,
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}`,
         {
           value: email,
         }

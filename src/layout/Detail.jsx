@@ -13,7 +13,7 @@ const Detail = ({ IDPersonne }) => {
             if (IDPersonne) {
                 try {
                     setLoading(true);
-                    const response = await fetch(`https://server-iis.uccle.intra/API_Personne/api/Personne/${IDPersonne}`);
+                    const response = await fetch(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch data');
                     }

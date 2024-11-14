@@ -23,7 +23,7 @@ const FormService = ({ personId }) => {
         const fetchData = async () => {
             if (personId) {
                 try {
-                    const personResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Personne/${personId}`);
+                    const personResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${personId}`);
                     setPersonData(personResponse.data);
 
 
@@ -33,14 +33,14 @@ const FormService = ({ personId }) => {
             }
 
             try {
-                const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/wwgrades`);
+                const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`);
                 setGrades(gradesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des grades:', error);
             }
 
             try {
-                const addressesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/Adresses`);
+                const addressesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`);
                 setAddresses(addressesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des adresses:', error);
@@ -50,7 +50,7 @@ const FormService = ({ personId }) => {
             // Récupérer la liste des types de personnel depuis votre API
             try {
                 const typePersonnelResponse = await axios.get(
-                    "https://server-iis.uccle.intra/API_Personne/api/typepersonnel"
+                    "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
                 );
                 setTypePersonnelList(typePersonnelResponse.data);
 
@@ -59,7 +59,7 @@ const FormService = ({ personId }) => {
             }
 
             try {
-                const servicesResponse = await axios.get(`https://server-iis.uccle.intra/API_Personne/api/affectation/services`);
+                const servicesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`);
                 setOtherServices(servicesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des autres services:', error);

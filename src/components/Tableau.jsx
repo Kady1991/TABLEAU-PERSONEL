@@ -15,7 +15,7 @@ function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
   const linkGetAllPersonnel =
-    "https://server-iis.uccle.intra/API_Personne/api/Personne";
+    "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
   //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
   const fetchData = () => {
     fetch(linkGetAllPersonnel)
