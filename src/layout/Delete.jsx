@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MdDeleteForever } from "react-icons/md";
+import { DatePicker, Modal, Button, message } from "antd";
+import "antd/dist/reset.css"; // Utilisez ce style si vous utilisez Ant Design v5+
 import "../index.css";
 
 const Delete = ({
@@ -12,9 +14,10 @@ const Delete = ({
   onError,
 }) => {
   const [isArchived, setIsArchived] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null); // Stocker la date sélectionnée
+  const [isModalVisible, setIsModalVisible] = useState(false); // Gérer l'affichage de la modale
 
   useEffect(() => {
-    // Vérifier si la personne est déjà archivée lors du chargement du composant
     checkArchivedStatus();
   }, []);
 
@@ -23,73 +26,91 @@ const Delete = ({
       const response = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
       );
-      const { SiArchive } = response.data; // Supposons que SiArchive est un champ dans la réponse qui indique si la personne est archivée ou non
+      const { SiArchive } = response.data;
       setIsArchived(SiArchive);
     } catch (error) {
       console.error("Erreur lors de la récupération des informations de la personne :", error);
     }
   };
 
-  const handleClick = async () => {
-    // Vérifier si la personne est déjà archivée
+  const handleDateChange = (date, dateString) => {
+    setSelectedDate(dateString); // Mettre à jour la date sélectionnée
+  };
+
+  const handleClick = () => {
     if (isArchived) {
-      alert("Cette personne est déjà archivée.");
+      message.warning("Cette personne est déjà archivée.");
+      return;
+    }
+    setIsModalVisible(true); // Afficher la modale
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedDate) {
+      message.error("Veuillez sélectionner une date de sortie avant d'archiver.");
       return;
     }
 
-    // Demande de confirmation avant d'archiver la personne
     const confirmation = window.confirm(
-      `Voulez-vous vraiment archiver cette personne ?\nID: ${IDPersonne} \nNom:  ${nomPersonne} \nPrénom:  ${prenomPersonne} \nEmail:  ${email}`
+      `Voulez-vous vraiment archiver ?\n\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email} le ${selectedDate} :`
     );
-    if (!confirmation) return; // Arrête le processus si l'utilisateur annule
+
+    if (!confirmation) return;
 
     try {
-      // Mettre à jour la valeur de SiArchive dans l'API
       await axios.put(
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}`,
         {
           value: email,
+          dateSortie: selectedDate, // Inclure la date sélectionnée
         }
       );
 
-      // Si la mise à jour réussit, appeler la fonction onSuccess
       onSuccess(email);
-
-      // Afficher une alerte de succès
-      alert(`La personne ${IDPersonne} ${prenomPersonne} ${nomPersonne}${email}  a été archivée avec succès.`);
-      console.log("La valeur de SiArchive a été mise à jour avec succès.");
-      setIsArchived(true); // Mettre à jour l'état local pour indiquer que la personne est maintenant archivée
-
-      // Afficher l'objet archivé dans la console
-      console.log({
-        IDPersonne,
-        nomPersonne,
-        prenomPersonne,
-        email
-      });
-    } catch (error) {
-      // Si une erreur se produit, appeler la fonction onError
-      onError(email);
-
-      // Afficher un message d'erreur dans la console
-      console.error(
-        "Une erreur s'est produite lors de la mise à jour de la valeur de SiArchive :",
-        error
+      message.success(
+        `La personne ${prenomPersonne} ${nomPersonne} a été archivée avec succès pour la date de sortie ${selectedDate}.`
       );
-      
-      // Afficher un message d'erreur
-      alert(`L'archivage de la personne ${IDPersonne} ${prenomPersonne} ${nomPersonne} a échoué.`);
+      setIsArchived(true);
+      setIsModalVisible(false); // Fermer la modale
+    } catch (error) {
+      onError(email);
+      console.error("Une erreur s'est produite :", error);
+      message.error("L'archivage a échoué.");
     }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); // Fermer la modale
+    setSelectedDate(null); // Réinitialiser la date sélectionnée
   };
 
   return (
     <div>
-      {/* Utilisation de l'icône de suppression */}
       <MdDeleteForever
         title="Archiver"
         onClick={handleClick}
-        style={{ cursor: "pointer", color: "red", fontSize: "22px", marginTop:"10px" }}
+        style={{ cursor: "pointer", color: "red", fontSize: "22px", marginTop: "10px" }}
       />
+      <Modal
+        title="Choisir une date de sortie"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Annuler
+          </Button>,
+          <Button key="confirm" type="primary" onClick={handleConfirm}>
+            Archiver
+          </Button>,
+        ]}
+      >
+        <p>Sélectionnez une date de sortie avant d'archiver cette personne :</p>
+        <DatePicker
+          onChange={handleDateChange}
+          format="YYYY-MM-DD"
+          style={{ width: "100%" }}
+        />
+      </Modal>
     </div>
   );
 };

@@ -36,11 +36,11 @@ body {
   margin: auto;
 }
 
-.person-walking-icon {
+.person-walking{
   position: absolute;
-  font-size: 5rem;
+  font-size: 3.5rem;
   animation: personneEnMarche 20s linear infinite;
-  color:"#6c8590 " ;
+  color:#6c8590 ;
   
 }
 
@@ -55,7 +55,7 @@ body {
 
 /*  test aénimation */
 .fade-in {
-  animation: fadeIn 1s ease-in-out;
+  animation: fadeIn 2s ease-in;
 }
 
 @keyframes fadeIn {
@@ -65,13 +65,13 @@ body {
   }
   to {
     opacity: 1;
-    transform: translateY(200);
+    transform: translateY(100);
   }
 }
 
 
 /*  STYLE DE L'ICON DU TABLEAU */
-.custom-person-icon {
+.person-icon {
   font-size: 120px; /* Taille de l'icône */
   color:#d9e3eb; /* Couleur de l'icône */
  
@@ -160,8 +160,8 @@ body {
 
 /* Icône personnalisée */
 .custom-person-icon {
-  font-size: 40px; /* Taille de l'icône */
-  color: #007bff; /* Couleur bleue */
+  font-size: 100px; /* Taille de l'icône */
+  color:#d9e3eb; /* Couleur bleue */
 }
 
 /* Titre principal */

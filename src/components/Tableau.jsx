@@ -97,11 +97,11 @@ function Tableau() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "20px",
+            gap: "10px",
             justifyContent: "center",
             position: "relative"
-          }}
-        >
+            }}
+            >
           {/* Div pour actions standards */}
           <div
             style={{
@@ -124,12 +124,10 @@ function Tableau() {
             />
           </div>
 
-                   
-    
 
           {/* Div pour actions de restauration */}
-          <div  className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
-            <RestoreAction 
+          <div className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
+            <RestoreAction
               IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}
               onError={(id) =>
@@ -234,7 +232,7 @@ function Tableau() {
     <div>
       <div className="main-container">
         <div className="icon-tableau">
-          <IoPersonAddSharp className="custom-person-icon" />
+          <IoPersonAddSharp className="person-icon" />
         </div>
         <h1 className="title">MEMBRE DU PERSONNEL</h1>
 
@@ -243,7 +241,7 @@ function Tableau() {
             <Export personnes={personnes} columns={columns} className="bouton-export" />
           </div>
           <div className="icon-container">
-            <FontAwesomeIcon icon={faPersonWalking} className="person-walking-icon" />
+            <FontAwesomeIcon icon={faPersonWalking} className="person-walking" />
           </div>
           <div className="add-member-container">
             <AddMemberForm />
@@ -263,5 +261,6 @@ function Tableau() {
         </div>
       </div>
     </div>
-  )}
+  )
+}
 export default Tableau;
