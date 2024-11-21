@@ -30,17 +30,17 @@ body {
 }
 
 /* animation icon personne en marche */
-.PersonWalkingDiv {
+.icon-container {
   width: 90%;
   position: relative;
   margin: auto;
 }
 
-.PersonWalkingCustom {
+.person-walking-icon {
   position: absolute;
-  font-size: 2rem;
+  font-size: 5rem;
   animation: personneEnMarche 20s linear infinite;
-  color: #6c8590 ;
+  color:"#6c8590 " ;
   
 }
 
@@ -67,5 +67,180 @@ body {
     opacity: 1;
     transform: translateY(200);
   }
+}
+
+
+/*  STYLE DE L'ICON DU TABLEAU */
+.custom-person-icon {
+  font-size: 120px; /* Taille de l'icône */
+  color:#d9e3eb; /* Couleur de l'icône */
+ 
+}
+
+ /* Titre principal */
+.title {
+  color: #d9e3eb;
+}
+
+/* Conteneur principal du header */
+.header-container {
+  height: 75px;
+  width: 80%;
+  background-color: white;
+  position: relative;
+  border-radius: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+/* Conteneur du bouton Export */
+.export-container {
+  margin: 2rem;
+}
+
+/* Conteneur de l'icône */
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icône de marche */
+.person-walking-icon {
+  font-size: 24px; /* Ajoutez une taille si nécessaire */
+  color: black; /* Exemple de couleur, à ajuster */
+}
+
+/* Conteneur du bouton Ajouter */
+.add-member-container {
+  margin-right: 1rem;
+  padding: 1rem;
+}
+
+/* Conteneur du DataGrid */
+.data-grid-container {
+  height: calc(100% - 75px - 2rem);
+  width: 80%;
+  background-color: white;
+  position: relative;
+  margin-top: 2rem;
+  border-radius: 0.5rem;
+  z-index: 0;
+}
+
+/* Ligne archivée dans le DataGrid */
+.archive-row {
+  background-color: #f5f5f5; /* Exemple : couleur de fond des lignes archivées */
+  color: gray; /* Exemple : texte grisé pour les lignes archivées */
+}
+
+/* Conteneur principal */
+.main-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icône principale au-dessus du tableau */
+.icon-tableau {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Icône personnalisée */
+.custom-person-icon {
+  font-size: 40px; /* Taille de l'icône */
+  color: #007bff; /* Couleur bleue */
+}
+
+/* Titre principal */
+.title {
+  color: #d9e3eb;
+  font-size: 2rem; /* Taille du texte */
+  margin-bottom: 1rem; /* Espace sous le titre */
+}
+
+/* Conteneur principal du header */
+.header-container {
+  height: 75px;
+  width: 80%;
+  background-color: white;
+  border-radius: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+/* Conteneur du bouton Export */
+.export-container {
+  margin: 2rem;
+}
+
+/* Conteneur de l'icône */
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icône de marche */
+.person-walking-icon {
+  font-size: 24px; /* Taille de l'icône */
+  color: black; /* Couleur noire */
+}
+
+/* Conteneur du bouton Ajouter */
+.add-member-container {
+  margin-right: 1rem;
+  padding: 1rem;
+}
+
+/* Conteneur du DataGrid */
+.data-grid-container {
+  height: calc(100% - 75px - 2rem);
+  width: 80%;
+  background-color: white;
+  margin-top: 2rem;
+  border-radius: 0.5rem;
+  z-index: 0;
+}
+
+/* Ligne archivée dans le DataGrid */
+.archive-row {
+  background-color: #f5f5f5; /* Fond des lignes archivées */
+  color: gray; /* Texte des lignes archivées */
+}
+/* style rtestor icon */
+/* Styles généraux pour RestoreIcon */
+.RestoreIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent */
+  border-radius: 4px;
+  padding: 10px;
+}
+
+/* Classe pour masquer l'élément */
+.hidden {
+  display: none;
+}
+
+/* Classe pour afficher l'élément */
+.visible {
+  display: flex;
 }
 

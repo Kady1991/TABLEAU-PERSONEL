@@ -10,15 +10,16 @@ import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IoPersonAddSharp } from "react-icons/io5";
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const linkGetAllPersonnel =
     "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
   //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
-  
+
   const fetchData = () => {
     fetch(linkGetAllPersonnel)
       .then((response) => response.json())
@@ -92,25 +93,18 @@ function Tableau() {
       headerClassName: "header-center",
       renderCell: (params) => (
         <div
-        
+
           style={{
             display: "flex",
             alignItems: "center",
             gap: "20px",
             justifyContent: "center",
-            position:"relative"
+            position: "relative"
           }}
         >
           {/* Div pour actions standards */}
-           <div
+          <div
             style={{
-              
-              // display: "flex",
-              // alignItems: "center",
-              // justifyContent: "center",
-              // gap: "20px",
-              // margin: 5,
-              // visibility: params.row.SiArchive === false ? "visible" : "hidden",
               display: params.row.SiArchive === false ? "flex" : "none",
               alignItems: "center",
               justifyContent: "center",
@@ -129,33 +123,13 @@ function Tableau() {
               onError={handleDeleteError}
             />
           </div>
-          
-{/*           
-          <div
-              style={{ visibility: params.row.SiArchive === true ? "visible" : "hidden", }}>
-              <RestoreAction
-                IDPersonne={params.row.personneID}
-                onSuccess={handleRestoreSuccess}
-                onError={handleRestoreError}
-              />
-          </div>
-        </div>
-      ),
-    }, */}
 
-     {/* Div pour actions de restauration */}
-     <div
-            style={{
-              display: params.row.SiArchive === true ? "flex" : "none",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
-              backgroundColor: "rgba(255, 255, 255, 0.8)", // Fond semi-transparent
-              borderRadius: "4px",
-              padding: "10px",
-            }}
-          >
-            <RestoreAction
+                   
+    
+
+          {/* Div pour actions de restauration */}
+          <div  className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
+            <RestoreAction 
               IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}
               onError={(id) =>
@@ -258,62 +232,25 @@ function Tableau() {
 
   return (
     <div>
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          height: "500px",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <h1 style={{ color: "white" }}>MEMBRE DU PERSONNEL</h1>
+      <div className="main-container">
+        <div className="icon-tableau">
+          <IoPersonAddSharp className="custom-person-icon" />
+        </div>
+        <h1 className="title">MEMBRE DU PERSONNEL</h1>
 
-        <div
-          style={{
-            height: "75px",
-            width: "80%",
-            backgroundColor: "white",
-            position: "relative",
-            borderRadius: "0.4rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: "2rem",
-          }}
-        >
-          <div style={{ margin: "2rem" }}>
-            <Export
-              personnes={personnes}
-              columns={columns}
-              className="bouton-export"
-            />
+        <div className="header-container">
+          <div className="export-container">
+            <Export personnes={personnes} columns={columns} className="bouton-export" />
           </div>
-          <div className="PersonWalkingDiv">
-            <FontAwesomeIcon icon={faPersonWalking} className="PersonWalkingCustom" />
+          <div className="icon-container">
+            <FontAwesomeIcon icon={faPersonWalking} className="person-walking-icon" />
           </div>
-
-          <div style={{ marginRight: "1rem", padding: "1rem" }}>
+          <div className="add-member-container">
             <AddMemberForm />
           </div>
         </div>
 
-        <div
-          style={{
-            height: "calc(100% - 75px - 2rem)",
-            width: "80%",
-            backgroundColor: "white",
-            position: "relative",
-            marginTop: "2rem",
-            borderRadius: "0.5rem",
-            zIndex: "0",
-          }}
-        >
+        <div className="data-grid-container">
           <DataGrid
             rows={personnes}
             columns={columns}
@@ -321,14 +258,10 @@ function Tableau() {
             loading={loading}
             checkboxSelection
             disableSelectionOnClick
-            getRowClassName={(params) =>
-              params.row.SiArchive ? "archive-row" : ""
-            }
+            getRowClassName={(params) => (params.row.SiArchive ? "archive-row" : "")}
           />
         </div>
       </div>
     </div>
-  );
-}
-
+  )}
 export default Tableau;
