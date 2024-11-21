@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import "../index.css";
 
 const { Option } = Select;
 
@@ -151,6 +152,7 @@ const handleNameChange = (e) => {
 
       {isFormOpen && (
         <div
+        className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
           style={{
             position: "fixed",
             top: "50%",

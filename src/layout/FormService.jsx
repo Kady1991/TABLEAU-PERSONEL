@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
 import { PiBuildingLight } from "react-icons/pi";
 import axios from 'axios';
+import "../index.css";
 
 const { Option } = Select;
 
@@ -158,6 +159,7 @@ const FormService = ({ personId }) => {
 
             >
                 <div
+                
                     style={{
                         display: 'flex',
                         justifyContent: 'center',

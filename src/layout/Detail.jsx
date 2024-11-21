@@ -1,76 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { GoListOrdered } from "react-icons/go";
+import React, { useState, useEffect } from "react";
+import { Modal } from "antd";
+import axios from "axios";
+import { FiEye } from "react-icons/fi";
+import dayjs from "dayjs";
 
 const Detail = ({ IDPersonne }) => {
-    const [personData, setPersonData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+   console.log("IDPersonne reçu :", IDPersonne); // Ajoutez ceci pour vérifier l'ID
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [personData, setPersonData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!showModal) return;
-            if (IDPersonne) {
-                try {
-                    setLoading(true);
-                    const response = await fetch(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch data');
-                    }
-                    const data = await response.json();
-                    setPersonData(data);
-                    setLoading(false);
-                } catch (error) {
-                    setError(error);
-                    setLoading(false);
-                }
-            }
-        };
-        fetchData();
-    }, [IDPersonne, showModal]);
+  useEffect(() => {
+    if (isModalVisible && IDPersonne) {
+      fetchPersonData();
+    }
+  }, [isModalVisible, IDPersonne]);
 
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
+  const fetchPersonData = async () => {
+    if (!IDPersonne) {
+      console.error("IDPersonne est undefined");
+      return;
+    }
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
+      );
 
-    return (
-        <div style={{ position: 'relative' }}>
-            {/* Icône d'information */}
-            <GoListOrdered
-                title="Voir les détails"
-                onClick={handleOpenModal}
-                style={{ fontSize: "22px", cursor: 'pointer', marginTop:"10px", color:"green", position: 'relative' }} // Définit la taille de l'icône et le curseur
-            />
+      console.log("Données de la personne reçues :", response.data);
 
-            {/* Modal pour afficher les détails */}
-            {showModal && (
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} className="modal">
-                    <div className="modal-content">
-                        <span className="close" onClick={handleCloseModal}>&times;</span>
-                        {loading && <p>Loading...</p>}
-                        {error && <p>Error: {error.message}</p>}
-                        {personData && (
-                            <>
-                                <h2>Détails de la personne</h2>
-                                <p>ID: {personData.IDPersonne}</p>
-                                <p>Nom: {personData.nomPersonne}</p>
-                                <p>Prénom: {personData.prenomPersonne}</p>
-                                <p>Email: {personData.email}</p>
-                                <p>Téléphone professionnel: {personData.TelPro}</p>
-                                <p>Date d'entrée: {personData.DateEntree}</p>
-                                
-                                {/* Ajoutez d'autres champs si nécessaire */}
-                            </>
-                        )}
-                    </div>
-                </div>
+      if (response.data) {
+        setPersonData(response.data);
+      } else {
+        console.error("Aucune donnée trouvée pour cet IDPersonne.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
+
+  return (
+    <>
+      <FiEye
+        title="Voir Détails"
+        style={{
+          fontSize: "18px",
+          cursor: "pointer",
+          color: "#095e74",
+          marginBottom: "10px",
+        }}
+        onClick={handleOpenModal}
+      />
+      <Modal
+        title="Détails de Personne"
+        open={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null}
+        centered
+      >
+        {loading ? (
+          <p>Chargement des données...</p>
+        ) : personData ? (
+          <div style={{ textAlign: "left" }}>
+            {personData.NomPersonne && (
+              <p><strong>Nom:</strong> {personData.NomPersonne}</p>
             )}
-        </div>
-    );
+            {personData.PrenomPersonne && (
+              <p><strong>Prénom:</strong> {personData.PrenomPersonne}</p>
+            )}
+            {personData.Email && (
+              <p><strong>Email:</strong> {personData.Email}</p>
+            )}
+            {personData.TelPro && (
+              <p><strong>Téléphone:</strong> {personData.TelPro}</p>
+            )}
+            {personData.DateEntreeDate && (
+              <p>
+                <strong>Date d'Entrée:</strong> {dayjs(personData.DateEntreeDate).format("DD/MM/YYYY")}
+              </p>
+            )}
+            {personData.WWGradeID && (
+              <p><strong>Grade:</strong> {personData.WWGradeID}</p>
+            )}
+            {personData.AdresseID && (
+              <p><strong>Adresse:</strong> {personData.AdresseID}</p>
+            )}
+            {personData.ServiceID && (
+              <p><strong>Service:</strong> {personData.ServiceID}</p>
+            )}
+            <p><strong>Langue:</strong> {personData.SiFrancais ? "Français" : "Néerlandais"}</p>
+            {personData.SiTypePersonnel && personData.TypePersonnelID && (
+              <p><strong>Type de Personnel:</strong> {personData.TypePersonnelID}</p>
+            )}
+          </div>
+        ) : (
+          <p>Aucune donnée trouvée pour cet utilisateur.</p>
+        )}
+      </Modal>
+    </>
+  );
 };
 
 export default Detail;

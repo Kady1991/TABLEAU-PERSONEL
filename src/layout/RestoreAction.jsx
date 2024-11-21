@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { FaPersonArrowDownToLine } from "react-icons/fa6";
+import "../index.css";
 
 const RestoreAction = ({ IDPersonne, email, onSuccess, onError }) => {
   const handleClick = async () => {
@@ -32,19 +33,29 @@ const RestoreAction = ({ IDPersonne, email, onSuccess, onError }) => {
   };
 
   return (
-    <div>
-      {/* Utilisation de l'icône de restauration */}
+
+    <div
+      style={{
+        background:"transparent",
+        padding: "10px", // Espace autour du bouton
+        borderRadius: "5px", // Coins arrondis
+        display: "flex", // Centrage horizontal et vertical
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <FaPersonArrowDownToLine
         title="Restaurer"
         onClick={handleClick}
         style={{
           cursor: "pointer",
           color: "green",
-          fontSize: "22px",
-          marginTop: "10px",
+          fontSize: "25px",
+          margin:"auto"
         }}
       />
     </div>
+
   );
 };
 

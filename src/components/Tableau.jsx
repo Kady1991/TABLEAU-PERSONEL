@@ -14,9 +14,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const linkGetAllPersonnel =
     "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
   //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
+  
   const fetchData = () => {
     fetch(linkGetAllPersonnel)
       .then((response) => response.json())
@@ -39,10 +41,6 @@ function Tableau() {
       });
   };
 
-  // pour ne pas garder les données encoder sur le formulaire d'ajout
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
 
   useEffect(() => {
     // Effect for fetching data after successful deletion or addition
@@ -94,21 +92,29 @@ function Tableau() {
       headerClassName: "header-center",
       renderCell: (params) => (
         <div
+        
           style={{
             display: "flex",
             alignItems: "center",
             gap: "20px",
             justifyContent: "center",
+            position:"relative"
           }}
         >
-          <div
+          {/* Div pour actions standards */}
+           <div
             style={{
-              display: "flex",
+              
+              // display: "flex",
+              // alignItems: "center",
+              // justifyContent: "center",
+              // gap: "20px",
+              // margin: 5,
+              // visibility: params.row.SiArchive === false ? "visible" : "hidden",
+              display: params.row.SiArchive === false ? "flex" : "none",
               alignItems: "center",
               justifyContent: "center",
               gap: "20px",
-              margin: 5,
-              visibility: params.row.SiArchive === false ? "visible" : "hidden",
             }}
           >
             <FormService personId={params.row.personneID} />
@@ -123,20 +129,40 @@ function Tableau() {
               onError={handleDeleteError}
             />
           </div>
+          
+{/*           
           <div
+              style={{ visibility: params.row.SiArchive === true ? "visible" : "hidden", }}>
+              <RestoreAction
+                IDPersonne={params.row.personneID}
+                onSuccess={handleRestoreSuccess}
+                onError={handleRestoreError}
+              />
+          </div>
+        </div>
+      ),
+    }, */}
+
+     {/* Div pour actions de restauration */}
+     <div
             style={{
-              display: "flex",
+              display: params.row.SiArchive === true ? "flex" : "none",
               alignItems: "center",
               justifyContent: "center",
-              gap: "20px",
-              margin: 5,
-              visibility: params.row.SiArchive === true ? "visible" : "hidden",
+              gap: "10px",
+              backgroundColor: "rgba(255, 255, 255, 0.8)", // Fond semi-transparent
+              borderRadius: "4px",
+              padding: "10px",
             }}
           >
             <RestoreAction
               IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}
-              onError={handleRestoreError}
+              onError={(id) =>
+                console.error(
+                  `Une erreur est survenue lors de la restauration de l'ID: ${id}`
+                )
+              }
             />
           </div>
         </div>
@@ -269,11 +295,10 @@ function Tableau() {
             />
           </div>
           <div className="PersonWalkingDiv">
-            <FontAwesomeIcon icon={faPersonWalking}className="PersonWalkingCustom"/>
-            
-          
+            <FontAwesomeIcon icon={faPersonWalking} className="PersonWalkingCustom" />
           </div>
-          <div style={{ marginRight: "1rem",padding:"1rem" }}>
+
+          <div style={{ marginRight: "1rem", padding: "1rem" }}>
             <AddMemberForm />
           </div>
         </div>
