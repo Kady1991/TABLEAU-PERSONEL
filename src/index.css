@@ -2,13 +2,11 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(
-    to bottom,
-    #095c83,
-    #d9e3eb
-  ); /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
-  font-family: Arial, sans-serif; /* Choix d'une police de caractères sans-serif */
-  height: 100vh; /* Hauteur à 100% de la fenêtre visible */
+  background: linear-gradient(to bottom,
+      #095c83, #d9e3eb);
+  /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
+  font-family: Arial, sans-serif;
+  height: 100vh;
   z-index: 0;
 }
 
@@ -16,12 +14,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #b6d2df; /* Couleur de fond de l'en-tête */
+  background-color: #b6d2df;
+  /* Couleur de fond de l'en-tête */
 }
 
 .archive-row {
-  color: #ff0202; /* ou toute autre couleur grise */
-  background-color: #b6d2df; /* Couleur de fond de l'en-tête */
+  color: #ff0202;
+  /* ou toute autre couleur grise */
+  background-color: #b6d2df;
+  /* Couleur de fond de l'en-tête */
 }
 
 /*  style pour afficher le le texte du menu deroulant sur la gauche */
@@ -36,22 +37,25 @@ body {
   margin: auto;
 }
 
-.person-walking{
+.personneEnMarche {
   position: absolute;
   font-size: 3.5rem;
   animation: personneEnMarche 20s linear infinite;
-  color:#6c8590 ;
-  
+  color: #6c8590;
+
 }
 
 @keyframes personneEnMarche {
   0% {
     left: 0;
   }
+
   100% {
-    left: calc(100% - 2rem); /* La largeur de la div moins la taille de l'icône */
+    left: calc(100% - 2rem);
+    /* La largeur de la div moins la taille de l'icône */
   }
 }
+
 
 /*  test aénimation */
 .fade-in {
@@ -63,21 +67,22 @@ body {
     opacity: 0;
     transform: translateY(-50px);
   }
+
   to {
     opacity: 1;
-    transform: translateY(100);
+    transform: translateY(200);
   }
 }
 
 
 /*  STYLE DE L'ICON DU TABLEAU */
+
 .person-icon {
-  font-size: 120px; /* Taille de l'icône */
-  color:#d9e3eb; /* Couleur de l'icône */
- 
+  font-size: 120px;
+  color: #d9e3eb;
 }
 
- /* Titre principal */
+/* Titre principal */
 .title {
   color: #d9e3eb;
 }
@@ -107,11 +112,6 @@ body {
   justify-content: center;
 }
 
-/* Icône de marche */
-.person-walking-icon {
-  font-size: 24px; /* Ajoutez une taille si nécessaire */
-  color: black; /* Exemple de couleur, à ajuster */
-}
 
 /* Conteneur du bouton Ajouter */
 .add-member-container {
@@ -130,11 +130,13 @@ body {
   z-index: 0;
 }
 
+
 /* Ligne archivée dans le DataGrid */
 .archive-row {
-  background-color: #f5f5f5; /* Exemple : couleur de fond des lignes archivées */
-  color: gray; /* Exemple : texte grisé pour les lignes archivées */
+  background-color: #f5f5f5;
+  color: gray;
 }
+
 
 /* Conteneur principal */
 .main-container {
@@ -160,18 +162,20 @@ body {
 
 /* Icône personnalisée */
 .custom-person-icon {
-  font-size: 100px; /* Taille de l'icône */
-  color:#d9e3eb; /* Couleur bleue */
+  font-size: 100px;
+  color: #d9e3eb;
+
 }
 
 /* Titre principal */
 .title {
   color: #d9e3eb;
-  font-size: 2rem; /* Taille du texte */
-  margin-bottom: 1rem; /* Espace sous le titre */
+  font-size: 2rem;
+  margin-bottom: 1rem;
+
 }
 
-/* Conteneur principal du header */
+/* Conteneur principal du header "menu" */
 .header-container {
   height: 75px;
   width: 80%;
@@ -186,6 +190,7 @@ body {
 /* Conteneur du bouton Export */
 .export-container {
   margin: 2rem;
+
 }
 
 /* Conteneur de l'icône */
@@ -193,12 +198,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+
 }
+
 
 /* Icône de marche */
 .person-walking-icon {
-  font-size: 24px; /* Taille de l'icône */
-  color: black; /* Couleur noire */
+  font-size: 24px;
+  color: black;
+
 }
 
 /* Conteneur du bouton Ajouter */
@@ -219,19 +227,21 @@ body {
 
 /* Ligne archivée dans le DataGrid */
 .archive-row {
-  background-color: #f5f5f5; /* Fond des lignes archivées */
-  color: gray; /* Texte des lignes archivées */
+  background-color: #f5f5f5;
+  color: gray;
+
 }
-/* style rtestor icon */
+
 /* Styles généraux pour RestoreIcon */
 .RestoreIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent */
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 4px;
   padding: 10px;
+
 }
 
 /* Classe pour masquer l'élément */
@@ -244,3 +254,8 @@ body {
   display: flex;
 }
 
+/* Animation AddMemberForm */
+.fade-in {
+  animation: fadeIn 2s ease;
+  /* Animation trop longue (3 secondes) */
+}

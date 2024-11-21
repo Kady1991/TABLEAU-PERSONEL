@@ -4,7 +4,6 @@ import axios from "axios";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import "../index.css";
 
-
 const { Option } = Select;
 
 const AddMemberForm = () => {
@@ -118,21 +117,21 @@ const AddMemberForm = () => {
     setIsPersonnelSelected(value);
   };
 
-  // Fonction pour générer l'e-mail à partir du prénom et du nom
-  const generateEmail = (prenom, nom) => {
-    const firstLetterPrenom =
-      prenom != undefined ? prenom.charAt(0).toLowerCase() : "";
-    const nomLowerCase = nom.toLowerCase();
-    return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
-  };
+ // Fonction pour générer l'e-mail à partir du prénom et du nom
+ const generateEmail = (prenom, nom) => {
+  const firstLetterPrenom =
+    prenom != undefined ? prenom.charAt(0).toLowerCase() : "";
+  const nomLowerCase = nom.toLowerCase();
+  return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
+};
 
-  // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
-  const handleNameChange = (e) => {
-    const prenom = form.getFieldValue("prenom");
-    const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
-    const email = generateEmail(prenom, nom);
-    form.setFieldsValue({ email });
-  };
+// Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
+const handleNameChange = (e) => {
+  const prenom = form.getFieldValue("prenom");
+  const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
+  const email = generateEmail(prenom, nom);
+  form.setFieldsValue({ email });
+};
 
 
 
@@ -153,7 +152,7 @@ const AddMemberForm = () => {
 
       {isFormOpen && (
         <div
-          className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
+        className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
           style={{
             position: "fixed",
             top: "50%",
@@ -183,8 +182,6 @@ const AddMemberForm = () => {
             Ajouter un nouveau membre
           </div>
 
-          
-
           {loadingData ? (
             <p>Chargement des données...</p>
           ) : (
@@ -212,7 +209,7 @@ const AddMemberForm = () => {
                     label="Nom"
                     rules={[{ required: true, message: "Veuillez entrer le nom" }]}
                   >
-                    <Input autoComplete="off" onChange={handleNameChange} />
+                   <Input autoComplete="off" onChange={handleNameChange} />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -221,7 +218,7 @@ const AddMemberForm = () => {
                     label="Prénom"
                     rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
                   >
-                    <Input autoComplete="off" onChange={handleNameChange} />
+                     <Input autoComplete="off" onChange={handleNameChange} />
                   </Form.Item>
                 </Col>
               </Row>

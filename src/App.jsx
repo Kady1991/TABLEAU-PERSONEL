@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Tableau from './components/Tableau'; // Assurez-vous que le chemin est correct
+import Tableau from './components/Tableau'; 
 
 function App() {
   return (

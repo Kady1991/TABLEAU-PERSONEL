@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MdDeleteForever } from "react-icons/md";
 import { DatePicker, Modal, Button, message } from "antd";
-import "antd/dist/reset.css"; // Utilisez ce style si vous utilisez Ant Design v5+
+import dayjs from "dayjs";
+import "antd/dist/reset.css";
 import "../index.css";
 
 const Delete = ({
@@ -14,8 +15,8 @@ const Delete = ({
   onError,
 }) => {
   const [isArchived, setIsArchived] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null); // Stocker la date sélectionnée
-  const [isModalVisible, setIsModalVisible] = useState(false); // Gérer l'affichage de la modale
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     checkArchivedStatus();
@@ -26,23 +27,32 @@ const Delete = ({
       const response = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
       );
+      console.log("Réponse API :", response.data); // Vérifiez la structure de la réponse
+      if (!response.data || response.data.SiArchive === undefined) {
+        console.warn("Données manquantes ou incorrectes dans la réponse de l'API.");
+        return;
+      }
       const { SiArchive } = response.data;
       setIsArchived(SiArchive);
+      console.log("État archivé :", SiArchive); // Log pour confirmer la valeur
     } catch (error) {
       console.error("Erreur lors de la récupération des informations de la personne :", error);
     }
   };
 
-  const handleDateChange = (date, dateString) => {
-    setSelectedDate(dateString); // Mettre à jour la date sélectionnée
+  const handleDateChange = (date) => {
+    const formattedDate = dayjs(date).format("YYYY-MM-DD");
+    setSelectedDate(formattedDate);
+    console.log("Date sélectionnée :", formattedDate); // Log pour vérifier la date sélectionnée
   };
 
   const handleClick = () => {
+    console.log("Date actuelle sélectionnée (avant ouverture) :", selectedDate);
     if (isArchived) {
-      message.warning("Cette personne est déjà archivée.");
+      message.warning(`Cette personne est déjà archivée.`);
       return;
     }
-    setIsModalVisible(true); // Afficher la modale
+    setIsModalVisible(true);
   };
 
   const handleConfirm = async () => {
@@ -51,27 +61,31 @@ const Delete = ({
       return;
     }
 
+    console.log("Date envoyée à l'API :", selectedDate); // Log pour vérifier la date envoyée
+
     const confirmation = window.confirm(
-      `Voulez-vous vraiment archiver ?\n\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email} le ${selectedDate} :`
+      `Voulez-vous vraiment archiver ? \n\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email}\nDate de sortie : ${selectedDate}`
     );
 
     if (!confirmation) return;
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}`,
         {
           value: email,
-          dateSortie: selectedDate, // Inclure la date sélectionnée
+          DateSortie: selectedDate, // Envoi de la date sélectionnée
         }
       );
+
+      console.log("Réponse du backend :", response.data); // Log pour vérifier la réponse du backend
 
       onSuccess(email);
       message.success(
         `La personne ${prenomPersonne} ${nomPersonne} a été archivée avec succès pour la date de sortie ${selectedDate}.`
       );
       setIsArchived(true);
-      setIsModalVisible(false); // Fermer la modale
+      setIsModalVisible(false);
     } catch (error) {
       onError(email);
       console.error("Une erreur s'est produite :", error);
@@ -80,8 +94,9 @@ const Delete = ({
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false); // Fermer la modale
-    setSelectedDate(null); // Réinitialiser la date sélectionnée
+    console.log("Annulation de la modale. Date sélectionnée réinitialisée."); // Log pour vérifier l'annulation
+    setIsModalVisible(false);
+    setSelectedDate(null);
   };
 
   return (
@@ -93,7 +108,7 @@ const Delete = ({
       />
       <Modal
         title="Choisir une date de sortie"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancel}
         footer={[
           <Button key="cancel" onClick={handleCancel}>
