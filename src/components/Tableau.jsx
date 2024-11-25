@@ -11,6 +11,7 @@ import RestoreAction from "../layout/RestoreAction.jsx";
 import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IoPersonAddSharp } from "react-icons/io5";
+import AnimationDataGrid from "../layout/AnimationDataGrid.jsx";
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);

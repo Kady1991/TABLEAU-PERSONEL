@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
 import axios from "axios";
-import { FiEye } from "react-icons/fi";
+import { BiSolidDetail } from "react-icons/bi";
 import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
+// import { green } from "@mui/material/colors";
 
 
 const Detail = ({ IDPersonne }) => {
@@ -60,16 +61,8 @@ const Detail = ({ IDPersonne }) => {
 
   return (
     <>
-      <FiEye
-        title="Voir Détails"
-        style={{
-          fontSize: "18px",
-          cursor: "pointer",
-          color: "#095e74",
-          marginBottom: "10px",
-        }}
-        onClick={handleOpenModal}
-      />
+      <BiSolidDetail className="Detail-icon"
+        title="Voir Détails" onClick={handleOpenModal}/>
       <Modal
         title="Détails de Personne"
         open={isModalVisible}

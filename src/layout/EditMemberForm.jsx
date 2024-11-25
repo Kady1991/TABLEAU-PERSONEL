@@ -10,7 +10,7 @@ import {
   DatePicker,
   Select,
 } from "antd";
-import { FiEdit } from "react-icons/fi";
+import { RiFileEditFill } from "react-icons/ri";
 import axios from "axios";
 import dayjs from "dayjs";
 import "../index.css";
@@ -194,7 +194,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
   return (
     <>
-      <FiEdit className="Edit-Icon"
+      <RiFileEditFill className="Edit-Icon"
         title="Editer"  
         onClick={handleOpenModal}
       />

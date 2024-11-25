@@ -210,6 +210,26 @@ body {
   z-index: 0;
 }
 
+/* animation datagrid */
+.data-grid-container {
+  opacity: 0; /* État initial */
+  transform: scale(0.5); /* État initial */
+  animation: fadeInScale 3s ease-out forwards; /* Animation sur 2 secondes */
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
 /* Ligne archivée dans le DataGrid */
 .archive-row {
   background-color: #eaeced;
@@ -257,8 +277,8 @@ body {
 .delete-Icon{
   cursor: "pointer";
   color: rgb(223, 2, 2);
-  font-size: 23px;
-  margin-top: 15px;
+  font-size: 24.5px;
+  margin-top:17px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .delete-Icon:hover{
@@ -273,14 +293,14 @@ body {
 .Edit-Icon{
   cursor: "pointer";
   color: #095c83;
-  font-size: 18px;
+  font-size: 20px;
   margin: 2px;
   margin-bottom:7px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .Edit-Icon:hover{
-  color: #2796c9; 
+  color: #6ea6c0; 
   transform: scale(1.05);   
   cursor: pointer; 
   font-size: 20px; 
@@ -288,11 +308,38 @@ body {
 
 /* STYLE SERVICE ICON */
 
-.Service-Icon{
+.Service-icon{
   cursor: "pointer";
-  color: #095c83;
-  font-size: 18px;
+  color: #fdbb03;
+  font-size: 20px;
   margin: 2px;
   margin-bottom:7px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
+.Service-icon:hover{
+  color: #eebb30;
+  transform: scale(1.05);   
+  cursor: pointer; 
+  font-size: 22px; 
+}
+
+/* style  Detail-icon */
+.Detail-icon{
+  cursor: "pointer";
+  color: #008000;
+  font-size: 20px;
+  margin: 2px;
+  margin-bottom:7px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.Detail-icon:hover{
+  background-color: #399539; 
+  color: whitesmoke;
+  border-radius: 10%;
+  transform: scale(1.05);   
+  cursor: pointer; 
+  font-size: 19px; 
+}
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
-import { PiBuildingLight } from "react-icons/pi";
+import { MdMedicalServices } from "react-icons/md";
 import axios from 'axios';
 import "../index.css";
 
@@ -147,7 +147,7 @@ const FormService = ({ personId }) => {
 
     return (
         <>
-            <PiBuildingLight title='Ajouter un service' style={{ marginBottom: 10, fontSize: '19px', cursor: 'pointer', color: '#5E9FCB' }} onClick={handleOpenModal} />
+            <MdMedicalServices className='Service-icon' title='Ajouter un service'  onClick={handleOpenModal} />
             <Modal
                 title="Ajouter un Service supplémentaire"
                 open={isModalVisible}
