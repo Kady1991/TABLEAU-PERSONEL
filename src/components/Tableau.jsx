@@ -127,9 +127,18 @@ function Tableau() {
 
           {/* Div pour actions de restauration */}
           <div className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
-          <Detail IDPersonne={params.row.personneID} />
+            <Detail IDPersonne={params.row.personneID}
+              nomPersonne={params.row.NomPersonne}
+              prenomPersonne={params.row.PrenomPersonne}
+              email={params.row.Email}
+              onSuccess={handleDeleteSuccess}
+              onError={handleDeleteError}
+            />
             <RestoreAction
               IDPersonne={params.row.personneID}
+              nomPersonne={params.row.NomPersonne}
+              prenomPersonne={params.row.PrenomPersonne}
+              email={params.row.Email}
               onSuccess={handleRestoreSuccess}
               onError={(id) =>
                 console.error(
