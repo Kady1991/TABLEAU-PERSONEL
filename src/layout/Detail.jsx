@@ -1,42 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal } from "antd";
 import axios from "axios";
 import { FiEye } from "react-icons/fi";
-import dayjs from "dayjs";
+import { XMLParser } from "fast-xml-parser";
 
 const Detail = ({ IDPersonne }) => {
-   console.log("IDPersonne reçu :", IDPersonne); // Ajoutez ceci pour vérifier l'ID
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personData, setPersonData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isModalVisible && IDPersonne) {
-      fetchPersonData();
-    }
-  }, [isModalVisible, IDPersonne]);
-
   const fetchPersonData = async () => {
-    if (!IDPersonne) {
-      console.error("IDPersonne est undefined");
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`,
+        {
+          headers: { Accept: "application/xml" },
+        }
       );
 
-      console.log("Données de la personne reçues :", response.data);
+      console.log("Réponse brute de l'API :", response.data);
 
-      if (response.data) {
-        setPersonData(response.data);
+      if (typeof response.data !== "string") {
+        throw new Error("La réponse API n'est pas une chaîne XML.");
+      }
+
+      const parser = new XMLParser();
+      const jsonData = parser.parse(response.data);
+
+      console.log("Données JSON après parsing :", jsonData);
+
+      if (jsonData && jsonData.WhosWhoModelView) {
+        setPersonData(jsonData.WhosWhoModelView);
       } else {
-        console.error("Aucune donnée trouvée pour cet IDPersonne.");
+        console.warn("Aucune donnée trouvée pour cet IDPersonne.");
+        setPersonData(null);
       }
     } catch (error) {
-      console.error("Erreur lors de la récupération des données :", error);
+      console.error(
+        "Erreur lors de la récupération des données :",
+        error.response?.data || error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -44,10 +48,12 @@ const Detail = ({ IDPersonne }) => {
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
+    fetchPersonData();
   };
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
+    setPersonData(null);
   };
 
   return (
@@ -73,36 +79,17 @@ const Detail = ({ IDPersonne }) => {
           <p>Chargement des données...</p>
         ) : personData ? (
           <div style={{ textAlign: "left" }}>
-            {personData.NomPersonne && (
-              <p><strong>Nom:</strong> {personData.NomPersonne}</p>
-            )}
-            {personData.PrenomPersonne && (
-              <p><strong>Prénom:</strong> {personData.PrenomPersonne}</p>
-            )}
-            {personData.Email && (
-              <p><strong>Email:</strong> {personData.Email}</p>
-            )}
-            {personData.TelPro && (
-              <p><strong>Téléphone:</strong> {personData.TelPro}</p>
-            )}
-            {personData.DateEntreeDate && (
-              <p>
-                <strong>Date d'Entrée:</strong> {dayjs(personData.DateEntreeDate).format("DD/MM/YYYY")}
-              </p>
-            )}
-            {personData.WWGradeID && (
-              <p><strong>Grade:</strong> {personData.WWGradeID}</p>
-            )}
-            {personData.AdresseID && (
-              <p><strong>Adresse:</strong> {personData.AdresseID}</p>
-            )}
-            {personData.ServiceID && (
-              <p><strong>Service:</strong> {personData.ServiceID}</p>
-            )}
-            <p><strong>Langue:</strong> {personData.SiFrancais ? "Français" : "Néerlandais"}</p>
-            {personData.SiTypePersonnel && personData.TypePersonnelID && (
-              <p><strong>Type de Personnel:</strong> {personData.TypePersonnelID}</p>
-            )}
+            <p><strong>Nom: </strong> {personData.NomPersonne}</p>
+            <p><strong>Prénom: </strong> {personData.PrenomPersonne}</p>
+            <p><strong>Email: </strong> {personData.Email}</p>
+            <p><strong>Téléphone: </strong> {personData.TelPro}</p>
+            <p><strong>Service: </strong>{personData.NomServiceFr}</p>
+            <p><strong>Grade: </strong>{personData.NomWWGradeFr}</p>
+            <p><strong>Date d'entrée: </strong>{personData.DateEntree}</p>
+            <p><strong>Adresse: </strong>{personData.NomRueFr} {personData.Numero} , <strong>Batiment: </strong>{personData.Batiment} , <strong>Etage: </strong> {personData.Etage} </p>
+            <p><strong>Chef de service: </strong>{personData.NomChefService} {personData.PrenomChefService}</p>
+            <p><strong>Département: </strong>{personData.NomDepartementFr}</p>
+            <p><strong>Chef de département: </strong>{personData.NomChefDepartement} {personData.PrenomChefDepartement}</p>
           </div>
         ) : (
           <p>Aucune donnée trouvée pour cet utilisateur.</p>

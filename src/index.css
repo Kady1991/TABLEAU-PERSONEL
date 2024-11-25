@@ -131,13 +131,6 @@ body {
 }
 
 
-/* Ligne archivée dans le DataGrid */
-.archive-row {
-  background-color: #f5f5f5;
-  color: gray;
-}
-
-
 /* Conteneur principal */
 .main-container {
   position: fixed;
@@ -201,14 +194,6 @@ body {
 
 }
 
-
-/* Icône de marche */
-.person-walking-icon {
-  font-size: 24px;
-  color: black;
-
-}
-
 /* Conteneur du bouton Ajouter */
 .add-member-container {
   margin-right: 1rem;
@@ -227,8 +212,8 @@ body {
 
 /* Ligne archivée dans le DataGrid */
 .archive-row {
-  background-color: #f5f5f5;
-  color: gray;
+  background-color: #eaeced;
+  color: rgb(28, 28, 28);
 
 }
 
@@ -238,11 +223,19 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 4px;
-  padding: 10px;
-
+  color: green;
+  font-size: 25px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  
 }
+
+.RestoreIcon:hover {
+  color: green; 
+  transform: scale(1.05);   
+  cursor: pointer; 
+  font-size: 28px;         
+} 
 
 /* Classe pour masquer l'élément */
 .hidden {
@@ -258,4 +251,48 @@ body {
 .fade-in {
   animation: fadeIn 2s ease;
   /* Animation trop longue (3 secondes) */
+}
+
+/* STYLE DELETE ICON */
+.delete-Icon{
+  cursor: "pointer";
+  color: rgb(223, 2, 2);
+  font-size: 23px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.delete-Icon:hover{
+  
+  color: rgb(170, 2, 2); 
+  transform: scale(1.05);   
+  cursor: pointer; 
+  font-size: 25px; 
+}
+
+/* STYLE EDITE ICON */
+.Edit-Icon{
+  cursor: "pointer";
+  color: #095c83;
+  font-size: 18px;
+  margin: 2px;
+  margin-bottom:7px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.Edit-Icon:hover{
+  color: #2796c9; 
+  transform: scale(1.05);   
+  cursor: pointer; 
+  font-size: 20px; 
+}
+
+/* STYLE SERVICE ICON */
+
+.Service-Icon{
+  cursor: "pointer";
+  color: #095c83;
+  font-size: 18px;
+  margin: 2px;
+  margin-bottom:7px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }

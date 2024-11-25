@@ -71,11 +71,11 @@ const Delete = ({
 
     try {
       const response = await axios.put(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}`,
-        {
-          value: email,
-          DateSortie: selectedDate, // Envoi de la date sélectionnée
-        }
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}&dateSortie=${selectedDate}`,
+        // {
+        //   value: email,
+        //   dateSortie: selectedDate, // Envoi de la date sélectionnée
+        // }
       );
 
       console.log("Réponse du backend :", response.data); // Log pour vérifier la réponse du backend
@@ -101,10 +101,10 @@ const Delete = ({
 
   return (
     <div>
-      <MdDeleteForever
+      <MdDeleteForever className="delete-Icon"
         title="Archiver"
         onClick={handleClick}
-        style={{ cursor: "pointer", color: "red", fontSize: "22px", marginTop: "10px" }}
+
       />
       <Modal
         title="Choisir une date de sortie"

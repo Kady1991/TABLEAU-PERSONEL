@@ -44,15 +44,9 @@ const RestoreAction = ({ IDPersonne, email, onSuccess, onError }) => {
         alignItems: "center",
       }}
     >
-      <FaPersonArrowDownToLine
+      <FaPersonArrowDownToLine className="IconRestore"
         title="Restaurer"
         onClick={handleClick}
-        style={{
-          cursor: "pointer",
-          color: "green",
-          fontSize: "25px",
-          margin:"auto"
-        }}
       />
     </div>
 

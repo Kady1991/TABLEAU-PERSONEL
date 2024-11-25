@@ -5,7 +5,7 @@ import Export from "../layout/Export.jsx";
 import AddMemberForm from "../layout/AddMemberForm.jsx";
 import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
-// import Detail from "../layout/Detail.jsx";
+import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
@@ -100,8 +100,8 @@ function Tableau() {
             gap: "10px",
             justifyContent: "center",
             position: "relative"
-            }}
-            >
+          }}
+        >
           {/* Div pour actions standards */}
           <div
             style={{
@@ -112,7 +112,7 @@ function Tableau() {
             }}
           >
             <FormService personId={params.row.personneID} />
-            {/* <Detail onClick={handleClick} rowData={params.row.personneID} /> */}
+            <Detail IDPersonne={params.row.personneID} />
             <EditMemberForm IDPersonne={params.row.personneID} />
             <Delete
               IDPersonne={params.row.personneID}

@@ -194,16 +194,11 @@ const EditMemberForm = ({ IDPersonne }) => {
 
   return (
     <>
-      <FiEdit
-        title="Editer"
-        style={{
-          fontSize: "18px",
-          cursor: "pointer",
-          color: "#095e74",
-          marginBottom: "10px",
-        }}
+      <FiEdit className="Edit-Icon"
+        title="Editer"  
         onClick={handleOpenModal}
       />
+      
       <Modal
         title="EDITER"
         open={isModalVisible}
