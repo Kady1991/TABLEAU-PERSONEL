@@ -4,7 +4,7 @@ import axios from "axios";
 import { BiSolidDetail } from "react-icons/bi";
 import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
-// import { green } from "@mui/material/colors";
+import { green } from "@mui/material/colors";
 
 
 const Detail = ({ IDPersonne }) => {
@@ -62,7 +62,10 @@ const Detail = ({ IDPersonne }) => {
   return (
     <>
       <BiSolidDetail className="Detail-icon"
-        title="Voir Détails" onClick={handleOpenModal}/>
+        title="Voir Détails"
+        
+        onClick={handleOpenModal}
+      />
       <Modal
         title="Détails de Personne"
         open={isModalVisible}

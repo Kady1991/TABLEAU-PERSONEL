@@ -212,7 +212,7 @@ body {
 
 /* animation datagrid */
 .data-grid-container {
-  opacity: 0; /* État initial */
+  opacity: 0; 
   transform: scale(0.5); /* État initial */
   animation: fadeInScale 3s ease-out forwards; /* Animation sur 2 secondes */
 }
@@ -251,7 +251,7 @@ body {
 }
 
 .RestoreIcon:hover {
-  color: green; 
+  color: rgb(64, 182, 64); 
   transform: scale(1.05);   
   cursor: pointer; 
   font-size: 28px;         
@@ -311,9 +311,9 @@ body {
 .Service-icon{
   cursor: "pointer";
   color: #fdbb03;
-  font-size: 20px;
+  font-size: 21px;
   margin: 2px;
-  margin-bottom:7px;
+  margin-bottom:9px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
@@ -327,7 +327,7 @@ body {
 /* style  Detail-icon */
 .Detail-icon{
   cursor: "pointer";
-  color: #008000;
+  color: #6ba2d9;
   font-size: 20px;
   margin: 2px;
   margin-bottom:7px;
@@ -335,7 +335,7 @@ body {
 }
 
 .Detail-icon:hover{
-  background-color: #399539; 
+  background-color: #36506a; 
   color: whitesmoke;
   border-radius: 10%;
   transform: scale(1.05);   

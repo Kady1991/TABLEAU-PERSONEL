@@ -11,7 +11,7 @@ import RestoreAction from "../layout/RestoreAction.jsx";
 import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IoPersonAddSharp } from "react-icons/io5";
-import AnimationDataGrid from "../layout/AnimationDataGrid.jsx";
+
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
@@ -259,7 +259,7 @@ function Tableau() {
           </div>
         </div>
 
-        <div className="data-grid-container">
+           <div className="data-grid-container">
           <DataGrid
             rows={personnes}
             columns={columns}
@@ -267,7 +267,9 @@ function Tableau() {
             loading={loading}
             checkboxSelection
             disableSelectionOnClick
-            getRowClassName={(params) => (params.row.SiArchive ? "archive-row" : "")}
+            getRowClassName={(params) =>
+              params.row.SiArchive ? "archive-row" : ""
+            }
           />
         </div>
       </div>

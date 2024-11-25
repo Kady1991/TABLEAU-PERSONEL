@@ -28,11 +28,11 @@ const Delete = ({
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
       );
       // Log pour vérifier la réponse de l'API
-      // console.log("Réponse API :", response.data); 
-      // if (!response.data || response.data.SiArchive === undefined) {
-      //   console.warn("Données manquantes ou incorrectes dans la réponse de l'API.");
-      //   return;
-      // }
+      console.log("Réponse API :", response.data); 
+      if (!response.data || response.data.SiArchive === undefined) {
+        console.warn("Données manquantes ou incorrectes dans la réponse de l'API.");
+        return;
+      }
       const { SiArchive } = response.data;
       setIsArchived(SiArchive);
       console.log("État archivé :", SiArchive); // Log pour confirmer la valeur
@@ -121,7 +121,6 @@ const Delete = ({
         ]}
       >
         <p>Sélectionnez une date de sortie avant d'archiver</p>
-        <p>ID: {IDPersonne}: Nom: {nomPersonne} Prénom: {prenomPersonne}</p>
         <DatePicker
           onChange={handleDateChange}
           format="YYYY-MM-DD"
