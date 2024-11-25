@@ -127,6 +127,7 @@ function Tableau() {
 
           {/* Div pour actions de restauration */}
           <div className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
+          <Detail IDPersonne={params.row.personneID} />
             <RestoreAction
               IDPersonne={params.row.personneID}
               onSuccess={handleRestoreSuccess}

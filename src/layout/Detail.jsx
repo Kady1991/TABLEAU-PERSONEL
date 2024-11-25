@@ -3,6 +3,8 @@ import { Modal } from "antd";
 import axios from "axios";
 import { FiEye } from "react-icons/fi";
 import { XMLParser } from "fast-xml-parser";
+import dayjs from "dayjs";
+
 
 const Detail = ({ IDPersonne }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -79,18 +81,25 @@ const Detail = ({ IDPersonne }) => {
           <p>Chargement des données...</p>
         ) : personData ? (
           <div style={{ textAlign: "left" }}>
-            <p><strong>Nom: </strong> {personData.NomPersonne}</p>
-            <p><strong>Prénom: </strong> {personData.PrenomPersonne}</p>
-            <p><strong>Email: </strong> {personData.Email}</p>
-            <p><strong>Téléphone: </strong> {personData.TelPro}</p>
-            <p><strong>Service: </strong>{personData.NomServiceFr}</p>
-            <p><strong>Grade: </strong>{personData.NomWWGradeFr}</p>
-            <p><strong>Date d'entrée: </strong>{personData.DateEntree}</p>
-            <p><strong>Adresse: </strong>{personData.NomRueFr} {personData.Numero} , <strong>Batiment: </strong>{personData.Batiment} , <strong>Etage: </strong> {personData.Etage} </p>
-            <p><strong>Chef de service: </strong>{personData.NomChefService} {personData.PrenomChefService}</p>
-            <p><strong>Département: </strong>{personData.NomDepartementFr}</p>
-            <p><strong>Chef de département: </strong>{personData.NomChefDepartement} {personData.PrenomChefDepartement}</p>
-          </div>
+          <p><strong>Nom: </strong> {personData.NomPersonne}</p>
+          <p><strong>Prénom: </strong> {personData.PrenomPersonne}</p>
+          <p><strong>Email: </strong> {personData.Email}</p>
+          <p><strong>Téléphone: </strong> {personData.TelPro}</p>
+          <p><strong>Service: </strong>{personData.NomServiceFr}</p>
+          <p><strong>Grade: </strong>{personData.NomWWGradeFr}</p>
+          <p><strong>Date d'entrée: </strong>{dayjs(personData.DateEntree).format("DD/MM/YYYY")}</p>
+          <p>
+            <strong>Date de sortie: </strong>
+            {personData.DateSortie
+              ? dayjs(personData.DateSortie).format("DD/MM/YYYY")
+              : "Cette personne n'est pas encore sortie"}
+          </p>
+          <p><strong>Adresse: </strong>{personData.NomRueFr} {personData.Numero}, <strong>Batiment: </strong>{personData.Batiment}, <strong>Étage: </strong> {personData.Etage}</p>
+          <p><strong>Chef de service: </strong>{personData.NomChefService} {personData.PrenomChefService}</p>
+          <p><strong>Département: </strong>{personData.NomDepartementFr}</p>
+          <p><strong>Chef de département: </strong>{personData.NomChefDepartement} {personData.PrenomChefDepartement}</p>
+        </div>
+        
         ) : (
           <p>Aucune donnée trouvée pour cet utilisateur.</p>
         )}
