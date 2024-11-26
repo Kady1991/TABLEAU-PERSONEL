@@ -259,7 +259,7 @@ function Tableau() {
           </div>
         </div>
 
-           <div className="data-grid-container">
+        <div className="data-grid-container">
           <DataGrid
             rows={personnes}
             columns={columns}

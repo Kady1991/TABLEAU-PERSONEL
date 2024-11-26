@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   background: linear-gradient(to bottom,
-      #095c83, #d9e3eb);
+      #81a4c0, #095c83);
   /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
   font-family: Arial, sans-serif;
   height: 100vh;
@@ -42,7 +42,6 @@ body {
   font-size: 3.5rem;
   animation: personneEnMarche 20s linear infinite;
   color: #6c8590;
-
 }
 
 @keyframes personneEnMarche {
@@ -78,7 +77,7 @@ body {
 /*  STYLE DE L'ICON DU TABLEAU */
 
 .person-icon {
-  font-size: 120px;
+  font-size: 90px;
   color: #d9e3eb;
 }
 
@@ -137,8 +136,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 500px;
-  width: 100%;
+  height: 450px;
+  width: 110%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -151,6 +150,7 @@ body {
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
+  /* font-size: 5rem; */
 }
 
 /* Icône personnalisée */
@@ -164,9 +164,8 @@ body {
 .title {
   color: #d9e3eb;
   font-size: 2rem;
-  
-
 }
+
 
 /* Conteneur principal du header "menu" */
 .header-container {
@@ -177,13 +176,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
 }
 
 /* Conteneur du bouton Export */
 .export-container {
   margin: 2rem;
-
 }
 
 /* Conteneur de l'icône */
@@ -191,7 +188,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 /* Conteneur du bouton Ajouter */
@@ -212,9 +208,11 @@ body {
 
 /* animation datagrid */
 .data-grid-container {
-  opacity: 0; 
-  transform: scale(0.5); /* État initial */
-  animation: fadeInScale 3s ease-out forwards; /* Animation sur 2 secondes */
+  opacity: 0;
+  transform: scale(0.5);
+  /* État initial */
+  animation: fadeInScale 3s ease-out forwards;
+  /* Animation sur 2 secondes */
 }
 
 @keyframes fadeInScale {
@@ -222,6 +220,7 @@ body {
     opacity: 0;
     transform: scale(0.5);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -247,15 +246,15 @@ body {
   color: green;
   font-size: 25px;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  
+
 }
 
 .RestoreIcon:hover {
-  color: rgb(64, 182, 64); 
-  transform: scale(1.05);   
-  cursor: pointer; 
-  font-size: 28px;         
-} 
+  color: rgb(64, 182, 64);
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 28px;
+}
 
 /* Classe pour masquer l'élément */
 .hidden {
@@ -274,72 +273,72 @@ body {
 }
 
 /* STYLE DELETE ICON */
-.delete-Icon{
+.delete-Icon {
   cursor: "pointer";
   color: rgb(223, 2, 2);
   font-size: 24.5px;
-  margin-top:17px;
+  margin-top: 17px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
-.delete-Icon:hover{
-  
-  color: rgb(170, 2, 2); 
-  transform: scale(1.05);   
-  cursor: pointer; 
-  font-size: 25px; 
+
+.delete-Icon:hover {
+
+  color: rgb(170, 2, 2);
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 25px;
 }
 
 /* STYLE EDITE ICON */
-.Edit-Icon{
+.Edit-Icon {
   cursor: "pointer";
   color: #095c83;
   font-size: 20px;
   margin: 2px;
-  margin-bottom:7px;
+  margin-bottom: 7px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.Edit-Icon:hover{
-  color: #6ea6c0; 
-  transform: scale(1.05);   
-  cursor: pointer; 
-  font-size: 20px; 
+.Edit-Icon:hover {
+  color: #6ea6c0;
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 20px;
 }
 
 /* STYLE SERVICE ICON */
 
-.Service-icon{
+.Service-icon {
   cursor: "pointer";
   color: #fdbb03;
   font-size: 21px;
   margin: 2px;
-  margin-bottom:9px;
+  margin-bottom: 9px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.Service-icon:hover{
+.Service-icon:hover {
   color: #eebb30;
-  transform: scale(1.05);   
-  cursor: pointer; 
-  font-size: 22px; 
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 22px;
 }
 
 /* style  Detail-icon */
-.Detail-icon{
+.Detail-icon {
   cursor: "pointer";
   color: #6ba2d9;
   font-size: 20px;
   margin: 2px;
-  margin-bottom:9px;
+  margin-bottom: 9px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.Detail-icon:hover{
-  background-color: #36506a; 
+.Detail-icon:hover {
+  background-color: #36506a;
   color: whitesmoke;
   border-radius: 10%;
-  transform: scale(1.05);   
-  cursor: pointer; 
-  font-size: 19px; 
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 19px;
 }
-
