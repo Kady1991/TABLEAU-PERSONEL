@@ -109,7 +109,7 @@ function Tableau() {
               display: params.row.SiArchive === false ? "flex" : "none",
               alignItems: "center",
               justifyContent: "center",
-              gap: "20px",
+              gap: "15px",
             }}
           >
             <FormService personId={params.row.personneID} />

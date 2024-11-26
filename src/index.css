@@ -164,7 +164,7 @@ body {
 .title {
   color: #d9e3eb;
   font-size: 2rem;
-  margin-bottom: 1rem;
+  
 
 }
 
@@ -177,7 +177,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 2rem;
+  
 }
 
 /* Conteneur du bouton Export */
@@ -202,10 +202,10 @@ body {
 
 /* Conteneur du DataGrid */
 .data-grid-container {
-  height: calc(100% - 75px - 2rem);
+  height: calc(110% - 10px - 1rem);
   width: 80%;
   background-color: white;
-  margin-top: 2rem;
+  margin-top: 1rem;
   border-radius: 0.5rem;
   z-index: 0;
 }
@@ -330,7 +330,7 @@ body {
   color: #6ba2d9;
   font-size: 20px;
   margin: 2px;
-  margin-bottom:7px;
+  margin-bottom:9px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
