@@ -4,8 +4,6 @@ import axios from "axios";
 import { BiSolidDetail } from "react-icons/bi";
 import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
-import { green } from "@mui/material/colors";
-
 
 const Detail = ({ IDPersonne }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,16 +20,12 @@ const Detail = ({ IDPersonne }) => {
         }
       );
 
-      console.log("Réponse brute de l'API :", response.data);
-
       if (typeof response.data !== "string") {
         throw new Error("La réponse API n'est pas une chaîne XML.");
       }
 
       const parser = new XMLParser();
       const jsonData = parser.parse(response.data);
-
-      console.log("Données JSON après parsing :", jsonData);
 
       if (jsonData && jsonData.WhosWhoModelView) {
         setPersonData(jsonData.WhosWhoModelView);
@@ -61,9 +55,9 @@ const Detail = ({ IDPersonne }) => {
 
   return (
     <>
-      <BiSolidDetail className="Detail-icon"
+      <BiSolidDetail
+        className="Detail-icon"
         title="Voir Détails"
-        
         onClick={handleOpenModal}
       />
       <Modal
@@ -77,25 +71,57 @@ const Detail = ({ IDPersonne }) => {
           <p>Chargement des données...</p>
         ) : personData ? (
           <div style={{ textAlign: "left" }}>
-          <p><strong>Nom: </strong> {personData.NomPersonne}</p>
-          <p><strong>Prénom: </strong> {personData.PrenomPersonne}</p>
-          <p><strong>Email: </strong> {personData.Email}</p>
-          <p><strong>Téléphone: </strong> {personData.TelPro}</p>
-          <p><strong>Service: </strong>{personData.NomServiceFr}</p>
-          <p><strong>Grade: </strong>{personData.NomWWGradeFr}</p>
-          <p><strong>Date d'entrée: </strong>{dayjs(personData.DateEntree).format("DD/MM/YYYY")}</p>
-          <p>
-            <strong>Date de sortie: </strong>
-            {personData.DateSortie
-              ? dayjs(personData.DateSortie).format("DD/MM/YYYY")
-              : "Cette personne n'est pas encore sortie"}
-          </p>
-          <p><strong>Adresse: </strong>{personData.NomRueFr} {personData.Numero}, <strong>Batiment: </strong>{personData.Batiment}, <strong>Étage: </strong> {personData.Etage}</p>
-          <p><strong>Chef de service: </strong>{personData.NomChefService} {personData.PrenomChefService}</p>
-          <p><strong>Département: </strong>{personData.NomDepartementFr}</p>
-          <p><strong>Chef de département: </strong>{personData.NomChefDepartement} {personData.PrenomChefDepartement}</p>
-        </div>
-        
+            <p>
+              <strong>Nom: </strong> {personData.NomPersonne}
+            </p>
+            <p>
+              <strong>Prénom: </strong> {personData.PrenomPersonne}
+            </p>
+            <p>
+              <strong>Email: </strong> {personData.Email}
+            </p>
+            <p>
+              <strong>Téléphone: </strong> {personData.TelPro}
+            </p>
+            <p>
+              <strong>Service: </strong>
+              {personData.NomServiceFr}
+            </p>
+            <p>
+              <strong>Grade: </strong>
+              {personData.NomWWGradeFr}
+            </p>
+            <p>
+              <strong>Date d'entrée: </strong>
+              {dayjs(personData.DateEntree).format("DD/MM/YYYY")}
+            </p>
+            {/* Affiche Date de sortie uniquement si SiArchive n'est pas "true" */}
+            {personData.SiArchive !== "true" && (
+              <p>
+                <strong>Date de sortie: </strong>
+                {personData.DateSortie
+                  ? dayjs(personData.DateSortie).format("DD/MM/YYYY")
+                  : "Non spécifiée"}
+              </p>
+            )}
+            <p>
+              <strong>Adresse: </strong>
+              {personData.NomRueFr} {personData.Numero}, <strong>Bâtiment: </strong>
+              {personData.Batiment}, <strong>Étage: </strong> {personData.Etage}
+            </p>
+            <p>
+              <strong>Chef de service: </strong>
+              {personData.NomChefService} {personData.PrenomChefService}
+            </p>
+            <p>
+              <strong>Département: </strong>
+              {personData.NomDepartementFr}
+            </p>
+            <p>
+              <strong>Chef de département: </strong>
+              {personData.NomChefDepartement} {personData.PrenomChefDepartement}
+            </p>
+          </div>
         ) : (
           <p>Aucune donnée trouvée pour cet utilisateur.</p>
         )}
