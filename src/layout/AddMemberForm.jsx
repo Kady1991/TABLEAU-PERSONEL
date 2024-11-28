@@ -3,6 +3,7 @@ import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import "../index.css";
+import { IoPersonAddSharp } from "react-icons/io5";
 
 const { Option } = Select;
 
@@ -117,42 +118,35 @@ const AddMemberForm = () => {
     setIsPersonnelSelected(value);
   };
 
- // Fonction pour générer l'e-mail à partir du prénom et du nom
- const generateEmail = (prenom, nom) => {
-  const firstLetterPrenom =
-    prenom != undefined ? prenom.charAt(0).toLowerCase() : "";
-  const nomLowerCase = nom.toLowerCase();
-  return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
-};
+  // Fonction pour générer l'e-mail à partir du prénom et du nom
+  const generateEmail = (prenom, nom) => {
+    const firstLetterPrenom =
+      prenom != undefined ? prenom.charAt(0).toLowerCase() : "";
+    const nomLowerCase = nom.toLowerCase();
+    return `${firstLetterPrenom}${nomLowerCase}@uccle.brussels`;
+  };
 
-// Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
-const handleNameChange = (e) => {
-  const prenom = form.getFieldValue("prenom");
-  const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
-  const email = generateEmail(prenom, nom);
-  form.setFieldsValue({ email });
-};
+  // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
+  const handleNameChange = (e) => {
+    const prenom = form.getFieldValue("prenom");
+    const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
+    const email = generateEmail(prenom, nom);
+    form.setFieldsValue({ email });
+  };
 
 
 
   return (
+    // STYLE INCORPORER BOUTON: AJOUTER MEMBRE
     <div>
-      <Button
-        style={{
-          backgroundColor: "#095c83",
-          height: "2.4rem",
-          fontStyle: "bold",
-        }}
-        type="primary"
-        onClick={openForm}
-        icon={<PlusOutlined />}
-      >
-        CREER MEMBRE
+      <Button className="custom-button" type="secondary" onClick={openForm} icon={<PlusOutlined />}>
+        AJOUTER MEMBRE
       </Button>
-
+      
+      {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}
       {isFormOpen && (
         <div
-        className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
+          className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
           style={{
             position: "fixed",
             top: "50%",
@@ -160,26 +154,37 @@ const handleNameChange = (e) => {
             transform: "translate(-50%, -50%)",
             zIndex: "9999",
             backgroundColor: "#fff",
-            padding: "20px",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            padding: "25px",
+            boxShadow: "0 5px 8px rgba(0,0,0,0.1)",
             borderRadius: "8px",
-            minHeight: "50vh",
-            minWidth: "70vh",
+            minHeight: "80vh",
+            minWidth: "80vh",
           }}
         >
           <div style={{ textAlign: "right", marginBottom: "20px" }}>
             <CloseOutlined onClick={closeForm} style={{ cursor: "pointer" }} />
           </div>
 
-          <div
+          {/* <div
             style={{
-              marginBottom: "50px",
+              marginBottom: "30px",
               textAlign: "center",
               fontSize: "1.2rem",
               fontWeight: "bold",
+              color: "#095c84"
             }}
           >
-            Ajouter un nouveau membre
+            <div className="icon-tableau">
+              <IoPersonAddSharp className="person-icon" />
+            </div>
+            Nouveau membre
+          </div> */}
+
+          <div className="new-member-container">
+            <div className="icon-tableau">
+              <IoPersonAddSharp className="person-icon" />
+            </div>
+            Nouveau membre
           </div>
 
           {loadingData ? (
@@ -190,10 +195,11 @@ const handleNameChange = (e) => {
               layout="vertical"
               onFinish={handleSubmit}
               style={{
-                minHeight: "70vh",
-                minWidth: "70vh",
-                padding: "30px",
-                backgroundColor: "#f0f2f5",
+                minHeight: "60vh",
+                minWidth: "50vh",
+                padding: "10px",
+                marginBottom: "10%",
+                backgroundColor: "#d9e3eb",
                 borderRadius: "8px",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
@@ -209,7 +215,7 @@ const handleNameChange = (e) => {
                     label="Nom"
                     rules={[{ required: true, message: "Veuillez entrer le nom" }]}
                   >
-                   <Input autoComplete="off" onChange={handleNameChange} />
+                    <Input autoComplete="off" onChange={handleNameChange} />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -218,7 +224,7 @@ const handleNameChange = (e) => {
                     label="Prénom"
                     rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
                   >
-                     <Input autoComplete="off" onChange={handleNameChange} />
+                    <Input autoComplete="off" onChange={handleNameChange} />
                   </Form.Item>
                 </Col>
               </Row>

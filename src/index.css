@@ -40,8 +40,8 @@ body {
 .personneEnMarche {
   position: absolute;
   font-size: 3.5rem;
-  animation: personneEnMarche 20s linear infinite;
-  color: #6c8590;
+  animation: personneEnMarche 30s linear infinite;
+  color: #8db8ca;
 }
 
 @keyframes personneEnMarche {
@@ -77,7 +77,7 @@ body {
 /*  STYLE DE L'ICON DU TABLEAU */
 
 .person-icon {
-  font-size: 90px;
+  font-size: 80px;
   color: #d9e3eb;
 }
 
@@ -150,7 +150,7 @@ body {
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
-  /* font-size: 5rem; */
+  font-size: 5rem;
 }
 
 /* Icône personnalisée */
@@ -198,7 +198,7 @@ body {
 
 /* Conteneur du DataGrid */
 .data-grid-container {
-  height: calc(110% - 10px - 1rem);
+  height: calc(130% - 10px - 1rem);
   width: 80%;
   background-color: white;
   margin-top: 1rem;
@@ -211,7 +211,7 @@ body {
   opacity: 0;
   transform: scale(0.5);
   /* État initial */
-  animation: fadeInScale 3s ease-out forwards;
+  animation: fadeInScale 1s ease-out forwards;
   /* Animation sur 2 secondes */
 }
 
@@ -341,4 +341,31 @@ body {
   transform: scale(1.05);
   cursor: pointer;
   font-size: 19px;
+}
+.custom-button {
+  background-color: #095c83;
+  height: 2.4rem;
+  font-weight: bold; /* Utilisez font-weight au lieu de fontStyle */
+  color: white; /* Optionnel, pour rendre le texte visible */
+  border: none; /* Optionnel, pour un style plus propre */
+  cursor: pointer; /* Optionnel, pour indiquer que c'est cliquable */
+}
+
+.custom-button:hover{
+  color: #095c83;
+  background-color: #eaeced;
+}
+
+/* STYLE ET ICON DU FORMULAIRE "AJOUTER MEMBRE" */
+.new-member-container {
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #095c84;
+}
+
+.icon-tableau .person-icon {
+  font-size: 3rem; /* Ajustez la taille si nécessaire */
+  color: #095c84;
 }
