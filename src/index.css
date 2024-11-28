@@ -369,3 +369,93 @@ body {
   font-size: 3rem; /* Ajustez la taille si nécessaire */
   color: #095c84;
 }
+
+
+/* Styles pour le modal AddmenberForm.jsx  */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: #fff;
+  padding: 25px;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-height: 80vh;
+  min-width: 80vh;
+}
+
+/* Transition pour faire apparaître le modal */
+.modal.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Styles pour l'icône de fermeture */
+.close-icon-container {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.close-icon {
+  cursor: pointer;
+}
+
+/* Conteneur "Nouveau membre" */
+.new-member-container {
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #095c84;
+}
+
+.icon-tableau .person-icon {
+  font-size: 2rem; /* Taille de l'icône */
+}
+
+/* Styles pour le formulaire */
+.form-container {
+  min-height: 60vh;
+  min-width: 50vh;
+  padding: 10px;
+  margin-bottom: 10%;
+  background-color: #d9e3eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons du formulaire */
+.form-buttons {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.form-buttons .button-validate {
+  z-index: 9999;
+}
+
+.form-buttons .button-cancel {
+  z-index: 9999;
+  margin: 8px;
+}
+
+/* Section des détails du service sélectionné */
+.service-details {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 1rem;
+}
+
+.service-details p {
+  text-align: left;
+}

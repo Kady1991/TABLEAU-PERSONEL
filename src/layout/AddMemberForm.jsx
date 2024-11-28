@@ -142,43 +142,13 @@ const AddMemberForm = () => {
       <Button className="custom-button" type="secondary" onClick={openForm} icon={<PlusOutlined />}>
         AJOUTER MEMBRE
       </Button>
-      
+
       {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}
       {isFormOpen && (
-        <div
-          className={`modal ${isFormOpen ? "fade-in" : ""}`} // Ajouter la classe fade-in quand le formulaire est ouvert
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: "9999",
-            backgroundColor: "#fff",
-            padding: "25px",
-            boxShadow: "0 5px 8px rgba(0,0,0,0.1)",
-            borderRadius: "8px",
-            minHeight: "80vh",
-            minWidth: "80vh",
-          }}
-        >
-          <div style={{ textAlign: "right", marginBottom: "20px" }}>
-            <CloseOutlined onClick={closeForm} style={{ cursor: "pointer" }} />
+        <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
+          <div className="close-icon-container">
+            <CloseOutlined onClick={closeForm} className="close-icon" />
           </div>
-
-          {/* <div
-            style={{
-              marginBottom: "30px",
-              textAlign: "center",
-              fontSize: "1.2rem",
-              fontWeight: "bold",
-              color: "#095c84"
-            }}
-          >
-            <div className="icon-tableau">
-              <IoPersonAddSharp className="person-icon" />
-            </div>
-            Nouveau membre
-          </div> */}
 
           <div className="new-member-container">
             <div className="icon-tableau">
@@ -194,20 +164,14 @@ const AddMemberForm = () => {
               form={form}
               layout="vertical"
               onFinish={handleSubmit}
-              style={{
-                minHeight: "60vh",
-                minWidth: "50vh",
-                padding: "10px",
-                marginBottom: "10%",
-                backgroundColor: "#d9e3eb",
-                borderRadius: "8px",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-              }}
+              className="form-container"
               initialValues={{
                 SiTypePersonnel: false,
                 siFrancais: true,
               }}
             >
+
+              {/* formulaire */}
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
@@ -374,18 +338,19 @@ const AddMemberForm = () => {
                 </Col>
               </Row>
 
-              <Form.Item style={{ display: "flex", justifyContent: "space-evenly" }}>
-                <Button type="primary" htmlType="submit" loading={loading} style={{ zIndex: "9999" }}>
+              {/* Boutons de soumission */}
+              <Form.Item className="form-buttons">
+                <Button type="primary" htmlType="submit" loading={loading} className="button-validate">
                   Valider
                 </Button>
-                <Button onClick={closeForm} style={{ zIndex: "9999", margin: 8 }}>
+                <Button onClick={closeForm} className="button-cancel">
                   Annuler
                 </Button>
               </Form.Item>
 
               {selectedServiceDetails && (
-                <div style={{ display: "grid", gridTemplateColumns: "auto auto", gap: 1 }}>
-                  <div style={{ textAlign: "left" }}>
+                <div className="service-details">
+                  <div>
                     <p>
                       <strong>Chef du Service:</strong> {selectedServiceDetails.NomChefService}{" "}
                       {selectedServiceDetails.PrenomChefService}
