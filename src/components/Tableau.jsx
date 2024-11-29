@@ -243,13 +243,13 @@ function Tableau() {
     <div>
       <div className="main-container">
         <div className="icon-tableau">
-          <IoPersonAddSharp className="person-icon" />
+          <IoPersonAddSharp className="person-icon-tableau" />
         </div>
         <h1 className="title">MEMBRE DU PERSONNEL</h1>
 
         <div className="header-container">
           <div className="export-container">
-            <Export personnes={personnes} columns={columns} className="bouton-export" />
+            <Export personnes={personnes} columns={columns} className="export-button" />
           </div>
           <div className="icon-container">
             <FontAwesomeIcon icon={faPersonWalking} className="personneEnMarche" />

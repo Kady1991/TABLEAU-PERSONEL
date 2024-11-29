@@ -93,14 +93,17 @@ const Export = ({ personnes, className }) => {
   };
 
   return (
-    <Button
-      variant="contained"
-      startIcon={<FileDownloadIcon className="icon-export" />}
-      onClick={handleExportCsv}
-      style={{ backgroundColor: "#095c82" }}
-    >
-      Exporter
-    </Button>
+    <Button 
+    className="export-button"
+    variant="contained"
+    startIcon={<FileDownloadIcon />}
+    onClick={handleExportCsv}
+    style={{ backgroundColor: "#095c82" }}
+>
+  Exporter
+</Button>
+
+  
   );
 };
 

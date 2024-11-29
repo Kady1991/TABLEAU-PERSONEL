@@ -145,7 +145,8 @@ const AddMemberForm = () => {
 
       {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}
       {isFormOpen && (
-        <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
+       <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
+
           <div className="close-icon-container">
             <CloseOutlined onClick={closeForm} className="close-icon" />
           </div>
@@ -340,13 +341,18 @@ const AddMemberForm = () => {
 
               {/* Boutons de soumission */}
               <Form.Item className="form-buttons">
-                <Button type="primary" htmlType="submit" loading={loading} className="button-validate">
-                  Valider
-                </Button>
-                <Button onClick={closeForm} className="button-cancel">
-                  Annuler
-                </Button>
-              </Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="button-validate"
+              >
+                Valider
+              </Button>
+              <Button onClick={closeForm} className="button-cancel">
+                Annuler
+              </Button>
+            </Form.Item>
 
               {selectedServiceDetails && (
                 <div className="service-details">
@@ -364,6 +370,7 @@ const AddMemberForm = () => {
               )}
             </Form>
           )}
+          
         </div>
       )}
     </div>

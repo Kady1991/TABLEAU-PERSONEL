@@ -1,132 +1,114 @@
-/* index.css */
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom,
-      #81a4c0, #095c83);
-  /* Dégradé linéaire du bleu (#007bff) au blanc (#ffffff) */
   font-family: Arial, sans-serif;
   height: 100vh;
   z-index: 0;
+  background: linear-gradient(to bottom, #81a4c0, #095c83);
 }
 
-.MuiDataGrid-columnHeader {
+/* style icon tableau principale */
+.person-icon-tableau{
+  color: whitesmoke;
+  font-size: 4rem;
+}
+
+.title {
+  color: whitesmoke;
+  font-weight: bold;
+}
+
+/* Conteneur du header "menu" */
+.header-container {
+  height: 75px;
+  width: 80%;
+  background-color: white;
+  border-radius: 0.4rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #b6d2df;
-  /* Couleur de fond de l'en-tête */
+  justify-content: space-between;
 }
 
-.archive-row {
-  color: #ff0202;
-  /* ou toute autre couleur grise */
-  background-color: #b6d2df;
-  /* Couleur de fond de l'en-tête */
+/* style bouton export */
+.MuiButton-root.export-button {
+  background-color: #095c83 !important;/* forcer le style */
+  color: white;
+  font-weight: bold;
+  height: 2.4rem;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin: 2rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/*  style pour afficher le le texte du menu deroulant sur la gauche */
+.MuiButton-root.export-button:hover {
+  background-color: #b6d2df !important;
+  color: #095c82;
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.MuiButton-root.export-button:active {
+  transform: scale(0.95);
+}
+
+.export-button:active {
+  transform: scale(0.95);
+  /* Effet d'appui */
+}
+
+
+/* style bouton :ajouter membre */
+.custom-button {
+  margin-right: 1.7rem;
+  background-color: #095c83;
+  height: 2.4rem;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  
+}
+.custom-button:hover {
+  color: #235f8d;
+  background-color: #b6d2df;
+  transform: scale(1.05);
+}
+
+
+
+/* texte du menu deroulant sur la gauche dans les formulaire */
 .left-align-form .ant-form-item-control-input-content {
   text-align: left;
 }
 
-/* animation icon personne en marche */
+/* div personne en marche */
 .icon-container {
-  width: 90%;
+  width: 50%;
   position: relative;
-  margin: auto;
+  margin: auto; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* animation icon personne en marche */ 
 .personneEnMarche {
   position: absolute;
   font-size: 3.5rem;
   animation: personneEnMarche 30s linear infinite;
-  color: #8db8ca;
+  color: #095c82;
 }
 
 @keyframes personneEnMarche {
   0% {
     left: 0;
   }
-
   100% {
     left: calc(100% - 2rem);
-    /* La largeur de la div moins la taille de l'icône */
   }
-}
-
-
-/*  test aénimation */
-.fade-in {
-  animation: fadeIn 2s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(200);
-  }
-}
-
-
-/*  STYLE DE L'ICON DU TABLEAU */
-
-.person-icon {
-  font-size: 80px;
-  color: #d9e3eb;
-}
-
-/* Titre principal */
-.title {
-  color: #d9e3eb;
-}
-
-/* Conteneur principal du header */
-.header-container {
-  height: 75px;
-  width: 80%;
-  background-color: white;
-  position: relative;
-  border-radius: 0.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 2rem;
-}
-
-/* Conteneur du bouton Export */
-.export-container {
-  margin: 2rem;
-}
-
-/* Conteneur de l'icône */
-.icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-/* Conteneur du bouton Ajouter */
-.add-member-container {
-  margin-right: 1rem;
-  padding: 1rem;
-}
-
-/* Conteneur du DataGrid */
-.data-grid-container {
-  height: calc(100% - 75px - 2rem);
-  width: 80%;
-  background-color: white;
-  position: relative;
-  margin-top: 2rem;
-  border-radius: 0.5rem;
-  z-index: 0;
 }
 
 
@@ -144,132 +126,30 @@ body {
   justify-content: center;
 }
 
-/* Icône principale au-dessus du tableau */
-.icon-tableau {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-  font-size: 5rem;
-}
-
-/* Icône personnalisée */
-.custom-person-icon {
-  font-size: 100px;
-  color: #d9e3eb;
-
-}
-
-/* Titre principal */
-.title {
-  color: #d9e3eb;
-  font-size: 2rem;
-}
-
-
-/* Conteneur principal du header "menu" */
-.header-container {
-  height: 75px;
-  width: 80%;
-  background-color: white;
-  border-radius: 0.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Conteneur du bouton Export */
-.export-container {
-  margin: 2rem;
-}
-
-/* Conteneur de l'icône */
-.icon-container {
+/* style header tableau*/
+.MuiDataGrid-columnHeader {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #b6d2df;/* Couleur de fond de l'en-tête */
 }
 
-/* Conteneur du bouton Ajouter */
-.add-member-container {
-  margin-right: 1rem;
-  padding: 1rem;
-}
 
 /* Conteneur du DataGrid */
 .data-grid-container {
   height: calc(130% - 10px - 1rem);
   width: 80%;
-  background-color: white;
+  background-color: whitesmoke;
   margin-top: 1rem;
   border-radius: 0.5rem;
   z-index: 0;
 }
 
-/* animation datagrid */
-.data-grid-container {
-  opacity: 0;
-  transform: scale(0.5);
-  /* État initial */
-  animation: fadeInScale 1s ease-out forwards;
-  /* Animation sur 2 secondes */
-}
-
-@keyframes fadeInScale {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-
-
 /* Ligne archivée dans le DataGrid */
 .archive-row {
-  background-color: #eaeced;
-  color: rgb(28, 28, 28);
-
-}
-
-/* Styles généraux pour RestoreIcon */
-.RestoreIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border-radius: 4px;
-  color: green;
-  font-size: 25px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-
-}
-
-.RestoreIcon:hover {
-  color: rgb(64, 182, 64);
-  transform: scale(1.05);
+  background-color: #d3d4d5;
+  color: rgb(26, 22, 22);
   cursor: pointer;
-  font-size: 28px;
-}
-
-/* Classe pour masquer l'élément */
-.hidden {
-  display: none;
-}
-
-/* Classe pour afficher l'élément */
-.visible {
-  display: flex;
-}
-
-/* Animation AddMemberForm */
-.fade-in {
-  animation: fadeIn 2s ease;
-  /* Animation trop longue (3 secondes) */
 }
 
 /* STYLE DELETE ICON */
@@ -342,32 +222,41 @@ body {
   cursor: pointer;
   font-size: 19px;
 }
-.custom-button {
-  background-color: #095c83;
-  height: 2.4rem;
-  font-weight: bold; /* Utilisez font-weight au lieu de fontStyle */
-  color: white; /* Optionnel, pour rendre le texte visible */
-  border: none; /* Optionnel, pour un style plus propre */
-  cursor: pointer; /* Optionnel, pour indiquer que c'est cliquable */
+
+/* Styles généraux pour RestoreIcon */
+.RestoreIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 4px;
+  color: green;
+  font-size: 25px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
 }
 
-.custom-button:hover{
-  color: #095c83;
-  background-color: #eaeced;
+.RestoreIcon:hover {
+  color: rgb(64, 182, 64);
+  transform: scale(1.05);
+  cursor: pointer;
+  font-size: 28px;
 }
 
-/* STYLE ET ICON DU FORMULAIRE "AJOUTER MEMBRE" */
-.new-member-container {
-  margin-bottom: 30px;
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #095c84;
+/* Classe pour masquer l'élément */
+.hidden {
+  display: none;
 }
 
-.icon-tableau .person-icon {
-  font-size: 3rem; /* Ajustez la taille si nécessaire */
-  color: #095c84;
+/* Classe pour afficher l'élément */
+.visible {
+  display: flex;
+}
+
+/* Animation AddMemberForm */
+.fade-in {
+  animation: fadeIn 2s ease;
+  /* Animation trop longue (3 secondes) */
 }
 
 
@@ -382,57 +271,76 @@ body {
   padding: 25px;
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  min-height: 80vh;
-  min-width: 80vh;
+  /* min-height: 80vh;
+  min-width: 80vh; */
 }
 
 /* Transition pour faire apparaître le modal */
-.modal.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
+.modal.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
 /* Styles pour l'icône de fermeture */
 .close-icon-container {
   text-align: right;
   margin-bottom: 20px;
+  color: #095c83;
 }
 
 .close-icon {
   cursor: pointer;
 }
 
-/* Conteneur "Nouveau membre" */
+/* style Nouveau membre: TITRE*/
 .new-member-container {
   margin-bottom: 30px;
   text-align: center;
   font-size: 1.2rem;
   font-weight: bold;
-  color: #095c84;
+  color: #095c83;
 }
 
+/* icon tablaeau */
 .icon-tableau .person-icon {
-  font-size: 2rem; /* Taille de l'icône */
+  font-size: 4rem;
+  color: #095c83;
 }
 
 /* Styles pour le formulaire */
 .form-container {
-  min-height: 60vh;
-  min-width: 50vh;
-  padding: 10px;
-  margin-bottom: 10%;
-  background-color: #d9e3eb;
-  border-radius: 8px;
+  height: 70vh;
+  width: 90vh;
+  padding: 2.3rem;
+  margin-bottom: 1%;
+  margin: auto;
+  background-color: #4d7e9572;
+  border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Cible les labels des Form.Item dans Ant Design */
+.ant-form-item-label > label {
+  font-size:18px; /* Taille du texte */
+  line-height: 1.5; /* Hauteur de ligne pour une meilleure lisibilité */
+}
+
+/* Style pour le bouton radio sélectionné */
+.ant-radio-checked .ant-radio-inner {
+   border: none;
+  background-color: #095c82 !important; 
+}
+
 
 /* Boutons du formulaire */
 .form-buttons {
@@ -442,11 +350,37 @@ body {
 
 .form-buttons .button-validate {
   z-index: 9999;
+  background-color: #095c82;
+  width:10rem;
+  height: 2.5rem;
+  font-size: 1.1rem;
+  margin: 10px;
+  
 }
 
+.form-buttons .button-validate:hover{
+  color:#2c648f !important;
+  background-color: #f8fcff !important;
+  border: solid 0.5px;
+  font-weight: bold;
+  
+}
 .form-buttons .button-cancel {
   z-index: 9999;
-  margin: 8px;
+  margin: 20px; 
+  width:10rem;
+  height: 2.5rem;
+  font-size: 1.1rem; 
+  
+}
+
+.form-buttons .button-cancel:hover {
+  z-index: 9999;
+  margin: 20px;
+  color:#2c648f !important;
+  background-color: #f8fcff !important;
+  border: solid 0.5px #2c648f !important; 
+  font-weight: bold; 
 }
 
 /* Section des détails du service sélectionné */
@@ -454,8 +388,40 @@ body {
   display: grid;
   grid-template-columns: auto auto;
   gap: 1rem;
+  background-color: #f8fcff;
+  width: 50%;
+  border-radius: 0.5rem;
 }
 
 .service-details p {
   text-align: left;
+  margin: 1rem;
+  font-size: 1rem;  
 }
+
+/* Modal principale */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: #ffffff;
+  padding: 25px;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-height: 50vh;
+  min-width: 50vh;
+  
+}
+
+/* Fond semi-transparent (overlay) */
+/* .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+} */
