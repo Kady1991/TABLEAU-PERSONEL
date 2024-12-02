@@ -61,16 +61,38 @@ const Detail = ({ IDPersonne }) => {
         onClick={handleOpenModal}
       />
       <Modal
-        title="Détails de Personne"
-        open={isModalVisible}
-        onCancel={handleCloseModal}
-        footer={null}
-        centered
-      >
+    title={<span style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c648f", textAlign: "center" }}>Détails de Personne</span>}
+    open={isModalVisible}
+    onCancel={handleCloseModal}
+    footer={null}
+    centered
+    style={{
+        backgroundColor: "#f0f2f5", // Couleur d'arrière-plan
+        borderRadius: "8px", // Coins arrondis
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Ombre
+        padding: "25px", // Espacement intérieur
+        maxWidth: "1000px", // Largeur maximale
+        minWidth: "500px", // Largeur minimale
+    }}
+   
+    closeIcon={
+        <span  style={{
+          color: "#999",
+          cursor: "pointer",
+          transition: "color 0.3s ease-in-out", // Transition fluide
+          fontSize: "30px", // Taille de la croix (vous pouvez ajuster cette valeur)
+          fontWeight: "bold", // Rendre la croix plus épaisse
+      }}
+            onMouseEnter={(e) => e.target.style.color = "#ff4d4f"}
+            onMouseLeave={(e) => e.target.style.color = "#999"}>
+            ×
+        </span>
+    }
+>
         {loading ? (
           <p>Chargement des données...</p>
         ) : personData ? (
-          <div style={{ textAlign: "left" }}>
+          <div style={{ textAlign: "left"}}>
             <p>
               <strong>Nom: </strong> {personData.NomPersonne}
             </p>

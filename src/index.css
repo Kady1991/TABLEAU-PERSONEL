@@ -9,12 +9,12 @@ body {
 
 /* style icon tableau principale */
 .person-icon-tableau{
-  color: whitesmoke;
+  color: #b6d2df;
   font-size: 4rem;
 }
 
 .title {
-  color: whitesmoke;
+  color: #b6d2df;
   font-weight: bold;
 }
 
@@ -348,7 +348,7 @@ body {
   justify-content: space-evenly;
 }
 
-.form-buttons .button-validate {
+.button-validate {
   z-index: 9999;
   background-color: #095c82;
   width:10rem;
@@ -358,14 +358,14 @@ body {
   
 }
 
-.form-buttons .button-validate:hover{
+.button-validate:hover{
   color:#2c648f !important;
   background-color: #f8fcff !important;
   border: solid 0.5px;
   font-weight: bold;
   
 }
-.form-buttons .button-cancel {
+.button-cancel {
   z-index: 9999;
   margin: 20px; 
   width:10rem;
@@ -415,13 +415,22 @@ body {
   
 }
 
-/* Fond semi-transparent (overlay) */
-/* .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 9998;
-} */
+
+ /* style modal composant detail.jsx */
+ /* Style principal de la modal */
+.custom-modal .ant-modal-content {
+  background-color: #f0f2f5; 
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* style close-icon */
+
+.close-icon {
+  color: #999; 
+  cursor: pointer; 
+  transition: color 0.3s ease-in-out; 
+  font-size: 30px; 
+  font-weight: bold;
+}
+
