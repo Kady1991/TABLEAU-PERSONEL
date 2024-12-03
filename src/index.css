@@ -85,8 +85,40 @@ body {
 }
 
 /* div personne en marche */
-.icon-container {
-  width: 50%;
+/* .archive-container {
+  position: relative;
+  margin: auto; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+} */
+
+/* animation icon personne en marche */ 
+/* .personneEnMarche {
+  position: absolute;
+  font-size: 3.5rem;
+  animation: personneEnMarche 30s linear infinite;
+  color: #095c82;
+} */
+
+/* @keyframes personneEnMarche {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: calc(100% - 2rem);
+  }
+} */
+
+
+
+/* archive style */
+
+/* Conteneur principal */
+.archive-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
   position: relative;
   margin: auto; 
   display: flex;
@@ -94,21 +126,48 @@ body {
   justify-content: center;
 }
 
-/* animation icon personne en marche */ 
-.personneEnMarche {
-  position: absolute;
-  font-size: 3.5rem;
-  animation: personneEnMarche 30s linear infinite;
-  color: #095c82;
+/* Bouton Mes Archives */
+.archive-button {
+  display: flex;
+  align-items: center;
+  background-color: #235f8d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
-@keyframes personneEnMarche {
-  0% {
-    left: 0;
-  }
-  100% {
-    left: calc(100% - 2rem);
-  }
+.archive-button:hover {
+  background-color: #1b4b6f;
+}
+
+/* Icône dans le bouton */
+.archive-icon {
+  margin-right: 8px;
+}
+
+/* Liste des archives */
+.archive-list {
+  margin-top: 20px;
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Élément de la liste */
+.archive-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+.archive-item:hover {
+  background-color: #e6f0f8;
 }
 
 
@@ -434,7 +493,90 @@ body {
   font-weight: bold;
 }
 
-/* BOUTON SERVICE ICON */
+/* STYLE ARCHIVE*/
+/* Styles pour le bouton Archive */
+.archive-button {
+  margin-bottom: 20px;
+  background-color: #2c648f;
+  border-color: #2c648f;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+}
 
+/* Conteneur principal de la modal */
+.archive-modal-body {
+  background-color: #f7f9fb;
+  border-radius: 12px;
+  max-height: 500px; /* Limiter la hauteur de la zone des cartes */
+  overflow-y: scroll; /* Permettre le défilement */
+  padding-top: 10px;
+  margin: 2rem;
+  scrollbar-width: none; /* Masquer la barre de défilement pour Firefox */
+}
+
+.archive-modal-body {
+  background-color: #f7f9fb;
+  border-radius: 12px;
+  
+  max-height: 500px; /* Limiter la hauteur des cartes */
+  overflow-y: auto; /* Ajouter un défilement vertical */
+  padding-top: 10; /* Pas de padding pour éviter un espace entre la barre de recherche et les cartes */
+  margin: 2rem;
+}
+
+/* Barre de recherche */
+.search-input {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+  width: 18rem;
+}
+
+/* Fixer la barre de recherche */
+.fixed-search-bar {
+  position: sticky; /* Rendre la barre fixe */
+  top: 0; /* Toujours en haut */
+  z-index: 10; /* Assurer qu'elle reste au-dessus des cartes */
+  background-color: #f7f9fb; /* Même couleur que le fond de la modal */
+  padding: 10px 20px;
+  border-top: 10px ; /* Légère séparation visuelle */
+  height: 4rem;
+}
+
+/* Styles pour les cartes */
+.archive-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  height: 250px; /* Hauteur augmentée */
+  width: 100%; /* Largeur maximale pour s'adapter */
+}
+
+.archive-card-title {
+  font-weight: bold;
+  font-size: 1.5rem; /* Taille augmentée */
+  color: #2c648f;
+}
+
+
+
+/* Message lorsque aucune personne n'est trouvée */
+.no-results {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #999;
+}
+
+/* Spinner */
+.spinner {
+  display: block;
+  margin: 20px auto;
+  font-size: 1.5rem;
+  color: #2c648f;
+}
 
 

@@ -28,14 +28,14 @@ const Delete = ({
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
       );
       // Log pour vérifier la réponse de l'API
-      console.log("Réponse API :", response.data); 
+      // console.log("Réponse API :", response.data); 
       if (!response.data || response.data.SiArchive === undefined) {
-        console.warn("Données manquantes ou incorrectes dans la réponse de l'API.");
+        // console.warn("Données manquantes ou incorrectes dans la réponse de l'API.");
         return;
       }
       const { SiArchive } = response.data;
       setIsArchived(SiArchive);
-      console.log("État archivé :", SiArchive); // Log pour confirmer la valeur
+      // console.log("État archivé :", SiArchive); 
     } catch (error) {
       console.error("Erreur lors de la récupération des informations de la personne :", error);
     }

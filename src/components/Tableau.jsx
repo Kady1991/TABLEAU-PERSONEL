@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../index.css";
 import Export from "../layout/Export.jsx";
+import ArchiveList from "../layout/ArchiveList.jsx";
 import AddMemberForm from "../layout/AddMemberForm.jsx";
 import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
-import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
+// import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IoPersonAddSharp } from "react-icons/io5";
 
@@ -244,6 +245,9 @@ function Tableau() {
       <div className="main-container">
         <div className="icon-tableau">
           <IoPersonAddSharp className="person-icon-tableau" />
+
+        </div>
+        <div>
         </div>
         <h1 className="title">MEMBRE DU PERSONNEL</h1>
 
@@ -251,8 +255,8 @@ function Tableau() {
           <div className="export-container">
             <Export personnes={personnes} columns={columns} className="export-button" />
           </div>
-          <div className="icon-container">
-            <FontAwesomeIcon icon={faPersonWalking} className="personneEnMarche" />
+          <div className="archive-container">
+            <ArchiveList className="archive"/>
           </div>
           <div className="add-member-container">
             <AddMemberForm />
