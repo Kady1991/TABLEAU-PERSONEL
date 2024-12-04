@@ -11,11 +11,21 @@ body {
 .person-icon-tableau{
   color: #b6d2df;
   font-size: 4rem;
+  
 }
 
 .title {
   color: #b6d2df;
   font-weight: bold;
+  font-size: 2rem;
+
+}
+
+.subtitle {
+  color: #b6d2df;
+  font-weight: bold;
+  font-size: 1.5rem;
+  /* margin-bottom: 2rem; */
 }
 
 /* Conteneur du header "menu" */
@@ -27,6 +37,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  
 }
 
 /* style bouton export */
@@ -129,25 +140,32 @@ body {
 /* Bouton Mes Archives */
 .archive-button {
   display: flex;
+  justify-content: center;
   align-items: center;
-  background-color: #235f8d;
-  color: white;
+  margin-right: 1.7rem;
+  background-color: #095c83;
+  height: 2.4rem;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
   border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
   cursor: pointer;
-  font-size: 16px;
+  width: 11rem;
+
   transition: background-color 0.3s ease;
 }
 
 .archive-button:hover {
-  background-color: #1b4b6f;
+  color: #235f8d !important;
+  background-color: #b6d2df !important;
+  transform: scale(1.05);
 }
 
+
 /* Icône dans le bouton */
-.archive-icon {
+/* .archive-icon {
   margin-right: 8px;
-}
+  font-size: 10px;
+} */
 
 /* Liste des archives */
 .archive-list {
@@ -177,12 +195,13 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 450px;
-  width: 110%;
+  height: 430px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  
 }
 
 /* style header tableau*/
@@ -196,10 +215,10 @@ body {
 
 /* Conteneur du DataGrid */
 .data-grid-container {
-  height: calc(130% - 10px - 1rem);
+  height: calc(160% - 2rem);
   width: 80%;
   background-color: whitesmoke;
-  margin-top: 1rem;
+  margin-top: 2rem;
   border-radius: 0.5rem;
   z-index: 0;
 }
@@ -469,8 +488,8 @@ body {
   padding: 25px;
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  min-height: 50vh;
-  min-width: 50vh;
+  min-height: 80vh;
+  min-width: 80vh;
   
 }
 
@@ -478,9 +497,10 @@ body {
  /* style modal composant detail.jsx */
  /* Style principal de la modal */
 .custom-modal .ant-modal-content {
-  background-color: #f0f2f5; 
+  background-color: #6a83a8; 
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
 }
 
 /* style close-icon */
@@ -506,26 +526,28 @@ body {
   color: white;
 }
 
+
 /* Conteneur principal de la modal */
 .archive-modal-body {
   background-color: #f7f9fb;
   border-radius: 12px;
   max-height: 500px; /* Limiter la hauteur de la zone des cartes */
-  overflow-y: scroll; /* Permettre le défilement */
+  overflow-y: auto; /* Permettre le défilement vertical */
   padding-top: 10px;
-  margin: 2rem;
+  margin: 2rem auto; /* Centrer la modal */
   scrollbar-width: none; /* Masquer la barre de défilement pour Firefox */
+  width: 200%; /* Augmenter la largeur */
 }
 
-.archive-modal-body {
+/* .archive-modal-body {
   background-color: #f7f9fb;
   border-radius: 12px;
   
-  max-height: 500px; /* Limiter la hauteur des cartes */
-  overflow-y: auto; /* Ajouter un défilement vertical */
-  padding-top: 10; /* Pas de padding pour éviter un espace entre la barre de recherche et les cartes */
+  max-height: 500px; 
+  overflow-y: auto; 
+  padding-top: 10; 
   margin: 2rem;
-}
+} */
 
 /* Barre de recherche */
 .search-input {
@@ -542,9 +564,9 @@ body {
   top: 0; /* Toujours en haut */
   z-index: 10; /* Assurer qu'elle reste au-dessus des cartes */
   background-color: #f7f9fb; /* Même couleur que le fond de la modal */
-  padding: 10px 20px;
-  border-top: 10px ; /* Légère séparation visuelle */
-  height: 4rem;
+  padding: 15px 25px;
+  border-bottom: 1px solid #e0e0e0; /* Légère séparation visuelle */
+  height: 5rem;
 }
 
 /* Styles pour les cartes */

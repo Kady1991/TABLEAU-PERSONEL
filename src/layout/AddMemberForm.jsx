@@ -118,34 +118,34 @@ const AddMemberForm = () => {
     setIsPersonnelSelected(value);
   };
 
-  // Fonction pour générer l'e-mail à partir du prénom et du nom
+ // Fonction pour générer l'e-mail à partir du prénom et du nom
 const generateEmail = (prenom, nom) => {
   if (!prenom || !nom) return ""; // Vérifie si prénom ou nom est manquant
 
-  // Nettoie les espaces et les tirets du prénom
-  const prenoms = prenom.split(/[\s-]+/);
+  // Nettoie les espaces et les tirets du prénom et nom
+  const prenoms = prenom.split(/[\s-]+/); // Séparer le prénom composé
+  const noms = nom.split(/[\s-]+/); // Séparer le nom composé
 
   // Prend la première lettre de chaque partie du prénom composé
-  const firstLetters = prenoms
+  const firstLettersPrenom = prenoms
     .filter((p) => p.trim() !== "") // Ignore les parties vides
     .map((p) => p.charAt(0).toLowerCase())
     .join("");
 
-  // Convertit le nom en minuscule
-  const nomLowerCase = nom.toLowerCase();
+  // Fusionne les parties du nom en une chaîne sans espaces ni tirets
+  const nomCleaned = noms.join("").toLowerCase();
 
   // Retourne l'e-mail formaté
-  return `${firstLetters}${nomLowerCase}@uccle.brussels`;
+  return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
 };
 
 // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
 const handleNameChange = (e) => {
-  const prenom = form.getFieldValue("prenom");
-  const nom = form.getFieldValue("nom"); // Récupérer la valeur du champ nom
-  const email = generateEmail(prenom, nom);
-  form.setFieldsValue({ email });
+  const prenom = form.getFieldValue("prenom"); // Récupérer le prénom
+  const nom = form.getFieldValue("nom"); // Récupérer le nom
+  const email = generateEmail(prenom, nom); // Générer l'e-mail
+  form.setFieldsValue({ email }); // Mettre à jour le champ e-mail
 };
-
 
 
 

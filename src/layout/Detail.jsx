@@ -14,7 +14,7 @@ const Detail = ({ IDPersonne }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/`,
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`,
         {
           headers: { Accept: "application/xml" },
         }
