@@ -19,7 +19,9 @@ const AddMemberForm = () => {
   const [isPersonnelSelected, setIsPersonnelSelected] = useState(false);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
+
   useEffect(() => {
+    
     setLoadingData(true);
     const fetchData = async () => {
       try {
@@ -118,34 +120,34 @@ const AddMemberForm = () => {
     setIsPersonnelSelected(value);
   };
 
- // Fonction pour générer l'e-mail à partir du prénom et du nom
-const generateEmail = (prenom, nom) => {
-  if (!prenom || !nom) return ""; // Vérifie si prénom ou nom est manquant
+  // Fonction pour générer l'e-mail à partir du prénom et du nom
+  const generateEmail = (prenom, nom) => {
+    if (!prenom || !nom) return ""; // Vérifie si prénom ou nom est manquant
 
-  // Nettoie les espaces et les tirets du prénom et nom
-  const prenoms = prenom.split(/[\s-]+/); // Séparer le prénom composé
-  const noms = nom.split(/[\s-]+/); // Séparer le nom composé
+    // Nettoie les espaces et les tirets du prénom et nom
+    const prenoms = prenom.split(/[\s-]+/); // Séparer le prénom composé
+    const noms = nom.split(/[\s-]+/); // Séparer le nom composé
 
-  // Prend la première lettre de chaque partie du prénom composé
-  const firstLettersPrenom = prenoms
-    .filter((p) => p.trim() !== "") // Ignore les parties vides
-    .map((p) => p.charAt(0).toLowerCase())
-    .join("");
+    // Prend la première lettre de chaque partie du prénom composé
+    const firstLettersPrenom = prenoms
+      .filter((p) => p.trim() !== "") // Ignore les parties vides
+      .map((p) => p.charAt(0).toLowerCase())
+      .join("");
 
-  // Fusionne les parties du nom en une chaîne sans espaces ni tirets
-  const nomCleaned = noms.join("").toLowerCase();
+    // Fusionne les parties du nom en une chaîne sans espaces ni tirets
+    const nomCleaned = noms.join("").toLowerCase();
 
-  // Retourne l'e-mail formaté
-  return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
-};
+    // Retourne l'e-mail formaté
+    return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
+  };
 
-// Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
-const handleNameChange = (e) => {
-  const prenom = form.getFieldValue("prenom"); // Récupérer le prénom
-  const nom = form.getFieldValue("nom"); // Récupérer le nom
-  const email = generateEmail(prenom, nom); // Générer l'e-mail
-  form.setFieldsValue({ email }); // Mettre à jour le champ e-mail
-};
+  // Fonction de modification de la valeur de l'e-mail en fonction du prénom et du nom
+  const handleNameChange = (e) => {
+    const prenom = form.getFieldValue("prenom"); // Récupérer le prénom
+    const nom = form.getFieldValue("nom"); // Récupérer le nom
+    const email = generateEmail(prenom, nom); // Générer l'e-mail
+    form.setFieldsValue({ email }); // Mettre à jour le champ e-mail
+  };
 
 
 
@@ -158,7 +160,7 @@ const handleNameChange = (e) => {
 
       {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}
       {isFormOpen && (
-       <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
+        <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
 
           <div className="close-icon-container">
             <CloseOutlined onClick={closeForm} className="close-icon" />
@@ -351,22 +353,6 @@ const handleNameChange = (e) => {
                   </Form.Item>
                 </Col>
               </Row>
-
-              {/* Boutons de soumission */}
-              <Form.Item className="form-buttons">
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                className="button-validate"
-              >
-                Valider
-              </Button>
-              <Button onClick={closeForm} className="button-cancel">
-                Annuler
-              </Button>
-            </Form.Item>
-
               {selectedServiceDetails && (
                 <div className="service-details">
                   <div>
@@ -381,9 +367,26 @@ const handleNameChange = (e) => {
                   </div>
                 </div>
               )}
+
+              {/* Boutons de soumission */}
+              <Form.Item className="form-buttons">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  className="button-validate"
+                >
+                  Valider
+                </Button>
+                <Button onClick={closeForm} className="button-cancel">
+                  Annuler
+                </Button>
+              </Form.Item>
+
+             
             </Form>
           )}
-          
+
         </div>
       )}
     </div>

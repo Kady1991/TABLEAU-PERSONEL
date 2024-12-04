@@ -143,6 +143,7 @@ const Detail = ({ IDPersonne }) => {
               <strong>Chef de département: </strong>
               {personData.NomChefDepartement} {personData.PrenomChefDepartement}
             </p>
+          
           </div>
         ) : (
           <p>Aucune donnée trouvée pour cet utilisateur.</p>

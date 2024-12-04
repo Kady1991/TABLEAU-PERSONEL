@@ -346,11 +346,10 @@ body {
   transform: translate(-50%, -50%);
   z-index: 9999;
   background-color: #fff;
-  padding: 25px;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 10 15px 18px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  /* min-height: 80vh;
-  min-width: 80vh; */
+  height: 95vh;
+  width: 80vh;
 }
 
 /* Transition pour faire apparaître le modal */
@@ -373,34 +372,37 @@ body {
 .close-icon-container {
   text-align: right;
   margin-bottom: 20px;
+  font-size: 1rem;
   color: #095c83;
 }
 
 .close-icon {
   cursor: pointer;
+  
 }
 
 /* style Nouveau membre: TITRE*/
 .new-member-container {
-  margin-bottom: 30px;
+  margin-bottom: 1rem;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
   color: #095c83;
 }
 
 /* icon tablaeau */
 .icon-tableau .person-icon {
-  font-size: 4rem;
+  font-size: 2rem;
   color: #095c83;
+  
 }
 
 /* Styles pour le formulaire */
 .form-container {
-  height: 70vh;
-  width: 90vh;
+  height: 75vh;
+  width: 75vh;
   padding: 2.3rem;
-  margin-bottom: 1%;
+  margin-bottom: 10%;
   margin: auto;
   background-color: #4d7e9572;
   border-radius: 5px;
@@ -409,8 +411,8 @@ body {
 
 /* Cible les labels des Form.Item dans Ant Design */
 .ant-form-item-label > label {
-  font-size:18px; /* Taille du texte */
-  line-height: 1.5; /* Hauteur de ligne pour une meilleure lisibilité */
+  font-size:15px; /* Taille du texte */
+  line-height: 0.5.; /* Hauteur de ligne pour une meilleure lisibilité */
 }
 
 /* Style pour le bouton radio sélectionné */
@@ -423,16 +425,18 @@ body {
 /* Boutons du formulaire */
 .form-buttons {
   display: flex;
-  justify-content: space-evenly;
+  text-align: center;
+  justify-content:center;
+  align-items: center;
 }
 
 .button-validate {
   z-index: 9999;
   background-color: #095c82;
-  width:10rem;
-  height: 2.5rem;
-  font-size: 1.1rem;
-  margin: 10px;
+  width:100px;
+  height: 32px;
+  font-size: 15px;
+  margin: auto;
   
 }
 
@@ -445,16 +449,15 @@ body {
 }
 .button-cancel {
   z-index: 9999;
-  margin: 20px; 
-  width:10rem;
-  height: 2.5rem;
-  font-size: 1.1rem; 
+  margin: 1rem; 
+  width:100px;
+  height: 32px;
+  font-size: 15px;
   
 }
 
 .form-buttons .button-cancel:hover {
   z-index: 9999;
-  margin: 20px;
   color:#2c648f !important;
   background-color: #f8fcff !important;
   border: solid 0.5px #2c648f !important; 
@@ -463,18 +466,16 @@ body {
 
 /* Section des détails du service sélectionné */
 .service-details {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 1rem;
   background-color: #f8fcff;
-  width: 50%;
+  height: auto;
   border-radius: 0.5rem;
+  
 }
 
 .service-details p {
   text-align: left;
-  margin: 1rem;
-  font-size: 1rem;  
+  margin: 0.4rem;
+  font-size:13px;  
 }
 
 /* Modal principale */

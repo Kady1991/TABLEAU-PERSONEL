@@ -28,50 +28,29 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [selectedGradeDetails, setSelectedGradeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const [startDate, setStartDate] = useState(null); // Initialiser la date à null
-  const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
-  const [typePersonnelData, setTypePersonnelData] = useState([]);
+  const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Manage personnel selection state
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
   useEffect(() => {
     fetchData();
-  }, [IDPersonne, form, isModalVisible]);
+  }, [IDPersonne, isModalVisible]);
 
   const fetchData = async () => {
     if (!isModalVisible) return;
-    if (IDPersonne) {
-      console.log(IDPersonne);
-      try {
-        const personResponse = await axios.get(
-          `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
-        );
-        //const personResponse = await axios.get(
-        //  `https://localhost:44333/api/Personne/${IDPersonne}`
-        // );
-        personResponse.data.DateEntreeDate = personResponse?.data
-          ?.DateEntreeDate
-          ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
-          : undefined;
 
-        personResponse.data.WWGradeID =
-          personResponse?.data?.WWGradeID != 0
-            ? personResponse.data.WWGradeID
-            : " ";
+    try {
+      const personResponse = await axios.get(
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
+      );
+      personResponse.data.DateEntreeDate = personResponse?.data?.DateEntreeDate
+        ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
+        : undefined;
 
-        personResponse.data.TypePersonnelID =
-          personResponse?.data?.TypePersonnelID != 0
-            ? personResponse.data.TypePersonnelID
-            : " ";
-
-        setPersonData(personResponse.data);
-        form.setFieldsValue(personResponse.data);
-        console.log(personResponse.data);
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des données de la personne:",
-          error
-        );
-      }
+      setIsPersonnelSelected(personResponse.data.SiTypePersonnel); // Set personnel selection state
+      setPersonData(personResponse.data);
+      form.setFieldsValue(personResponse.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données de la personne:", error);
     }
 
     try {
@@ -92,27 +71,65 @@ const EditMemberForm = ({ IDPersonne }) => {
       console.error("Erreur lors de la récupération des adresses:", error);
     }
 
-    // Récupérer la liste des types de personnel depuis votre API
     try {
       const typePersonnelResponse = await axios.get(
         "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
       );
       setTypePersonnelList(typePersonnelResponse.data);
     } catch (error) {
-      console.error("Erreur lors du chargement des données:", error);
+      console.error("Erreur lors du chargement des types de personnel:", error);
     }
+
     try {
       const servicesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`
       );
       setOtherServices(servicesResponse.data);
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des autres services:",
-        error
-      );
+      console.error("Erreur lors de la récupération des services:", error);
     }
   };
+
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    const formData = {
+      IDPersonne: personData?.IDPersonne,
+      NomPersonne: values.NomPersonne,
+      PrenomPersonne: values.PrenomPersonne,
+      Email: values.Email,
+      TelPro: values.TelPro === undefined ? null : values.TelPro,
+      DateEntree: values.DateEntreeDate ? values.DateEntreeDate.toISOString() : null,
+      WWGradeID: values.WWGradeID || null,
+      AdresseID: values.AdresseID,
+      ServiceID: values.ServiceID,
+      SiFrancais: values.SiFrancais,
+      SiServicePrincipal: values.SiServicePrincipal,
+      SiTypePersonnel: values.SiTypePersonnel,
+      TypePersonnelID: values.TypePersonnelID || null,
+    };
+
+    try {
+      const response = await axios.put(
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${IDPersonne}`,
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (response.status !== 200) {
+        throw new Error(`Erreur lors de l'envoi des données: ${response.statusText}`);
+      }
+
+      alert("Les modifications ont été enregistrées avec succès !");
+      setFormSubmitted(true);
+      handleCloseModal();
+    } catch (error) {
+      console.error("Erreur lors de l'envoi des données", error);
+      alert(`Une erreur est survenue: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOpenModal = () => {
     setIsModalVisible(true);
   };
@@ -121,77 +138,20 @@ const EditMemberForm = ({ IDPersonne }) => {
     setIsModalVisible(false);
   };
 
-  const handleServiceSelection = (value) => {
-    const selectedService = otherServices.find(
-      (service) => service.IDService === value
-    );
-    setSelectedServiceDetails(selectedService);
+  const handlePersonnelSelection = (value) => {
+    setIsPersonnelSelected(value); // Update personnel selection state
   };
 
   const handleGradeSelection = (value) => {
     const selectedGrade = grades.find((grade) => grade.WWGradeID === value);
-    setSelectedGradeDetails(selectedGrade);
+    setSelectedGradeDetails(selectedGrade); // Met à jour l'état avec les détails du grade sélectionné
   };
 
-  // Logique de soumission du formulaire
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    try {
-      // const option = {
-      //   day: "numeric",
-      //   month: "2-digit",
-      //   year: "numeric",
-      // };
-      // const dateEntree = new Intl.DateTimeFormat("fr-FR", option).format(
-      //   values.dateEntree
-      // );
-
-      const DateEntreeDate = values["DateEntreeDate"];
-      const formData = {
-        IDPersonne: personData?.IDPersonne,
-        NomPersonne: values.NomPersonne,
-        PrenomPersonne: values.PrenomPersonne,
-        Email: values.Email,
-        TelPro: values.TelPro == undefined ? null : values.TelPro,
-        DateEntree: values.DateEntreeDate,
-        WWGradeID: values.WWGradeID,
-        AdresseID: values.AdresseID,
-        ServiceID: values.ServiceID,
-        SiFrancais: values.SiFrancais,
-        SiServicePrincipal: values.SiServicePrincipal,
-        SiTypePersonnel: values.SiTypePersonnel,
-        TypePersonnelID: values.TypePersonnelID,
-      };
-
-      //console.log(formData);
-
-      const linkEditPersonne = `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${IDPersonne}`;
-      //const linkEditPersonne = `https://localhost:44333/api/Personne/edit?id=${IDPersonne}`;
-
-      const response = await axios.put(linkEditPersonne, formData);
-
-      if (response.status != 200) {
-        throw new Error("Erreur lors de l'envoi des données");
-      }
-      // Afficher une alerte lorsque l'ajout est réussi
-      alert("Ajout réussi !");
-      console.log("Les modifications sont faites avec succès");
-      // Fermer le formulaire après l'ajout réussi
-      setFormSubmitted(true);
-      handleCloseModal();
-    } catch (error) {
-      console.log(error);
-      console.error("Erreur lors de l'envoi des données", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleServiceSelection = (value) => {
+    const selectedService = otherServices.find((service) => service.IDService === value);
+    setSelectedServiceDetails(selectedService); // Met à jour l'état avec les détails du service sélectionné
   };
-
-  // Fonction pour gérer le changement de sélection du statut "Personnel"
-  const handlePersonnelSelection = (value) => {
-    setIsPersonnelSelected(value); // Met à jour l'état pour indiquer si "Oui" ou "Non" est sélectionné
-  };
-
+  
   return (
     <>
       <RiFileEditFill className="Edit-Icon"
@@ -389,49 +349,18 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Col span={12}>
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <Form.Item
-                    name="SiTypePersonnel"
-                    label="Personnel"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez choisir si le membre est personnel",
-                      },
-                    ]}
-                  >
-                    <Radio.Group
-                      onChange={(e) => handlePersonnelSelection(e.target.value)}
-                    >
-                      <Radio value={true}>Oui</Radio>
-                      <Radio value={false}>Non</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </div>
+               
+                   <Form.Item label="Personnel" name="SiTypePersonnel">
+                  <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                    <Radio value={true}>Oui</Radio>
+                    <Radio value={false}>Non</Radio>
+                  </Radio.Group>
+                </Form.Item>
                 {isPersonnelSelected && (
-                  <Form.Item
-                    name="TypePersonnelID"
-                    label="Type de personnel"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez choisir le type de personnel",
-                      },
-                    ]}
-                  >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                    >
+                  <Form.Item name="TypePersonnelID" label="Type de personnel" rules={[{ required: true }]}>
+                    <Select style={{ width: "100%" }} allowClear showSearch>
                       {typePersonnelList.map((typePersonnel) => (
-                        <Option
-                          key={typePersonnel.IDTypePersonnel}
-                          value={typePersonnel.IDTypePersonnel}
-                        >
+                        <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
                           {typePersonnel.NomTypePersonnelFr}
                         </Option>
                       ))}
