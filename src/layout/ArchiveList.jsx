@@ -1,5 +1,6 @@
+import { DataGrid } from "@mui/x-data-grid";
 import React, { useState } from "react";
-import { Modal, Card, Spin, Button, Row, Col, message, Input } from "antd";
+import { Modal, Spin, Button, message, Input } from "antd";
 import { FaFileArchive } from "react-icons/fa";
 import axios from "axios";
 import "../index.css";
@@ -55,6 +56,15 @@ const ArchiveList = () => {
     setFilteredArchives(filtered);
   };
 
+  const columns = [
+    { field: "PrenomPersonne", headerName: "Prénom", width: 150 },
+    { field: "NomPersonne", headerName: "Nom", width: 150 },
+    { field: "Email", headerName: "Email", width: 200 },
+    { field: "NomServiceFr", headerName: "Service", width: 200 },
+    { field: "DateEntree", headerName: "Date d'entrée", width: 150 },
+    { field: "DateSortie", headerName: "Date de sortie", width: 150 },
+  ];
+
   return (
     <div>
       {/* Bouton pour ouvrir la modal */}
@@ -66,7 +76,7 @@ const ArchiveList = () => {
         Archive
       </Button>
 
-      {/* Modal affichant les cartes */}
+      {/* Modal affichant la table */}
       <Modal
         title={
           <span style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c648f" }}>
@@ -91,13 +101,14 @@ const ArchiveList = () => {
           </Button>,
         ]}
         className="archive-modal"
+        width={800}
       >
         {loading ? (
           <Spin tip="Chargement..." className="spinner" />
         ) : (
           <>
-            {/* Barre de recherche fixe */}
-            <div className="fixed-search-bar">
+            {/* Barre de recherche */}
+            <div className="fixed-search-bar" style={{ marginBottom: "1rem" }}>
               <Input
                 placeholder="Rechercher par Nom ou Prénom"
                 value={searchTerm}
@@ -106,40 +117,16 @@ const ArchiveList = () => {
               />
             </div>
 
-            {/* Liste des cartes avec défilement */}
-            <div className="archive-modal-body">
-              <Row gutter={[16, 16]}>
-                {filteredArchives.length > 0 ? (
-                  filteredArchives.map((person) => (
-                    <Col xs={24} sm={12} md={8} key={person.IDPersonne}>
-                      <Card
-                        title={
-                          <span className="archive-card-title">
-                            {person.PrenomPersonne} {person.NomPersonne}
-                          </span>
-                        }
-                        bordered={false}
-                        className="archive-card"
-                      >
-                        <p>
-                          <strong>Email :</strong> {person.Email}
-                        </p>
-                        <p>
-                          <strong>Service :</strong> {person.NomServiceFr || "Non défini"}
-                        </p>
-                        <p>
-                          <strong>Date d'entrée :</strong> {person.DateEntree || "Non spécifiée"}
-                        </p>
-                        <p>
-                          <strong>Date de sortie :</strong> {person.DateSortie || "Non spécifiée"}
-                        </p>
-                      </Card>
-                    </Col>
-                  ))
-                ) : (
-                  <p className="no-results">Aucune personne ne correspond à votre recherche.</p>
-                )}
-              </Row>
+            {/* Tableau DataGrid */}
+            <div style={{ height: 400, width: "100%" }}>
+              <DataGrid
+                rows={filteredArchives}
+                columns={columns}
+                getRowId={(row) => row.IDPersonne}
+                pageSize={10}
+                rowsPerPageOptions={[10, 20, 50]}
+                disableSelectionOnClick
+              />
             </div>
           </>
         )}
