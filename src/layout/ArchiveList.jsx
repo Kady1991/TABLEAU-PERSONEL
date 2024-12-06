@@ -60,6 +60,7 @@ const ArchiveList = () => {
     { field: "PrenomPersonne", headerName: "Prénom", width: 150 },
     { field: "NomPersonne", headerName: "Nom", width: 150 },
     { field: "Email", headerName: "Email", width: 200 },
+    { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200},
     { field: "NomServiceFr", headerName: "Service", width: 200 },
     { field: "DateEntree", headerName: "Date d'entrée", width: 150 },
     { field: "DateSortie", headerName: "Date de sortie", width: 150 },

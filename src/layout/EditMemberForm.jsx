@@ -45,7 +45,7 @@ const EditMemberForm = ({ IDPersonne }) => {
       personResponse.data.DateEntreeDate = personResponse?.data?.DateEntreeDate
         ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
         : undefined;
-
+      personResponse.data.WWGradeID = personResponse.data.WWGradeID || null; // Met à null si aucun grade
       setIsPersonnelSelected(personResponse.data.SiTypePersonnel); // Set personnel selection state
       setPersonData(personResponse.data);
       form.setFieldsValue(personResponse.data);
