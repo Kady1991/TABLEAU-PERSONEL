@@ -95,35 +95,6 @@ body {
   text-align: left;
 }
 
-/* div personne en marche */
-/* .archive-container {
-  position: relative;
-  margin: auto; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-} */
-
-/* animation icon personne en marche */ 
-/* .personneEnMarche {
-  position: absolute;
-  font-size: 3.5rem;
-  animation: personneEnMarche 30s linear infinite;
-  color: #095c82;
-} */
-
-/* @keyframes personneEnMarche {
-  0% {
-    left: 0;
-  }
-  100% {
-    left: calc(100% - 2rem);
-  }
-} */
-
-
-
 /* archive style */
 
 /* Conteneur principal */
@@ -144,13 +115,13 @@ body {
   align-items: center;
   margin-right: 1.7rem;
   background-color: #095c83;
-  height: 2.4rem;
-  font-weight: bold;
+  height: 2.5rem;
+  width: 11.5rem;
+  font-size: 10rem;
+  font-weight:lighter;
   color: rgb(255, 255, 255);
   border: none;
   cursor: pointer;
-  width: 11rem;
-
   transition: background-color 0.3s ease;
 }
 
@@ -161,11 +132,7 @@ body {
 }
 
 
-/* Icône dans le bouton */
-/* .archive-icon {
-  margin-right: 8px;
-  font-size: 10px;
-} */
+
 
 /* Liste des archives */
 .archive-list {
@@ -173,6 +140,7 @@ body {
   list-style-type: none;
   padding: 0;
 }
+
 
 /* Élément de la liste */
 .archive-item {

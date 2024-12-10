@@ -73,7 +73,7 @@ const AddMemberForm = () => {
         SiFrancais: values.siFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
         SiTypePersonnel: values.SiTypePersonnel,
-        TypePersonnelID: values.TypePersonnelID,
+        SiTypePersonnel: values.SiTypePersonnel 
       };
 
       const response = await axios.post(
@@ -113,8 +113,12 @@ const AddMemberForm = () => {
   };
 
   const closeForm = () => {
+    form.resetFields(); // Réinitialise tous les champs du formulaire
+    setIsPersonnelSelected(false); // Réinitialise les champs conditionnels
+    setSelectedServiceDetails(null); // Réinitialise les détails sélectionnés
     setIsFormOpen(false);
   };
+  
 
   const handlePersonnelSelection = (value) => {
     setIsPersonnelSelected(value);
@@ -320,7 +324,7 @@ const AddMemberForm = () => {
                   </Form.Item>
                   {isPersonnelSelected && (
                     <Form.Item
-                      name="TypePersonnelID"
+                      name="NomTypePersonnelFr"
                       label="Type de personnel"
                       rules={[{ required: true, message: "Veuillez choisir le type de personnel" }]}
                     >
@@ -331,7 +335,7 @@ const AddMemberForm = () => {
                         optionFilterProp="children"
                       >
                         {typePersonnelList.map((typePersonnel) => (
-                          <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
+                          <Option key={typePersonnel.NomTypePersonnelFr} value={typePersonnel.NomTypePersonnelFr}>
                             {typePersonnel.NomTypePersonnelFr}
                           </Option>
                         ))}

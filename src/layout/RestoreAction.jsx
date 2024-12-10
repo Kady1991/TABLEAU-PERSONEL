@@ -3,23 +3,25 @@ import axios from "axios";
 import { FaPersonArrowDownToLine } from "react-icons/fa6";
 import "../index.css";
 
-const RestoreAction = ({ IDPersonne, email, onSuccess, onError }) => {
+const RestoreAction = ({ PersonneID, email, onSuccess, onError }) => {
   const handleClick = async () => {
+    // console.log("IDPersonneService", IDPersonneService);
+    
     try {
       // Mettre à jour la valeur de SiArchive dans l'API
-      const link = `https://server-iis.uccle.intra/API_PersonneTest/api/personne/desarchiver?id=${IDPersonne}`;
+      const link = `https://server-iis.uccle.intra/API_PersonneTest/api/personne/desarchiver?id=${PersonneID}`;
       //const link = `https://localhost:44333/api/personne/desarchiver?id=${IDPersonne}`;
 
       await axios.put(link);
 
       // Si la mise à jour réussit, appeler la fonction onSuccess
-      onSuccess(IDPersonne);
+      onSuccess(PersonneID);
 
       // Afficher une alerte de succès
       alert("La personne a été restaurée avec succès.");
     } catch (error) {
-      // Si une erreur se produit, appeler la fonction onError
-      onError(IDPersonne);
+      console.error("Détails de l'erreur :", error); // ✅ Déjà là
+      onError(PersonneID);
 
       // Afficher un message d'erreur dans la console
       console.error(

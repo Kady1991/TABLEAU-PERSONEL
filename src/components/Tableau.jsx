@@ -9,83 +9,60 @@ import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
-// import { faPersonWalking } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IoPersonAddSharp } from "react-icons/io5";
-
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const linkGetAllPersonnel =
-    "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
-  //const linkGetAllPersonnel = "https://localhost:44333/api/Personne";
+  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
 
   const fetchData = () => {
     fetch(linkGetAllPersonnel)
       .then((response) => response.json())
       .then((data) => {
+        console.log("data", data);
         const personnesData = data.map((personne) => ({
           ...personne,
-          id: personne.IDPersonne,
-          personneID: personne.PersonneID,
+          // id: personne.IDPersonneService,
+          IDPersonneService: personne.IDPersonneService,// L'ID réel retourné par l'API
+           affichageIDPersonneService: personne.PersonneID || personne.IDPersonneService 
         }));
-
         setPersonnes(personnesData);
         setLoading(false);
       })
       .catch((error) => {
-        console.error(
-          "Une erreur est survenue lors de la récupération des données :",
-          error
-        );
+        console.error("Une erreur est survenue lors de la récupération des données :", error);
         setLoading(false);
       });
   };
 
-
   useEffect(() => {
-    // Effect for fetching data after successful deletion or addition
     fetchData();
-  }, [personnes]); // This will trigger the effect whenever personnes state changes
+  }, []);
 
-  // Définition de la fonction handleDeleteSuccess
+
   const handleDeleteSuccess = (deletedId) => {
     setPersonnes((prevPersonnes) =>
-      prevPersonnes.filter((personne) => personne.id !== deletedId)
+      prevPersonnes.filter((personne) => personne.IDPersonneService !== deletedId)
     );
   };
 
-  // Définition de la fonction handleDeleteError
   const handleDeleteError = (deletedId) => {
-    //  gérer l'erreur lors de la suppression
-    console.error(
-      `Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`
-    );
+    console.error(`Une erreur s'est produite lors de la suppression de l'élément avec l'ID ${deletedId}.`);
   };
 
   const handleRestoreSuccess = (restoredId) => {
-    // Mettez ici le code à exécuter en cas de succès de la restauration
-    console.log(
-      `La personne avec l'id ${restoredId} a été restaurée avec succès.`
-    );
+    console.log(`La personne avec l'id ${restoredId} a été restaurée avec succès.`);
   };
 
   const handleRestoreError = (restoredId) => {
-    // Mettez ici le code à exécuter en cas d'erreur lors de la restauration
-    console.error(
-      `Une erreur s'est produite lors de la restauration de la personne avec l'ID ${restoredId}.`
-    );
-  };
-
-  // Define handleClick function
-  const handleClick = () => {
-    // Add your click handling logic here
+    console.error(`Une erreur s'est produite lors de la restauration de la personne avec l'ID ${restoredId}.`);
   };
 
   const columns = [
-    { field: "IDPersonne", headerName: "ID", width: 50, hideable: true },
+    { field: "IDPersonneService", headerName: "ID", width: 50, hideable: true },
+   // { field: "PersonneID", headerName: "ID", width: 50, hideable: true },
     {
       field: "actions",
       headerName: "Actions",
@@ -113,23 +90,24 @@ function Tableau() {
               gap: "15px",
             }}
           >
-            <FormService personId={params.row.personneID} />
-            <Detail IDPersonne={params.row.personneID} />
-            <EditMemberForm IDPersonne={params.row.personneID} />
+            <FormService IDPersonneService={params.row.IDPersonneService} />
+            <Detail IDPersonneService={params.row.IDPersonneService} />
+            <EditMemberForm IDPersonneService={params.row.IDPersonneService}/>
             <Delete
-              IDPersonne={params.row.personneID}
+              IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}
               onSuccess={handleDeleteSuccess}
               onError={handleDeleteError}
             />
+
           </div>
 
 
           {/* Div pour actions de restauration */}
           <div className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
-            <Detail IDPersonne={params.row.personneID}
+            <Detail IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}
@@ -137,7 +115,7 @@ function Tableau() {
               onError={handleDeleteError}
             />
             <RestoreAction
-              IDPersonne={params.row.personneID}
+              PersonneID={params.row.PersonneID}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}
@@ -256,7 +234,7 @@ function Tableau() {
             <Export personnes={personnes} columns={columns} className="export-button" />
           </div>
           <div className="archive-container">
-            <ArchiveList className="archive"/>
+            <ArchiveList className="archive"  />
           </div>
           <div className="add-member-container">
             <AddMemberForm />
@@ -274,6 +252,7 @@ function Tableau() {
             getRowClassName={(params) =>
               params.row.SiArchive ? "archive-row" : ""
             }
+            getRowId={(row) => row.IDPersonneService} // Utilisation de la prop getRowId
           />
         </div>
       </div>

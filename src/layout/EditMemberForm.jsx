@@ -17,7 +17,7 @@ import "../index.css";
 
 const { Option } = Select;
 
-const EditMemberForm = ({ IDPersonne }) => {
+const EditMemberForm = ({ IDPersonneService }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personData, setPersonData] = useState(null);
   const [grades, setGrades] = useState([]);
@@ -31,69 +31,108 @@ const EditMemberForm = ({ IDPersonne }) => {
   const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Manage personnel selection state
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
+
+
   useEffect(() => {
-    fetchData();
-  }, [IDPersonne, isModalVisible]);
+    console.log("IDPersonneService", IDPersonneService);
+
+    if (isModalVisible) {
+      console.log("useEffect déclenché avec IDPersonne et modal visible :", IDPersonneService);
+      fetchData();
+    }
+  }, [IDPersonneService, isModalVisible]);
+
 
   const fetchData = async () => {
-    if (!isModalVisible) return;
+    console.log("fetchData appelé");
+
+    if (!isModalVisible) {
+      console.log("Modal non visible, fetchData annulé");
+      return;
+    }
 
     try {
+      console.log("Envoi de la requête pour IDPersonneService :", IDPersonneService);
       const personResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`
       );
+      console.log("Données de l'API pour IDPersonneService :", personResponse.data);
+
       personResponse.data.DateEntreeDate = personResponse?.data?.DateEntreeDate
         ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
         : undefined;
       personResponse.data.WWGradeID = personResponse.data.WWGradeID || null; // Met à null si aucun grade
+
       setIsPersonnelSelected(personResponse.data.SiTypePersonnel); // Set personnel selection state
       setPersonData(personResponse.data);
       form.setFieldsValue(personResponse.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des données de la personne:", error);
+      if (error.response) {
+        // 🔥 Affiche le contenu de la réponse de l'API pour voir la cause de l'erreur
+        console.error("Détails de l'erreur :", error.response.data);
+        alert(`Erreur serveur : ${error.response.status} - ${error.response.data.message || 'Pas de message'}`);
+      } else if (error.request) {
+        alert("Aucune réponse reçue du serveur.");
+      } else {
+        alert(`Erreur de la requête : ${error.message}`);
+      }
+
+      // Affiche toutes les informations sur l'erreur
+      console.error("Détails complets de l'erreur :", error);
     }
 
+
     try {
+      console.log("Envoi de la requête pour les grades");
       const gradesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`
       );
+      console.log("Données des grades :", gradesResponse.data);
       setGrades(gradesResponse.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des grades:", error);
     }
 
     try {
+      console.log("Envoi de la requête pour les adresses");
       const addressesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`
       );
+      console.log("Données des adresses :", addressesResponse.data);
       setAddresses(addressesResponse.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des adresses:", error);
     }
 
     try {
+      console.log("Envoi de la requête pour les types de personnel");
       const typePersonnelResponse = await axios.get(
         "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
       );
+      console.log("Données des types de personnel :", typePersonnelResponse.data);
       setTypePersonnelList(typePersonnelResponse.data);
     } catch (error) {
       console.error("Erreur lors du chargement des types de personnel:", error);
     }
 
     try {
+      console.log("Envoi de la requête pour les services");
       const servicesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`
       );
+      console.log("Données des services :", servicesResponse.data);
       setOtherServices(servicesResponse.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des services:", error);
     }
   };
 
+
   const handleSubmit = async (values) => {
     setLoading(true);
     const formData = {
-      IDPersonne: personData?.IDPersonne,
+      IDPersonneService: personData?.IDPersonneService,
+      PersonneID: personData?.PersonneID,
       NomPersonne: values.NomPersonne,
       PrenomPersonne: values.PrenomPersonne,
       Email: values.Email,
@@ -110,7 +149,7 @@ const EditMemberForm = ({ IDPersonne }) => {
 
     try {
       const response = await axios.put(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${IDPersonne}`,
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${personData?.PersonneID}`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -151,7 +190,7 @@ const EditMemberForm = ({ IDPersonne }) => {
     const selectedService = otherServices.find((service) => service.IDService === value);
     setSelectedServiceDetails(selectedService); // Met à jour l'état avec les détails du service sélectionné
   };
-  
+
   return (
     <>
       <RiFileEditFill className="Edit-Icon"
@@ -349,8 +388,8 @@ const EditMemberForm = ({ IDPersonne }) => {
               </Col>
 
               <Col span={12}>
-               
-                   <Form.Item label="Personnel" name="SiTypePersonnel">
+
+                <Form.Item label="Personnel" name="SiTypePersonnel">
                   <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
                     <Radio value={true}>Oui</Radio>
                     <Radio value={false}>Non</Radio>
@@ -358,7 +397,12 @@ const EditMemberForm = ({ IDPersonne }) => {
                 </Form.Item>
                 {isPersonnelSelected && (
                   <Form.Item name="TypePersonnelID" label="Type de personnel" rules={[{ required: true }]}>
-                    <Select style={{ width: "100%" }} allowClear showSearch>
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      showSearch
+                      disabled={true} // Rend la liste déroulante non modifiable
+                    >
                       {typePersonnelList.map((typePersonnel) => (
                         <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
                           {typePersonnel.NomTypePersonnelFr}

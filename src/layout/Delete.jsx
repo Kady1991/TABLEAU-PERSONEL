@@ -7,7 +7,7 @@ import "antd/dist/reset.css";
 import "../index.css";
 
 const Delete = ({
-  IDPersonne,
+  IDPersonneService,
   nomPersonne,
   prenomPersonne,
   email,
@@ -61,27 +61,22 @@ const Delete = ({
       message.error("Veuillez sélectionner une date de sortie avant d'archiver.");
       return;
     }
-
-    console.log("Date envoyée à l'API :", selectedDate); // Log pour vérifier la date envoyée
-
+  
     const confirmation = window.confirm(
-      `Voulez-vous vraiment archiver ? \n\nID: ${IDPersonne}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email}\nDate de sortie : ${selectedDate}`
+      `Voulez-vous vraiment archiver ? \n\nID: ${IDPersonneService}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email}\nDate de sortie : ${selectedDate}`
     );
-
+  
     if (!confirmation) return;
-
+  
     try {
       const response = await axios.put(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}&dateSortie=${selectedDate}`,
-        // {
-        //   value: email,
-        //   dateSortie: selectedDate, // Envoi de la date sélectionnée
-        // }
+        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
       );
-
-      console.log("Réponse du backend :", response.data); // Log pour vérifier la réponse du backend
-
-      onSuccess(email);
+  
+      console.log("Réponse du backend :", response.data); 
+  
+      // ✅ Met à jour l'affichage principal et la liste des archives
+      onSuccess(email); // Retire la personne de la liste principale
       message.success(
         `La personne ${prenomPersonne} ${nomPersonne} a été archivée avec succès pour la date de sortie ${selectedDate}.`
       );
@@ -93,6 +88,7 @@ const Delete = ({
       message.error("L'archivage a échoué.");
     }
   };
+  
 
   const handleCancel = () => {
     console.log("Annulation de la modale. Date sélectionnée réinitialisée."); // Log pour vérifier l'annulation

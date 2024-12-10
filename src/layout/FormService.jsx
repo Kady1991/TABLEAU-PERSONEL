@@ -6,7 +6,7 @@ import "../index.css";
 
 const { Option } = Select;
 
-const FormService = ({ personId }) => {
+const FormService = ({ IDPersonneService }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [personData, setPersonData] = useState(null);
     const [grades, setGrades] = useState([]);
@@ -22,16 +22,23 @@ const FormService = ({ personId }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (personId) {
-                try {
-                    const personResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${personId}`);
-                    setPersonData(personResponse.data);
-
-
-                } catch (error) {
-                    console.error('Erreur lors de la récupération des données de la personne:', error);
+            try {
+                const personResponse = await axios.get(
+                  `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                  }
+                );
+                setPersonData(personResponse.data);
+              } catch (error) {
+                console.error('Erreur lors de la récupération des données de la personne:', error);
+                if (error.response) {
+                  console.error('Détails de l\'erreur (error.response.data) :', error.response.data);
                 }
-            }
+              }
+              
 
             try {
                 const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`);
@@ -68,7 +75,7 @@ const FormService = ({ personId }) => {
         };
 
         fetchData();
-    }, [personId]);
+    }, [IDPersonneService]);
 
     const handleOpenModal = () => {
         setIsModalVisible(true);
@@ -155,9 +162,8 @@ const FormService = ({ personId }) => {
                 footer={null}
                 style={{ textAlign: "center", minHeight: "60vh", minWidth: "70vh", }}
                 centered
-
-
             >
+
                 <div
                 
                     style={{
@@ -278,12 +284,13 @@ const FormService = ({ personId }) => {
                                     </Select>
                                 </Form.Item>
                             </Col>
+                            
 
                             <Col span={24}>
                                 <Form.Item
                                     style={{ width: "100%" }}
                                     name="service"
-                                    label="Service"
+                                    label="Service supplémentaire"
                                     rules={[
                                         { required: true, message: "Veuillez choisir le service" },
                                     ]}

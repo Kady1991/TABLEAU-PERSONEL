@@ -1,5 +1,5 @@
 import { DataGrid } from "@mui/x-data-grid";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Spin, Button, message, Input } from "antd";
 import { FaFileArchive } from "react-icons/fa";
 import axios from "axios";
@@ -12,17 +12,23 @@ const ArchiveList = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fonction pour récupérer les archives de l'API
   const fetchArchives = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://server-iis.uccle.intra/API_PersonneTest/api/Personne"
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne`
       );
 
       const archivedPersons = response.data.filter((person) => person.SiArchive === true);
 
-      setArchives(archivedPersons);
-      setFilteredArchives(archivedPersons);
+      const formattedArchives = archivedPersons.map((person) => ({
+        ...person,
+        id: person.IDPersonneService // Ajout de la propriété id unique pour MUI DataGrid
+      }));
+
+      setArchives(formattedArchives);
+      setFilteredArchives(formattedArchives);
     } catch (error) {
       console.error("Erreur lors de la récupération :", error);
       message.error("Impossible de charger les données.");
@@ -31,11 +37,13 @@ const ArchiveList = () => {
     }
   };
 
+  // Fonction pour afficher la modal
   const showModal = () => {
     setIsModalVisible(true);
     fetchArchives();
   };
 
+  // Fonction pour fermer la modal
   const handleCancel = () => {
     setIsModalVisible(false);
     setArchives([]);
@@ -43,24 +51,27 @@ const ArchiveList = () => {
     setSearchTerm("");
   };
 
+  // Fonction pour gérer la recherche en temps réel
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
 
     const filtered = archives.filter(
       (person) =>
-        person.PrenomPersonne.toLowerCase().includes(term) ||
-        person.NomPersonne.toLowerCase().includes(term)
+        person.PrenomPersonne?.toLowerCase().includes(term) ||
+        person.NomPersonne?.toLowerCase().includes(term)
     );
 
     setFilteredArchives(filtered);
   };
 
+  // Définition des colonnes pour le DataGrid
   const columns = [
+    { field: "IDPersonneService", headerName: "ID", width: 50, hideable: true },
     { field: "PrenomPersonne", headerName: "Prénom", width: 150 },
     { field: "NomPersonne", headerName: "Nom", width: 150 },
     { field: "Email", headerName: "Email", width: 200 },
-    { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200},
+    { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200 },
     { field: "NomServiceFr", headerName: "Service", width: 200 },
     { field: "DateEntree", headerName: "Date d'entrée", width: 150 },
     { field: "DateSortie", headerName: "Date de sortie", width: 150 },
@@ -102,10 +113,15 @@ const ArchiveList = () => {
           </Button>,
         ]}
         className="archive-modal"
-        width={800}
+        width={1000} // Largeur ajustée de la modal
+        
+
+
       >
         {loading ? (
-          <Spin tip="Chargement..." className="spinner" />
+          <div className="spinner">
+          
+          </div>
         ) : (
           <>
             {/* Barre de recherche */}
@@ -119,15 +135,20 @@ const ArchiveList = () => {
             </div>
 
             {/* Tableau DataGrid */}
-            <div style={{ height: 400, width: "100%" }}>
+            <div
+              className="data-grid-container"
+              style={{ height: 400, width: "100%", overflow: "auto" }}
+            >
               <DataGrid
                 rows={filteredArchives}
                 columns={columns}
-                getRowId={(row) => row.IDPersonne}
+                height={80}
                 pageSize={10}
                 rowsPerPageOptions={[10, 20, 50]}
                 disableSelectionOnClick
+                getRowId={(row) => row.IDPersonneService}
               />
+
             </div>
           </>
         )}

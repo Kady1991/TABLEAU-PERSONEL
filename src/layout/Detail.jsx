@@ -5,7 +5,7 @@ import { BiSolidDetail } from "react-icons/bi";
 import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
 
-const Detail = ({ IDPersonne }) => {
+const Detail = ({ IDPersonneService }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personData, setPersonData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const Detail = ({ IDPersonne }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonne}`,
+        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
         {
           headers: { Accept: "application/xml" },
         }
