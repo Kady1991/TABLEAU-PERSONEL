@@ -51,6 +51,8 @@ const EditMemberForm = ({ IDPersonneService }) => {
       return;
     }
 
+    
+
     try {
       console.log("Envoi de la requête pour IDPersonneService :", IDPersonneService);
       const personResponse = await axios.get(
@@ -58,22 +60,37 @@ const EditMemberForm = ({ IDPersonneService }) => {
       );
       console.log("Données de l'API pour IDPersonneService :", personResponse.data);
 
+
+      if (!personResponse.data) {
+        console.error("Aucune donnée n'a été renvoyée par l'API.");
+        return;
+      }
+
+
       personResponse.data.DateEntreeDate = personResponse?.data?.DateEntreeDate
         ? dayjs(personResponse.data.DateEntreeDate, "YYYY-MM-DD")
         : undefined;
       personResponse.data.WWGradeID = personResponse.data.WWGradeID || null; // Met à null si aucun grade
 
+
       setIsPersonnelSelected(personResponse.data.SiTypePersonnel); // Set personnel selection state
       setPersonData(personResponse.data);
       form.setFieldsValue(personResponse.data);
+
     } catch (error) {
+
       if (error.response) {
+
         // 🔥 Affiche le contenu de la réponse de l'API pour voir la cause de l'erreur
         console.error("Détails de l'erreur :", error.response.data);
+
         alert(`Erreur serveur : ${error.response.status} - ${error.response.data.message || 'Pas de message'}`);
       } else if (error.request) {
+
+        
         alert("Aucune réponse reçue du serveur.");
       } else {
+
         alert(`Erreur de la requête : ${error.message}`);
       }
 
@@ -87,8 +104,10 @@ const EditMemberForm = ({ IDPersonneService }) => {
       const gradesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`
       );
+      
       console.log("Données des grades :", gradesResponse.data);
       setGrades(gradesResponse.data);
+
     } catch (error) {
       console.error("Erreur lors de la récupération des grades:", error);
     }
@@ -98,6 +117,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
       const addressesResponse = await axios.get(
         `https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`
       );
+
       console.log("Données des adresses :", addressesResponse.data);
       setAddresses(addressesResponse.data);
     } catch (error) {
@@ -105,10 +125,12 @@ const EditMemberForm = ({ IDPersonneService }) => {
     }
 
     try {
+
       console.log("Envoi de la requête pour les types de personnel");
       const typePersonnelResponse = await axios.get(
         "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
       );
+
       console.log("Données des types de personnel :", typePersonnelResponse.data);
       setTypePersonnelList(typePersonnelResponse.data);
     } catch (error) {

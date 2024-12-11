@@ -18,27 +18,27 @@ const FormService = ({ IDPersonneService }) => {
     const [isPersonnelSelected, setIsPersonnelSelected] = useState(false); // Ajout de l'état pour gérer l'affichage du champ supplémentaire
     const [typePersonnelData, setTypePersonnelData] = useState([]);
     const [typePersonnelList, setTypePersonnelList] = useState([]);
-    
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const personResponse = await axios.get(
-                  `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem("token")}`
+                    `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`
+                        }
                     }
-                  }
                 );
                 setPersonData(personResponse.data);
-              } catch (error) {
+            } catch (error) {
                 console.error('Erreur lors de la récupération des données de la personne:', error);
                 if (error.response) {
-                  console.error('Détails de l\'erreur (error.response.data) :', error.response.data);
+                    console.error('Détails de l\'erreur (error.response.data) :', error.response.data);
                 }
-              }
-              
+            }
+
 
             try {
                 const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`);
@@ -92,8 +92,8 @@ const FormService = ({ IDPersonneService }) => {
     };
 
     const handlePersonnelSelection = (value) => {
-    setIsPersonnelSelected(value);
-};
+        setIsPersonnelSelected(value);
+    };
 
 
 
@@ -154,7 +154,7 @@ const FormService = ({ IDPersonneService }) => {
 
     return (
         <>
-            <MdMedicalServices className='Service-icon' title='Ajouter un service'  onClick={handleOpenModal} />
+            <MdMedicalServices className='Service-icon' title='Ajouter un service' onClick={handleOpenModal} />
             <Modal
                 title="Ajouter un Service supplémentaire"
                 open={isModalVisible}
@@ -165,7 +165,7 @@ const FormService = ({ IDPersonneService }) => {
             >
 
                 <div
-                
+
                     style={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -188,7 +188,7 @@ const FormService = ({ IDPersonneService }) => {
                         initialValues={{
                             NomPersonne: personData ? personData.NomPersonne : '', // Assurez-vous que personData est défini et extrayez le nom si possible
                             PrenomPersonne: personData ? personData.PrenomPersonne : '', // Assurez-vous que personData est défini et extrayez le prénom si possible
-                            NomServiceFr: personData ? personData.NomServiceFr:'',
+                            NomServiceFr: personData ? personData.NomServiceFr : '',
                             siPersonnel: false,
                             siFrancais: true,
                         }}
@@ -284,7 +284,7 @@ const FormService = ({ IDPersonneService }) => {
                                     </Select>
                                 </Form.Item>
                             </Col>
-                            
+
 
                             <Col span={24}>
                                 <Form.Item
