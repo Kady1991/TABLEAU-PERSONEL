@@ -1,158 +1,123 @@
-import { DataGrid } from "@mui/x-data-grid";
-import React, { useState, useEffect } from "react";
-import { Modal, Spin, Button, message, Input } from "antd";
-import { FaFileArchive } from "react-icons/fa";
-import axios from "axios";
+import React, { useMemo, useEffect, useState } from 'react';
+import { useTable } from 'react-table';
+import axios from 'axios';
+import { Drawer, Button, message, Spin } from 'antd';
 import "../index.css";
 
 const ArchiveList = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [archives, setArchives] = useState([]);
-  const [filteredArchives, setFilteredArchives] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false); // État d'ouverture/fermeture du tiroir
 
   // Fonction pour récupérer les archives de l'API
   const fetchArchives = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne`
-      );
-
+      const response = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne`);
       const archivedPersons = response.data.filter((person) => person.SiArchive === true);
 
       const formattedArchives = archivedPersons.map((person) => ({
-        ...person,
-        id: person.IDPersonneService // Ajout de la propriété id unique pour MUI DataGrid
+        ID: person.IDPersonneService,
+        Prenom: person.PrenomPersonne,
+        Nom: person.NomPersonne,
+        Email: person.Email,
+        DateEntree: person.DateEntree || '', // Date d'entrée vide si la date n'existe pas
+        DateSortie: person.DateSortie || '',
       }));
 
-      setArchives(formattedArchives);
-      setFilteredArchives(formattedArchives);
+      setData(formattedArchives);
     } catch (error) {
-      console.error("Erreur lors de la récupération :", error);
+      console.error("Erreur lors de la récupération des données :", error);
       message.error("Impossible de charger les données.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fonction pour afficher la modal
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showDrawer = () => {
+    setIsDrawerVisible(true);
     fetchArchives();
   };
 
-  // Fonction pour fermer la modal
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setArchives([]);
-    setFilteredArchives([]);
-    setSearchTerm("");
+  const closeDrawer = () => {
+    setIsDrawerVisible(false);
   };
 
-  // Fonction pour gérer la recherche en temps réel
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
+  const columns = useMemo(() => [
+    { Header: 'ID', accessor: 'ID' },
+    { Header: 'Prénom', accessor: 'Prenom' },
+    { Header: 'Nom', accessor: 'Nom' },
+    { Header: 'Email', accessor: 'Email' },
+    { 
+      Header: 'Date d\'entrée', 
+      accessor: 'DateEntree',
+      Cell: ({ value }) => value ? new Date(value).toLocaleDateString() : '' // Affichage vide si la date n'existe pas
+    },
+    { 
+      Header: 'Date de sortie', 
+      accessor: 'DateSortie',
+      Cell: ({ value }) => value ? new Date(value).toLocaleDateString() : '',
+    },
+    
+    
+  ], []);
 
-    const filtered = archives.filter(
-      (person) =>
-        person.PrenomPersonne?.toLowerCase().includes(term) ||
-        person.NomPersonne?.toLowerCase().includes(term)
-    );
-
-    setFilteredArchives(filtered);
-  };
-
-  // Définition des colonnes pour le DataGrid
-  const columns = [
-    { field: "IDPersonneService", headerName: "ID", width: 50, hideable: true },
-    { field: "PrenomPersonne", headerName: "Prénom", width: 150 },
-    { field: "NomPersonne", headerName: "Nom", width: 150 },
-    { field: "Email", headerName: "Email", width: 200 },
-    { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200 },
-    { field: "NomServiceFr", headerName: "Service", width: 200 },
-    { field: "DateEntree", headerName: "Date d'entrée", width: 150 },
-    { field: "DateSortie", headerName: "Date de sortie", width: 150 },
-  ];
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
   return (
-    <div>
-      {/* Bouton pour ouvrir la modal */}
-      <Button
-        className="archive-button"
-        icon={<FaFileArchive />}
-        onClick={showModal}
+    <div className="archive-list-container">
+      <Button 
+        type="primary" 
+        onClick={showDrawer} 
+        className="archive-list-button"
       >
-        Archive
+        Ouvrir les archives
       </Button>
 
-      {/* Modal affichant la table */}
-      <Modal
-        title={
-          <span style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c648f" }}>
-            Liste des Personnes Archivées
-          </span>
-        }
-        open={isModalVisible}
-        onCancel={handleCancel}
-        footer={[
-          <Button
-            key="close"
-            onClick={handleCancel}
-            style={{
-              backgroundColor: "#ff4d4f",
-              borderColor: "#ff4d4f",
-              color: "#fff",
-              fontWeight: "bold",
-              borderRadius: "8px",
-            }}
-          >
-            Fermer
-          </Button>,
-        ]}
-        className="archive-modal"
-        width={1000} // Largeur ajustée de la modal
-        
-
-
+      <Drawer 
+        title="Liste des Personnes Archivées" 
+        placement="right" 
+        onClose={closeDrawer} 
+        open={isDrawerVisible}
+        width={1300} 
       >
         {loading ? (
-          <div className="spinner">
-          
+          <div className="archive-list-spinner">
+            <Spin size="large" />
           </div>
         ) : (
-          <>
-            {/* Barre de recherche */}
-            <div className="fixed-search-bar" style={{ marginBottom: "1rem" }}>
-              <Input
-                placeholder="Rechercher par Nom ou Prénom"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="search-input"
-              />
-            </div>
-
-            {/* Tableau DataGrid */}
-            <div
-              className="data-grid-container"
-              style={{ height: 400, width: "100%", overflow: "auto" }}
-            >
-              <DataGrid
-                rows={filteredArchives}
-                columns={columns}
-                height={80}
-                pageSize={10}
-                rowsPerPageOptions={[10, 20, 50]}
-                disableSelectionOnClick
-                getRowId={(row) => row.IDPersonneService}
-              />
-
-            </div>
-          </>
+          <table {...getTableProps()} className="archive-list-table">
+            <thead>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()} className="archive-list-header-row">
+                  {headerGroup.headers.map(column => (
+                    <th 
+                      {...column.getHeaderProps()} 
+                      className="archive-list-header-cell"
+                    >
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()} className="archive-list-body">
+              {rows.map(row => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()} className="archive-list-row">
+                    {row.cells.map(cell => (
+                      <td {...cell.getCellProps()} className="archive-list-cell">
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
-      </Modal>
+      </Drawer>
     </div>
   );
 };

@@ -109,7 +109,7 @@ body {
 }
 
 /* Bouton Mes Archives */
-.archive-button {
+/* .archive-button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -123,38 +123,38 @@ body {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
-
+} */
+/* 
 .archive-button:hover {
   color: #235f8d !important;
   background-color: #b6d2df !important;
   transform: scale(1.05);
-}
+} */
 
 
 
 
 /* Liste des archives */
-.archive-list {
+/* .archive-list {
   margin-top: 20px;
   list-style-type: none;
   padding: 0;
-}
+} */
 
 
 /* Élément de la liste */
-.archive-item {
+/* .archive-item {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 10px;
   background-color: #f9f9f9;
   transition: background-color 0.3s ease;
-}
+} */
 
-.archive-item:hover {
+/* .archive-item:hover {
   background-color: #e6f0f8;
-}
+} */
 
 
 /* Conteneur principal */
@@ -481,9 +481,9 @@ body {
   font-size: 30px; 
   font-weight: bold;
 }
-
+/* 
 /* STYLE ARCHIVE*/
-/* Styles pour le bouton Archive */
+/* 
 .archive-button {
   margin-bottom: 20px;
   background-color: #2c648f;
@@ -496,29 +496,20 @@ body {
 }
 
 
-/* Conteneur principal de la modal */
+
 .archive-modal-body {
   background-color: #f7f9fb;
   border-radius: 12px;
-  max-height: 500px; /* Limiter la hauteur de la zone des cartes */
-  overflow-y: auto; /* Permettre le défilement vertical */
-  padding-top: 10px;
-  margin: 2rem auto; /* Centrer la modal */
-  scrollbar-width: none; /* Masquer la barre de défilement pour Firefox */
-  width: 200%; /* Augmenter la largeur */
-}
-
-/* .archive-modal-body {
-  background-color: #f7f9fb;
-  border-radius: 12px;
-  
   max-height: 500px; 
   overflow-y: auto; 
-  padding-top: 10; 
-  margin: 2rem;
-} */
+  padding-top: 10px;
+  margin: 2rem auto;
+  scrollbar-width: none; 
+  width: 200%;
+}
 
-/* Barre de recherche */
+
+
 .search-input {
   margin-bottom: 20px;
   border-radius: 8px;
@@ -527,47 +518,124 @@ body {
   width: 18rem;
 }
 
-/* Fixer la barre de recherche */
+
 .fixed-search-bar {
-  position: sticky; /* Rendre la barre fixe */
-  top: 0; /* Toujours en haut */
-  z-index: 10; /* Assurer qu'elle reste au-dessus des cartes */
-  background-color: #f7f9fb; /* Même couleur que le fond de la modal */
+  position: sticky; 
+  top: 0;
+  z-index: 10; 
+  background-color: #f7f9fb; 
   padding: 15px 25px;
-  border-bottom: 1px solid #e0e0e0; /* Légère séparation visuelle */
+  border-bottom: 1px solid #e0e0e0; 
   height: 5rem;
 }
 
-/* Styles pour les cartes */
+
 .archive-card {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
-  height: 250px; /* Hauteur augmentée */
-  width: 100%; /* Largeur maximale pour s'adapter */
+  height: 250px;
+  width: 100%; 
 }
 
 .archive-card-title {
   font-weight: bold;
-  font-size: 1.5rem; /* Taille augmentée */
+  font-size: 1.5rem; 
   color: #2c648f;
 }
 
 
 
-/* Message lorsque aucune personne n'est trouvée */
+
 .no-results {
   font-size: 1.2rem;
   text-align: center;
   color: #999;
 }
 
-/* Spinner */
+
 .spinner {
   display: block;
   margin: 20px auto;
   font-size: 1.5rem;
   color: #2c648f;
+} */ 
+
+
+
+/* tiroir archive  */
+/* Conteneur principal du composant */
+/* .archive-list-container {
+  
+} */
+
+/* Bouton pour ouvrir le tiroir */
+.archive-list-button {
+  margin-bottom: 16px;
+  background-color: #2c648f;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: bold;
+  height: 2.5rem;
+  width: 11.5rem;
+  font-size: 1rem;
+  
 }
 
+.archive-list-button:hover {
+  /* height: 2.5rem;
+  width: 11.5rem;
+  font-size: 10rem; */
+  background-color: #b6d2df !important;
+  color: #095c83 !important;
+}
 
+/* Tiroir principal */
+.archive-list-drawer .ant-drawer-header {
+  background-color: #2c648f !important;
+  color: #fff !important;
+}
+
+.archive-list-drawer .ant-drawer-body {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+/* Spinner de chargement */
+.archive-list-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  
+}
+
+/* Table générale */
+.archive-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.archive-list-header-row {
+  background-color: #2c648f;
+}
+
+.archive-list-header-cell {
+  padding: 8px;
+  color: white;
+  text-align: center;
+}
+
+.archive-list-body {
+  background-color: #fff;
+}
+
+.archive-list-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.archive-list-cell {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
