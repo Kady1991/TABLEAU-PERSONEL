@@ -1,13 +1,14 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import axios from 'axios';
-import { Drawer, Button, message, Spin } from 'antd';
+import { Drawer, Button, message, Spin, Input } from 'antd';
 import "../index.css";
 
 const ArchiveList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false); // État d'ouverture/fermeture du tiroir
+  const [searchTerm, setSearchTerm] = useState(""); // État pour le terme de recherche
 
   // Fonction pour récupérer les archives de l'API
   const fetchArchives = async () => {
@@ -18,8 +19,8 @@ const ArchiveList = () => {
 
       const formattedArchives = archivedPersons.map((person) => ({
         ID: person.IDPersonneService,
-        Prenom: person.PrenomPersonne,
-        Nom: person.NomPersonne,
+        Prenom: person.PrenomPersonne || '',
+        Nom: person.NomPersonne || '',
         Email: person.Email,
         DateEntree: person.DateEntree || '', // Date d'entrée vide si la date n'existe pas
         DateSortie: person.DateSortie || '',
@@ -43,6 +44,18 @@ const ArchiveList = () => {
     setIsDrawerVisible(false);
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(person => 
+      (person.Prenom && person.Prenom.toLowerCase().includes(searchTerm.toLowerCase())) || 
+      (person.Nom && person.Nom.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [data, searchTerm]);
+
   const columns = useMemo(() => [
     { Header: 'ID', accessor: 'ID' },
     { Header: 'Prénom', accessor: 'Prenom' },
@@ -58,11 +71,9 @@ const ArchiveList = () => {
       accessor: 'DateSortie',
       Cell: ({ value }) => value ? new Date(value).toLocaleDateString() : '',
     },
-    
-    
   ], []);
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: filteredData });
 
   return (
     <div className="archive-list-container">
@@ -81,9 +92,15 @@ const ArchiveList = () => {
         open={isDrawerVisible}
         width={1300} 
       >
+        <Input 
+          placeholder="Rechercher par prénom ou nom" 
+          value={searchTerm} 
+          onChange={handleSearch} 
+          className="archive-list-search-input" 
+        />
         {loading ? (
           <div className="archive-list-spinner">
-            <Spin size="large" />
+            <Spin size="medium" />
           </div>
         ) : (
           <table {...getTableProps()} className="archive-list-table">

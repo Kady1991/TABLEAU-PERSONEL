@@ -483,91 +483,22 @@ body {
 }
 /* 
 /* STYLE ARCHIVE*/
-/* 
-.archive-button {
-  margin-bottom: 20px;
-  background-color: #2c648f;
-  border-color: #2c648f;
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 10px 20px;
-  border-radius: 8px;
-  color: white;
+
+
+
+
+.ant-drawer-content{
+  margin-top: 2rem;
+  max-height:46rem;  
 }
 
-
-
-.archive-modal-body {
-  background-color: #f7f9fb;
-  border-radius: 12px;
-  max-height: 500px; 
-  overflow-y: auto; 
-  padding-top: 10px;
-  margin: 2rem auto;
-  scrollbar-width: none; 
-  width: 200%;
+.archive-list-search-input {
+  width: 50%; 
+  min-width: 200px; 
+  max-width: 400px; 
+  margin-bottom: 20px; 
 }
 
-
-
-.search-input {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 1rem;
-  width: 18rem;
-}
-
-
-.fixed-search-bar {
-  position: sticky; 
-  top: 0;
-  z-index: 10; 
-  background-color: #f7f9fb; 
-  padding: 15px 25px;
-  border-bottom: 1px solid #e0e0e0; 
-  height: 5rem;
-}
-
-
-.archive-card {
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  height: 250px;
-  width: 100%; 
-}
-
-.archive-card-title {
-  font-weight: bold;
-  font-size: 1.5rem; 
-  color: #2c648f;
-}
-
-
-
-
-.no-results {
-  font-size: 1.2rem;
-  text-align: center;
-  color: #999;
-}
-
-
-.spinner {
-  display: block;
-  margin: 20px auto;
-  font-size: 1.5rem;
-  color: #2c648f;
-} */ 
-
-
-
-/* tiroir archive  */
-/* Conteneur principal du composant */
-/* .archive-list-container {
-  
-} */
 
 /* Bouton pour ouvrir le tiroir */
 .archive-list-button {
@@ -583,9 +514,6 @@ body {
 }
 
 .archive-list-button:hover {
-  /* height: 2.5rem;
-  width: 11.5rem;
-  font-size: 10rem; */
   background-color: #b6d2df !important;
   color: #095c83 !important;
 }
