@@ -10,6 +10,8 @@ import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 import { IoPersonAddSharp } from "react-icons/io5";
+import Statistics from '../layout/Statistics';
+
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
@@ -26,7 +28,7 @@ function Tableau() {
           ...personne,
           // id: personne.IDPersonneService,
           IDPersonneService: personne.IDPersonneService,// L'ID réel retourné par l'API
-           affichageIDPersonneService: personne.PersonneID || personne.IDPersonneService 
+          affichageIDPersonneService: personne.PersonneID || personne.IDPersonneService
         }));
         setPersonnes(personnesData);
         setLoading(false);
@@ -62,7 +64,7 @@ function Tableau() {
 
   const columns = [
     { field: "IDPersonneService", headerName: "ID", width: 50, hideable: true },
-   // { field: "PersonneID", headerName: "ID", width: 50, hideable: true },
+    // { field: "PersonneID", headerName: "ID", width: 50, hideable: true },
     {
       field: "actions",
       headerName: "Actions",
@@ -92,7 +94,7 @@ function Tableau() {
           >
             <FormService IDPersonneService={params.row.IDPersonneService} />
             <Detail IDPersonneService={params.row.IDPersonneService} />
-            <EditMemberForm IDPersonneService={params.row.IDPersonneService}/>
+            <EditMemberForm IDPersonneService={params.row.IDPersonneService} />
             <Delete
               IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
@@ -222,19 +224,23 @@ function Tableau() {
     <div>
       <div className="main-container">
         <div className="icon-tableau">
-          <IoPersonAddSharp className="person-icon-tableau" />
+          {/* <IoPersonAddSharp className="person-icon-tableau" /> */}
 
         </div>
         <div>
         </div>
-        <h1 className="title">MEMBRE DU PERSONNEL</h1>
+        <div className="titre-et-statistics">
+        <IoPersonAddSharp className="person-icon-tableau" />
+          <h1 className="title">MEMBRE DU PERSONNEL</h1>
+          <Statistics data={personnes} />
+        </div>
 
         <div className="header-container">
           <div className="export-container">
             <Export personnes={personnes} columns={columns} className="export-button" />
           </div>
           <div className="archive-container">
-            <ArchiveList className="archive"  />
+            <ArchiveList className="archive" />
           </div>
           <div className="add-member-container">
             <AddMemberForm />
