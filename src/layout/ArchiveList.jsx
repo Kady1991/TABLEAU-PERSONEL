@@ -2,28 +2,50 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import axios from 'axios';
 import { Drawer, Button, message, Spin, Input } from 'antd';
+import { XMLParser } from 'fast-xml-parser';
+import dayjs from 'dayjs';
 import "../index.css";
 
 const ArchiveList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false); // État d'ouverture/fermeture du tiroir
-  const [searchTerm, setSearchTerm] = useState(""); // État pour le terme de recherche
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Fonction pour récupérer les archives de l'API
   const fetchArchives = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne`);
       const archivedPersons = response.data.filter((person) => person.SiArchive === true);
 
-      const formattedArchives = archivedPersons.map((person) => ({
-        ID: person.IDPersonneService,
-        Prenom: person.PrenomPersonne || '',
-        Nom: person.NomPersonne || '',
-        Email: person.Email,
-        DateEntree: person.DateEntree || '', // Date d'entrée vide si la date n'existe pas
-        DateSortie: person.DateSortie || '',
+      const formattedArchives = await Promise.all(archivedPersons.map(async (person) => {
+        try {
+          const detailResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${person.IDPersonneService}`, {
+            headers: { Accept: "application/xml" },
+          });
+          const parser = new XMLParser();
+          const personDetail = parser.parse(detailResponse.data);
+          const whosWhoData = personDetail?.WhosWhoModelView || {};
+
+          return {
+            ID: person.IDPersonneService,
+            Prenom: person.PrenomPersonne || '',
+            Nom: person.NomPersonne || '',
+            Email: person.Email,
+            DateEntree: whosWhoData.DateEntree || '',
+            DateSortie: whosWhoData.DateSortie || '',
+          };
+        } catch (error) {
+          console.error("Erreur lors de la récupération des détails de la personne:", error);
+          return {
+            ID: person.IDPersonneService,
+            Prenom: person.PrenomPersonne || '',
+            Nom: person.NomPersonne || '',
+            Email: person.Email,
+            DateEntree: person.DateEntree || '',
+            DateSortie: person.DateSortie || '',
+          };
+        }
       }));
 
       setData(formattedArchives);
@@ -64,12 +86,12 @@ const ArchiveList = () => {
     { 
       Header: 'Date d\'entrée', 
       accessor: 'DateEntree',
-      Cell: ({ value }) => value ? new Date(value).toLocaleDateString() : '' // Affichage vide si la date n'existe pas
+      Cell: ({ value }) => value ? dayjs(value).format("DD/MM/YYYY") : '' 
     },
     { 
       Header: 'Date de sortie', 
       accessor: 'DateSortie',
-      Cell: ({ value }) => value ? new Date(value).toLocaleDateString() : '',
+      Cell: ({ value }) => value ? dayjs(value).format("DD/MM/YYYY") : '',
     },
   ], []);
 
