@@ -1,78 +1,31 @@
-import React, { useMemo } from 'react';
-import { Card } from 'antd';
-import { Pie } from '@ant-design/plots';
-import dayjs from 'dayjs';
-import "../assets/styles/statistics.css";
+import React from 'react';
+import { Card, Col, Row, Statistic } from 'antd';
 
 const Statistics = ({ data }) => {
-  const totalPersonnes = data.length;
-  const totalArchives = data.filter(personne => personne.SiArchive === true).length;
-  const personnesAnnee = data.filter(personne => dayjs(personne.DateEntree).isSame(dayjs(), 'year')).length;
-  const personnesMois = data.filter(personne => dayjs(personne.DateEntree).isSame(dayjs(), 'month')).length;
-
-  const pieChartData = [
-    {
-      type: 'Personnes enregistrées',
-      value: totalPersonnes - totalArchives,
-    },
-    {
-      type: 'Personnes archivées',
-      value: totalArchives,
-    },
-  ];
-
-  const pieConfig = {
-    appendPadding: 10,
-    data: pieChartData,
-    angleField: 'value',
-    colorField: 'type',
-    color: ['#3CB371', '#FF6347'], // Vert pour les enregistrées, rouge pour les archivées
-    radius: 1,
-    innerRadius: 0.6,
-    label: {
-      type: 'spider',
-      labelHeight: 28,
-      content: '{name} ({percentage})',
-      style: {
-        fontSize: 14,
-      },
-    },
-    interactions: [
-      {
-        type: 'element-active',
-      },
-    ],
-  };
+  const totalPersonnesActives = data.filter(personne => personne.SiArchive === false).length;
+  const totalPersonnesArchivees = data.filter(personne => personne.SiArchive === true).length;
 
   return (
-    <div className="statistics-wrapper">
-      <h2 className="statistics-title">Statistiques</h2>
-      <div className="statistics-container">
-        <div className="statistics-item">
-          <div className="small-card">
-            <span style={{ fontSize: '1.2rem' }}>Ce mois: </span>
-            <strong style={{ fontSize: '1.2rem' }}>{personnesMois}</strong>
-          </div>
-        </div>
-        <div className="statistics-item">
-          <div className="small-card">
-            <span style={{ fontSize: '1.2rem' }}>Cette année: </span>
-            <strong style={{ fontSize: '1.2rem' }}>{personnesAnnee}</strong>
-          </div>
-        </div>
-        <div className="statistics-item">
-          <div className="small-card">
-            <span style={{ fontSize: '1.2rem' }}>Total: </span>
-            <strong style={{ fontSize: '1.2rem' }}>{totalPersonnes}</strong>
-          </div>
-        </div>
-        <div className="statistics-item">
-          <div className="small-chart" style={{ width: '200px', height: '200px' }}>
-            <Pie {...pieConfig} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <Row gutter={16}>
+      <Col span={12}>
+        <Card bordered={false}>
+          <Statistic
+            title="ACTIVES"
+            value={totalPersonnesActives}
+            valueStyle={{ color: '#3f8600' }}
+          />
+        </Card>
+      </Col>
+      <Col span={12}>
+        <Card bordered={false}>
+          <Statistic
+            title="SORTIES"
+            value={totalPersonnesArchivees}
+            valueStyle={{ color: '#cf1322' }}
+          />
+        </Card>
+      </Col>
+    </Row>
   );
 };
 
