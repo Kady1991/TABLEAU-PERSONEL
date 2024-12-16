@@ -29,8 +29,8 @@ const ArchiveList = () => {
 
           return {
             ID: person.IDPersonneService,
-            Prenom: person.PrenomPersonne || '',
             Nom: person.NomPersonne || '',
+            Prenom: person.PrenomPersonne || '',
             Email: person.Email,
             DateEntree: whosWhoData.DateEntree || '',
             DateSortie: whosWhoData.DateSortie || '',
@@ -39,8 +39,8 @@ const ArchiveList = () => {
           console.error("Erreur lors de la récupération des détails de la personne:", error);
           return {
             ID: person.IDPersonneService,
-            Prenom: person.PrenomPersonne || '',
             Nom: person.NomPersonne || '',
+            Prenom: person.PrenomPersonne || '',
             Email: person.Email,
             DateEntree: person.DateEntree || '',
             DateSortie: person.DateSortie || '',
@@ -80,8 +80,8 @@ const ArchiveList = () => {
 
   const columns = useMemo(() => [
     { Header: 'ID', accessor: 'ID' },
-    { Header: 'Prénom', accessor: 'Prenom' },
     { Header: 'Nom', accessor: 'Nom' },
+    { Header: 'Prénom', accessor: 'Prenom' },
     { Header: 'Email', accessor: 'Email' },
     { 
       Header: 'Date d\'entrée', 

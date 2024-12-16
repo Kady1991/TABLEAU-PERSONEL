@@ -233,7 +233,7 @@ function Tableau() {
         <div>
         </div>
         <div className="titre-et-statistics">
-        <img src={logoWhite} alt="Logo" className="person-icon-tableau" style={{ width: '150px', height: '150px' }} />
+        <img src={logoWhite} alt="Logo" className="person-icon-tableau" style={{ width: '160px' }} />
           <h1 className="title-tableau">MEMBRE DU PERSONNEL</h1>
           <Statistics data={personnes} />
         </div>
