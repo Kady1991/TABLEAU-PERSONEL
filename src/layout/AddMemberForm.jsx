@@ -72,7 +72,6 @@ const AddMemberForm = () => {
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
-        SiTypePersonnel: values.SiTypePersonnel,
         SiTypePersonnel: values.SiTypePersonnel 
       };
 

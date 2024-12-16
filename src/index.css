@@ -8,13 +8,13 @@ body {
 }
 
 /* style icon tableau principale */
-.person-icon-tableau{
+/* .person-icon-tableau{
   color: #b6d2df;
   font-size: 6rem;
-}
+} */
 
 .title-tableau {
-  color: #b6d2df;
+  color: #ffffff;
   font-weight: bold;
   font-size: 2rem;
   margin: auto;
@@ -23,60 +23,14 @@ body {
 /* STYLE DIV TITRE ET STATICS */
 .titre-et-statistics {
   display: flex;
-  justify-content: space-evenly; 
+  justify-content: space-around; 
   align-items: center; 
   width: 90%;
 }
 
-.title {
-  font-size: 1.5rem; 
-  font-weight: bold; 
-  margin: auto;
-  
-}
-
-.statistics-wrapper {
-  width: auto;
-  max-width: 50%; 
-}
-
-.statistics-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.statistics-item {
-  width: 8vw;
-  height: 10vh;
-  background-color: black;
-  border-radius: 5px;
-}
-
-.small-card {
-  background-color: blue;
-  color: aliceblue;
-  font-size: 0.8rem; 
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 6vw; 
-  height: 5vh; 
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.small-chart {
-  width: 50px; 
-  height: 50px; 
-}
-/* FIN DU STYLE */
-
 .subtitle {
   color: #b6d2df;
-  font-weight: bold;
+  font-weight: lighter;
   font-size: 1.5rem;
   /* margin-bottom: 2rem; */
 }
@@ -86,9 +40,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 2rem;
+  margin-top:1rem;
   height: 60px;
-  width: 80%;
+  width: 90%;
   background-color: white;
   border-radius: 0.4rem;
   
@@ -163,54 +117,6 @@ body {
   justify-content: center;
 }
 
-/* Bouton Mes Archives */
-/* .archive-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 1.7rem;
-  background-color: #095c83;
-  height: 2.5rem;
-  width: 11.5rem;
-  font-size: 10rem;
-  font-weight:lighter;
-  color: rgb(255, 255, 255);
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-} */
-/* 
-.archive-button:hover {
-  color: #235f8d !important;
-  background-color: #b6d2df !important;
-  transform: scale(1.05);
-} */
-
-
-
-
-/* Liste des archives */
-/* .archive-list {
-  margin-top: 20px;
-  list-style-type: none;
-  padding: 0;
-} */
-
-
-/* Élément de la liste */
-/* .archive-item {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  transition: background-color 0.3s ease;
-} */
-
-/* .archive-item:hover {
-  background-color: #e6f0f8;
-} */
-
 
 /* Conteneur principal */
 .main-container {
@@ -239,8 +145,8 @@ body {
 /* Conteneur du DataGrid */
 .data-grid-container {
   height: calc(160% - 2rem);
-  width: 80%;
-  background-color: whitesmoke;
+  width: 90%;
+  background-color: white;
   margin-top: 0.5rem;
   border-radius: 0.5rem;
   z-index: 0;
@@ -248,10 +154,13 @@ body {
 
 /* Ligne archivée dans le DataGrid */
 .archive-row {
-  background-color: #d3d4d5;
+  background-color: #c5c6c6;
   color: rgb(26, 22, 22);
   cursor: pointer;
 }
+/* .archive-row:hover{
+  background-color: #455962;
+} */
 
 /* STYLE DELETE ICON */
 .delete-Icon {
@@ -324,7 +233,7 @@ body {
   font-size: 19px;
 }
 
-/* Styles généraux pour RestoreIcon */
+/* Styles  pour RestoreIcon */
 .RestoreIcon {
   display: flex;
   align-items: center;
@@ -524,7 +433,6 @@ body {
   background-color: #6a83a8; 
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
 }
 
 /* style close-icon */
@@ -536,11 +444,8 @@ body {
   font-size: 30px; 
   font-weight: bold;
 }
-/* 
+
 /* STYLE ARCHIVE*/
-
-
-
 
 .ant-drawer-content{
   margin-top: 2rem;
