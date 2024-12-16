@@ -10,33 +10,34 @@ body {
 /* style icon tableau principale */
 .person-icon-tableau{
   color: #b6d2df;
-  font-size: 4rem;
-  
+  font-size: 6rem;
 }
 
-.title {
+.title-tableau {
   color: #b6d2df;
   font-weight: bold;
   font-size: 2rem;
+  margin: auto;
 
 }
 /* STYLE DIV TITRE ET STATICS */
 .titre-et-statistics {
   display: flex;
-  justify-content: space-evenly; /* Aligne le titre à gauche et Statistics à droite */
-  align-items: center; /* Aligne verticalement les deux éléments */
+  justify-content: space-evenly; 
+  align-items: center; 
   width: 90%;
 }
 
 .title {
-  font-size: 1.5rem; /* Taille du texte */
-  font-weight: bold; /* Met en gras le titre */
-  margin-right: auto; /* Pousse le titre vers la gauche */
+  font-size: 1.5rem; 
+  font-weight: bold; 
+  margin: auto;
+  
 }
 
 .statistics-wrapper {
   width: auto;
-  max-width: 50%; /* Ajuster la largeur du composant Statistics */
+  max-width: 50%; 
 }
 
 .statistics-container {

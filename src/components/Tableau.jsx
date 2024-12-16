@@ -9,8 +9,11 @@ import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
-import { IoPersonAddSharp } from "react-icons/io5";
+// import { IoPersonAddSharp } from "react-icons/io5";
 import Statistics from '../layout/Statistics';
+import logoWhite from '../assets/logo_white.png';
+
+
 
 
 function Tableau() {
@@ -230,10 +233,11 @@ function Tableau() {
         <div>
         </div>
         <div className="titre-et-statistics">
-        <IoPersonAddSharp className="person-icon-tableau" />
-          <h1 className="title">MEMBRE DU PERSONNEL</h1>
+        <img src={logoWhite} alt="Logo" className="person-icon-tableau" style={{ width: '150px', height: '150px' }} />
+          <h1 className="title-tableau">MEMBRE DU PERSONNEL</h1>
           <Statistics data={personnes} />
         </div>
+
 
         <div className="header-container">
           <div className="export-container">

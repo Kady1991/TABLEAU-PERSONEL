@@ -6,11 +6,11 @@ const Statistics = ({ data }) => {
   const totalPersonnesArchivees = data.filter(personne => personne.SiArchive === true).length;
 
   return (
-    <Row gutter={16}>
+    <Row gutter={18}>
       <Col span={12}>
         <Card bordered={false}>
           <Statistic
-            title="ACTIVES"
+            title="Actives"
             value={totalPersonnesActives}
             valueStyle={{ color: '#3f8600' }}
           />
@@ -19,7 +19,7 @@ const Statistics = ({ data }) => {
       <Col span={12}>
         <Card bordered={false}>
           <Statistic
-            title="SORTIES"
+            title="Inactives"
             value={totalPersonnesArchivees}
             valueStyle={{ color: '#cf1322' }}
           />
