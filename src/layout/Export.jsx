@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { CiExport } from "react-icons/ci";
 
 const Export = ({ personnes, className }) => {
   const generateCsvData = () => {
@@ -76,11 +76,11 @@ const Export = ({ personnes, className }) => {
 
   return (
     <Button 
-      className="export-button"
+      className="button"
       variant="contained"
-      startIcon={<FileDownloadIcon />}
+      startIcon={<CiExport />}
       onClick={handleExportCsv}
-      style={{ backgroundColor: "#095c82" }}
+      
     >
       Exporter
     </Button>

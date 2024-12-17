@@ -102,7 +102,7 @@ const ArchiveList = () => {
       <Button 
         type="primary" 
         onClick={showDrawer} 
-        className="archive-list-button"
+        className="button"
       >
         Ouvrir les archives
       </Button>

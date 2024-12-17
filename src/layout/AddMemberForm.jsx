@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
-import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import { CloseOutlined} from "@ant-design/icons";
+import { IoPersonAddOutline } from "react-icons/io5";
 import "../index.css";
 import { IoPersonAddSharp } from "react-icons/io5";
 
@@ -157,8 +158,8 @@ const AddMemberForm = () => {
   return (
     // STYLE INCORPORER BOUTON: AJOUTER MEMBRE
     <div>
-      <Button className="custom-button" type="secondary" onClick={openForm} icon={<PlusOutlined />}>
-        AJOUTER MEMBRE
+      <Button className="button" type="secondary" onClick={openForm} icon={<IoPersonAddOutline />}>
+        Nouveau membre
       </Button>
 
       {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}

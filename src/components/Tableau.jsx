@@ -12,6 +12,8 @@ import RestoreAction from "../layout/RestoreAction.jsx";
 // import { IoPersonAddSharp } from "react-icons/io5";
 import Statistics from '../layout/Statistics';
 import logoWhite from '../assets/logo_white.png';
+import MenuPersonnel from "../layout/MenuPersonnel";
+
 
 
 
@@ -232,23 +234,30 @@ function Tableau() {
         </div>
         <div>
         </div>
-        <div className="titre-et-statistics">
+        {/* <div className="titre-et-statistics">
         <img src={logoWhite} alt="Logo" className="person-icon-tableau" style={{ width: '165px' }} />
           <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1>
-          <Statistics data={personnes} />
-        </div>
+          <MenuPersonnel/>
+          
+        </div> */}
 
 
         <div className="header-container">
-          <div className="export-container">
-            <Export personnes={personnes} columns={columns} className="export-button" />
+          <div className="titre-et-statistics">
+            <img src={logoWhite} alt="Logo" className="LOGO" style={{ width: '100px' }} />
+          <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1>
+            <MenuPersonnel />
           </div>
-          <div className="archive-container">
+          {/* <div className="export-container">
+            <Export personnes={personnes} columns={columns} className="button" />
+          </div> */}
+          {/* <div className="archive-container">
             <ArchiveList className="archive" />
-          </div>
+          </div> */}
+          {/* <Statistics data={personnes} />
           <div className="add-member-container">
             <AddMemberForm />
-          </div>
+          </div> */}
         </div>
 
         <div className="data-grid-container">
