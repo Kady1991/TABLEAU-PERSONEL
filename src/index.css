@@ -7,25 +7,14 @@ body {
   background: linear-gradient(to bottom, #81a4c0, #095c83);
 }
 
-/* style icon tableau principale */
-/* .person-icon-tableau{
-  color: #b6d2df;
-  font-size: 6rem;
-} */
 
-.title-tableau {
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 2rem;
-  margin: auto;
-
-}
 /* STYLE DIV TITRE ET STATICS */
 .titre-et-statistics {
   display: flex;
   justify-content: space-around; 
   align-items: center; 
-  width: 90%;
+  width: 100%;
+  margin: auto;
 }
 
 .subtitle {
@@ -39,18 +28,16 @@ body {
 .header-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-top:1rem;
-  height: 75px;
-  width: 90%;
-  background-color: rgb(31, 105, 142);
+  width: 50%;
   border-radius: 0.4rem;
   
   
 }
 
 /* style bouton export */
-.button {
+/* .button {
   background-color: rgb(31, 105, 142) !important;
   color: white;
   font-weight: lighter;
@@ -64,7 +51,7 @@ body {
 }
 
 .button:hover {
-  background-color: rgb(118, 157, 186) !important;/* forcer le style */
+  background-color: rgb(118, 157, 186) !important;
   color: #eef1f2;
   transform: scale(1.05);
   cursor: pointer;
@@ -72,7 +59,7 @@ body {
 
 .button:active {
   transform: scale(0.95);
-}
+} */
 
 
 
@@ -119,15 +106,17 @@ body {
 /* Conteneur principal */
 .main-container {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 57%;
+  left: 55.2%;
   transform: translate(-50%, -50%);
-  height: 430px;
-  width: 100%;
+  height: 500px;
+  width: 97%;
   display: flex;
-  flex-direction: column;
+  flex-direction:row;
   align-items: center;
   justify-content: center;
+  
+  
   
 }
 
@@ -142,10 +131,10 @@ body {
 
 /* Conteneur du DataGrid */
 .data-grid-container {
-  height: calc(160% - 2rem);
+  height: calc(150% - 2rem);
   width: 90%;
   background-color: white;
-  margin-top: 0.5rem;
+  margin-bottom: 3rem;
   border-radius: 0.5rem;
   z-index: 0;
 }
@@ -278,8 +267,8 @@ body {
   background-color: #fff;
   box-shadow: 10 15px 18px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  height: 95vh;
-  width: 80vh;
+  
+  
 }
 
 /* Transition pour faire apparaître le modal */
@@ -301,48 +290,50 @@ body {
 /* Styles pour l'icône de fermeture */
 .close-icon-container {
   text-align: right;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  color: #095c83;
+  
 }
 
 .close-icon {
-  cursor: pointer;
+  font-size: 0.2rem;
+  color: #095c83;
   
 }
 
-/* style Nouveau membre: TITRE*/
-.new-member-container {
-  margin-bottom: 1rem;
+/* style formulaire d'ajout membre: TITRE*/
+.div-title-form-ajout-membre-icon {
   text-align: center;
-  font-size: 1rem;
-  font-weight: lighter;
+
+}
+.title-ajouter-membre {
+  display: flex;
+  justify-content: center;
   color: #095c83;
+  font-weight:bolder;
+  font-size: 1.7rem;
+
 }
 
 /* icon tablaeau */
-.icon-tableau .person-icon {
+.person-icon {
   font-size: 2rem;
   color: #095c83;
-  
 }
 
 /* Styles pour le formulaire */
 .form-container {
-  height: 75vh;
-  width: 75vh;
-  padding: 2.3rem;
-  margin-bottom: 10%;
-  margin: auto;
-  background-color: #4d7e9572;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 100%;
+  width: 100%;
+  padding: 20px;
+  background-color:"#f0f2f5";
+  border-radius: 8px;
+  box-shadow: "0 4px 8px rgba(0,0,0,0.1)";
 }
 
 /* Cible les labels des Form.Item dans Ant Design */
 .ant-form-item-label > label {
   font-size:15px; /* Taille du texte */
-  line-height: 0.5.; /* Hauteur de ligne pour une meilleure lisibilité */
+  line-height: 1rem; /* Hauteur de ligne pour une meilleure lisibilité */
+  color: #034f73 !important;
 }
 
 /* Style pour le bouton radio sélectionné */
@@ -366,8 +357,7 @@ body {
   width:100px;
   height: 32px;
   font-size: 15px;
-  margin: auto;
-  
+  margin: auto;  
 }
 
 .button-validate:hover{
@@ -386,13 +376,13 @@ body {
   
 }
 
-.form-buttons .button-cancel:hover {
+/* .form-buttons .button-cancel:hover {
   z-index: 9999;
   color:#2c648f !important;
   background-color: #f8fcff !important;
   border: solid 0.5px #2c648f !important; 
   font-weight: lighter; 
-}
+} */
 
 /* Section des détails du service sélectionné */
 .service-details {
@@ -433,16 +423,19 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* style close-icon */
+/* style close-icon formulaire d'ajout */
 
-.close-icon {
-  color: #999; 
-  cursor: pointer; 
-  transition: color 0.3s ease-in-out; 
-  font-size: 30px; 
-  font-weight: bold;
+.close_icon {
+  color:  #6a83a8; 
+  font-size: 20px; 
+  
 }
 
+.close_icon:hover{
+  transition: color 0.3s ease-in-out; 
+  color: #f41408; 
+  font-size: 22px; 
+}
 /* STYLE ARCHIVE*/
 
 .ant-drawer-content{

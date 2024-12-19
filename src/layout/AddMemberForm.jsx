@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
-import { CloseOutlined} from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
 import { IoPersonAddOutline } from "react-icons/io5";
 import "../index.css";
 import { IoPersonAddSharp } from "react-icons/io5";
 
 const { Option } = Select;
 
-const AddMemberForm = () => {
+const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onClose pour éviter l'erreur de référence non définie
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [grades, setGrades] = useState([]);
@@ -22,28 +22,25 @@ const AddMemberForm = () => {
 
 
   useEffect(() => {
-    
+
     setLoadingData(true);
+
     const fetchData = async () => {
       try {
-        const gradesResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades"
-        );
+        const gradesResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades");
+        console.log('Grades:', gradesResponse.data); // ✅ Affichage des données
         setGrades(gradesResponse.data);
 
-        const servicesResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services"
-        );
+        const servicesResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services");
+        console.log('Services:', servicesResponse.data); // ✅ Affichage des données
         setServices(servicesResponse.data);
 
-        const addressResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/Adresses"
-        );
+        const addressResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/Adresses");
+        console.log('Adresses:', addressResponse.data); // ✅ Affichage des données
         setAddressData(addressResponse.data);
 
-        const typePersonnelResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
-        );
+        const typePersonnelResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel");
+        console.log('TypePersonnel:', typePersonnelResponse.data); // ✅ Affichage des données
         setTypePersonnelList(typePersonnelResponse.data);
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -51,6 +48,7 @@ const AddMemberForm = () => {
         setLoadingData(false);
       }
     };
+
 
     fetchData();
   }, []);
@@ -73,7 +71,7 @@ const AddMemberForm = () => {
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
-        SiTypePersonnel: values.SiTypePersonnel 
+        SiTypePersonnel: values.SiTypePersonnel
       };
 
       const response = await axios.post(
@@ -118,7 +116,7 @@ const AddMemberForm = () => {
     setSelectedServiceDetails(null); // Réinitialise les détails sélectionnés
     setIsFormOpen(false);
   };
-  
+
 
   const handlePersonnelSelection = (value) => {
     setIsPersonnelSelected(value);
@@ -154,247 +152,239 @@ const AddMemberForm = () => {
   };
 
 
-
   return (
-    // STYLE INCORPORER BOUTON: AJOUTER MEMBRE
-    <div>
-      <Button className="button" type="secondary" onClick={openForm} icon={<IoPersonAddOutline />}>
-        Nouveau membre
-      </Button>
 
-      {/*  MODAL FORMULAIRE AJOUTER MEMBRE */}
-      {isFormOpen && (
-        <div className={`modal ${isFormOpen ? "fade-in" : ""}`}>
+    
+    <div className="modal fade-in">
+      <div className="close-icon-container">
+        <CloseOutlined onClick={onClose} className="close_icon" />
+      </div>
+      <div className="div-title-form-ajout-membre-icon" >
+        <IoPersonAddSharp className="person-icon " />
+        <h1 className="title-ajouter-membre">Ajouter un membre</h1>
+      </div>
 
-          <div className="close-icon-container">
-            <CloseOutlined onClick={closeForm} className="close-icon" />
-          </div>
 
-          <div className="new-member-container">
-            <div className="icon-tableau">
-              <IoPersonAddSharp className="person-icon" />
-            </div>
-            Nouveau membre
-          </div>
 
-          {loadingData ? (
-            <p>Chargement des données...</p>
-          ) : (
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmit}
-              className="form-container"
-              initialValues={{
-                SiTypePersonnel: false,
-                siFrancais: true,
-              }}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        // className="form-container"
+        initialValues={{ siFrancais: true, SiTypePersonnel: false }}
+        style={{
+          maxWidth: "100%",
+          width: "100%",
+          padding: "20px",
+          backgroundColor: "#f0f2f5",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        }}
+
+      >
+      
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="nom"
+              label="Nom"
+              rules={[{ required: true, message: "Veuillez entrer le nom" }]}
             >
+              <Input autoComplete="off" onChange={handleNameChange} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="prenom"
+              label="Prénom"
+              rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
+            >
+              <Input autoComplete="off" onChange={handleNameChange} />
+            </Form.Item>
+          </Col>
+        </Row>
 
-              {/* formulaire */}
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="nom"
-                    label="Nom"
-                    rules={[{ required: true, message: "Veuillez entrer le nom" }]}
-                  >
-                    <Input autoComplete="off" onChange={handleNameChange} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="prenom"
-                    label="Prénom"
-                    rules={[{ required: true, message: "Veuillez entrer le prénom" }]}
-                  >
-                    <Input autoComplete="off" onChange={handleNameChange} />
-                  </Form.Item>
-                </Col>
-              </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="telephone"
+              label="Téléphone"
+              rules={[{ required: false, message: "Veuillez entrer le numéro de téléphone" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[{ required: true, message: "Veuillez entrer l'adresse email" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
 
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="telephone"
-                    label="Téléphone"
-                    rules={[{ required: false, message: "Veuillez entrer le numéro de téléphone" }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="email"
-                    label="Email"
-                    rules={[{ required: true, message: "Veuillez entrer l'adresse email" }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-              </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="DateEntreeDate"
+              label="Date d'entrée"
+              rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="grade"
+              label="Grade"
+              rules={[{ required: false, message: "Veuillez choisir le grade" }]}
+            >
+              <Select
+                style={{ width: "100%" }}
+                allowClear
+                showSearch
+                optionFilterProp="children"
+              >
+                {grades.map((grade) => (
+                  <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
+                    {grade.NomWWGradeFr}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="DateEntreeDate"
-                    label="Date d'entrée"
-                    rules={[{ required: true, message: "Veuillez choisir la date d'entrée" }]}
-                  >
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="grade"
-                    label="Grade"
-                    rules={[{ required: false, message: "Veuillez choisir le grade" }]}
-                  >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                    >
-                      {grades.map((grade) => (
-                        <Option key={grade.IDWWGrade} value={grade.IDWWGrade}>
-                          {grade.NomWWGradeFr}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="adresse"
+              label="Adresse"
+              rules={[{ required: true, message: "Veuillez choisir l'adresse" }]}
+            >
+              <Select
+                style={{ width: "100%" }}
+                allowClear
+                showSearch
+                optionFilterProp="children"
+              >
+                {addressData.map((adresse) => (
+                  <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
+                    {adresse.AdresseComplete}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="service"
+              label="Service"
+              rules={[{ required: true, message: "Veuillez choisir le service" }]}
+            >
+              <Select
+                style={{ width: "100%" }}
+                allowClear
+                showSearch
+                optionFilterProp="children"
+                onChange={handleServiceSelection}
+              >
+                {services.map((service) => (
+                  <Option key={service.IDService} value={service.IDService}>
+                    {service.NomServiceFr}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="adresse"
-                    label="Adresse"
-                    rules={[{ required: true, message: "Veuillez choisir l'adresse" }]}
-                  >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                    >
-                      {addressData.map((adresse) => (
-                        <Option key={adresse.IDAdresse} value={adresse.IDAdresse}>
-                          {adresse.AdresseComplete}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="service"
-                    label="Service"
-                    rules={[{ required: true, message: "Veuillez choisir le service" }]}
-                  >
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                      onChange={handleServiceSelection}
-                    >
-                      {services.map((service) => (
-                        <Option key={service.IDService} value={service.IDService}>
-                          {service.NomServiceFr}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="SiTypePersonnel"
-                    label="Personnel"
-                    rules={[{ required: true, message: "Veuillez choisir si le membre est personnel" }]}
-                  >
-                    <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
-                      <Radio value={true}>Oui</Radio>
-                      <Radio value={false}>Non</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                  {isPersonnelSelected && (
-                    <Form.Item
-                      name="NomTypePersonnelFr"
-                      label="Type de personnel"
-                      rules={[{ required: true, message: "Veuillez choisir le type de personnel" }]}
-                    >
-                      <Select
-                        style={{ width: "100%" }}
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                      >
-                        {typePersonnelList.map((typePersonnel) => (
-                          <Option key={typePersonnel.NomTypePersonnelFr} value={typePersonnel.NomTypePersonnelFr}>
-                            {typePersonnel.NomTypePersonnelFr}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  )}
-                </Col>
-
-                <Col span={12}>
-                  <Form.Item
-                    name="siFrancais"
-                    label="Langue"
-                    rules={[{ required: true, message: "Veuillez choisir la langue" }]}
-                  >
-                    <Radio.Group>
-                      <Radio value={true}>FR</Radio>
-                      <Radio value={false}>NL</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-              </Row>
-              {selectedServiceDetails && (
-                <div className="service-details">
-                  <div>
-                    <p>
-                      <strong>Chef du Service:</strong> {selectedServiceDetails.NomChefService}{" "}
-                      {selectedServiceDetails.PrenomChefService}
-                    </p>
-                    <p>
-                      <strong>Chef du Département:</strong> {selectedServiceDetails.NomChefDepartement}{" "}
-                      {selectedServiceDetails.PrenomChefDepartement}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Boutons de soumission */}
-              <Form.Item className="form-buttons">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  className="button-validate"
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="SiTypePersonnel"
+              label="Personnel"
+              rules={[{ required: true, message: "Veuillez choisir si le membre est personnel" }]}
+            >
+              <Radio.Group onChange={(e) => handlePersonnelSelection(e.target.value)}>
+                <Radio value={true}>Oui</Radio>
+                <Radio value={false}>Non</Radio>
+              </Radio.Group>
+            </Form.Item>
+            {isPersonnelSelected && (
+              <Form.Item
+                name="NomTypePersonnelFr"
+                label="Type de personnel"
+                rules={[{ required: true, message: "Veuillez choisir le type de personnel" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  allowClear
+                  showSearch
+                  optionFilterProp="children"
                 >
-                  Valider
-                </Button>
-                <Button onClick={closeForm} className="button-cancel">
-                  Annuler
-                </Button>
+                  {typePersonnelList.map((typePersonnel) => (
+                    <Option key={typePersonnel.NomTypePersonnelFr} value={typePersonnel.NomTypePersonnelFr}>
+                      {typePersonnel.NomTypePersonnelFr}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
+            )}
+          </Col>
 
-             
-            </Form>
-          )}
+          <Col span={12}>
+            <Form.Item
+              name="siFrancais"
+              label="Langue"
+              rules={[{ required: true, message: "Veuillez choisir la langue" }]}
+            >
+              <Radio.Group>
+                <Radio value={true}>FR</Radio>
+                <Radio value={false}>NL</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+        </Row>
+        {selectedServiceDetails && (
+          <div className="service-details">
+            <div>
+              <p>
+                <strong>Chef du Service:</strong> {selectedServiceDetails.NomChefService}{" "}
+                {selectedServiceDetails.PrenomChefService}
+              </p>
+              <p>
+                <strong>Chef du Département:</strong> {selectedServiceDetails.NomChefDepartement}{" "}
+                {selectedServiceDetails.PrenomChefDepartement}
+              </p>
+            </div>
+          </div>
+        )}
 
-        </div>
-      )}
+        {/* Boutons de soumission */}
+        <Form.Item className="form-buttons">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            className="button-validate"
+          >
+            Valider
+          </Button>
+          <Button onClick={closeForm} className="button-cancel">
+            Annuler
+          </Button>
+        </Form.Item>
+
+
+      </Form>
     </div>
+
   );
 };
+
+
 
 export default AddMemberForm;

@@ -228,37 +228,34 @@ function Tableau() {
   return (
     <div>
       <div className="main-container">
-        <div className="icon-tableau">
-          {/* <IoPersonAddSharp className="person-icon-tableau" /> */}
+        {/* <div className="icon-tableau">
+        <IoPersonAddSharp className="person-icon-tableau" />
 
-        </div>
-        <div>
-        </div>
-        {/* <div className="titre-et-statistics">
-        <img src={logoWhite} alt="Logo" className="person-icon-tableau" style={{ width: '165px' }} />
+        </div> */}
+        {/* <div>
+        </div> */}
+        {/* <div >
           <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1>
-          <MenuPersonnel/>
-          
         </div> */}
 
 
-        <div className="header-container">
-          <div className="titre-et-statistics">
-            <img src={logoWhite} alt="Logo" className="LOGO" style={{ width: '100px' }} />
-          <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1>
-            <MenuPersonnel />
-          </div>
-          {/* <div className="export-container">
+        {/* <div className="header-container"> */}
+        {/* <div className="titre-et-statistics"> */}
+        {/* <img src={logoWhite} alt="Logo" className="LOGO" style={{ width: '100px' }} /> */}
+        {/* <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1> */}
+        {/* <MenuPersonnel /> */}
+        {/* </div> */}
+        {/* <div className="export-container">
             <Export personnes={personnes} columns={columns} className="button" />
           </div> */}
-          {/* <div className="archive-container">
+        {/* <div className="archive-container">
             <ArchiveList className="archive" />
           </div> */}
-          {/* <Statistics data={personnes} />
+        {/* <Statistics data={personnes} />
           <div className="add-member-container">
             <AddMemberForm />
           </div> */}
-        </div>
+        {/* </div> */}
 
         <div className="data-grid-container">
           <DataGrid

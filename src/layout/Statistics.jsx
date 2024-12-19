@@ -1,44 +1,20 @@
 import React, { useState } from 'react';
-import { Card, Col, Row, Statistic, Button, Drawer } from 'antd';
-import { IoIosStats } from "react-icons/io";
+import { Card, Col, Row, Statistic, Drawer } from 'antd';
 
-const Statistics = ({ data = [] }) => {
-  const [open, setOpen] = useState(false);
-
+const Statistics = ({ data = [], onClose, isOpen }) => {
   const totalPersonnesActives = Array.isArray(data) ? data.filter(personne => personne.SiArchive === false).length : 0;
   const totalPersonnesArchivees = Array.isArray(data) ? data.filter(personne => personne.SiArchive === true).length : 0;
 
-  const handleStatisticsClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  
-
   return (
-    <div>
-      <Button
-        
-        className="button"
-        startIcon={<IoIosStats />}
-        onClick={handleStatisticsClick} 
-        // variant="contained"
-      >
-        Statistiques
-      </Button>
-      
-
-      <Drawer
-        title="Statistiques"
-        placement="top"
-        onClose={handleClose}
-        open={open}
-        width={500}
-      >
-        {open && (
-          <Row gutter={18}>
+    <Drawer
+      title="Statistiques"
+      placement="right"
+      onClose={onClose}
+      open={isOpen}
+      width={500}
+    >
+      {isOpen && (
+        <Row gutter={18}>
           <Col span={12}>
             <Card bordered={false}>
               <Statistic
@@ -58,9 +34,8 @@ const Statistics = ({ data = [] }) => {
             </Card>
           </Col>
         </Row>
-        )}
-      </Drawer>
-    </div>
+      )}
+    </Drawer>
   );
 };
 
