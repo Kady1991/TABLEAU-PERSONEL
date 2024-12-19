@@ -88,7 +88,7 @@ const Home = () => {
              zIndex: 1,
            }}
         >
-        <h1 style={{ position: 'fixe', zIndex: 3, textAlign: 'center', fontWeight: 'bold' }}>GESTION DU PERSONNEL UCCLE</h1>
+        <h1 style={{ position: 'fixe', zIndex: 3, textAlign: 'center', fontWeight: 'bold', color:"#001529" }}>GESTION DU PERSONNEL UCCLE</h1>
           <Tableau/>
           {activeComponent === 'addMemberForm' && (
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2 }}>
@@ -97,6 +97,23 @@ const Home = () => {
           )}
         </Content>
       </Layout>
+      <style jsx>{`
+        .ant-menu-item:hover {
+          background-color:#7498B2 !important; /* Change la couleur de fond au survol */
+        }
+
+        .ant-menu-item a:hover {
+          color: #ffffff !important; /* Change la couleur du texte au survol */
+        }
+
+        .ant-menu-item-selected {
+          background-color: #001529 !important; /* Garde la couleur du menu sélectionné */
+        }
+
+        .trigger:hover {
+          color:#7498B2 !important; /* Change la couleur de l'icône du bouton de repli */
+        }
+      `}</style>
     </Layout>
   );
 };
