@@ -134,7 +134,7 @@ body {
   height: calc(150% - 2rem);
   width: 90%;
   background-color: white;
-  margin-bottom: 3rem;
+  margin-top: 2rem;
   border-radius: 0.5rem;
   z-index: 0;
 }

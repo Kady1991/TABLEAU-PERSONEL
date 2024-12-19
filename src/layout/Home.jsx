@@ -88,7 +88,8 @@ const Home = () => {
              zIndex: 1,
            }}
         >
-          <Tableau />
+        <h1 style={{ position: 'fixe', zIndex: 3, textAlign: 'center', fontWeight: 'bold' }}>GESTION DU PERSONNEL UCCLE</h1>
+          <Tableau/>
           {activeComponent === 'addMemberForm' && (
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2 }}>
               <AddMemberForm onClose={() => setActiveComponent('tableau')} />
