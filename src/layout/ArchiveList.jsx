@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import axios from 'axios';
-import { Drawer, Button, message, Spin, Input } from 'antd';
+import { Drawer, message, Spin, Input } from 'antd';
 import { XMLParser } from 'fast-xml-parser';
 import dayjs from 'dayjs';
 import "../index.css";
@@ -9,7 +9,7 @@ import "../index.css";
 const ArchiveList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(true); // Drawer ouvert par défaut
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchArchives = async () => {
@@ -57,11 +57,6 @@ const ArchiveList = () => {
     }
   };
 
-  const showDrawer = () => {
-    setIsDrawerVisible(true);
-    fetchArchives();
-  };
-
   const closeDrawer = () => {
     setIsDrawerVisible(false);
   };
@@ -97,16 +92,12 @@ const ArchiveList = () => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: filteredData });
 
+  useEffect(() => {
+    fetchArchives();
+  }, []);
+
   return (
     <div className="archive-list-container">
-      <Button 
-        type="primary" 
-        onClick={showDrawer} 
-        className="button"
-      >
-        Ouvrir les archives
-      </Button>
-
       <Drawer 
         title="Liste des Personnes Archivées" 
         placement="right" 
