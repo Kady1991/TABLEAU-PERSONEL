@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -22,14 +22,41 @@ const { Header, Sider, Content } = Layout;
 const Home = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeComponent, setActiveComponent] = useState('tableau');
-  const [personnes, setPersonnes] = useState([]); // Correction de l'erreur de la variable 'personnes'
+  const [personnes, setPersonnes] = useState([]); // Données centralisées
+  const [loading, setLoading] = useState(true); // Gestion du chargement
+  const [exportData, setExportData] = useState(null); // Nouvelle variable pour gérer les données à exporter
 
 
-  // Fonction d'ouverture/fermeture du composant Formulaire d'ajout ; Ouvrir l'affichage de la liste des archives
-  const openForm = () => setActiveComponent('addMemberForm');
-  const openTableau = () => setActiveComponent('tableau');
-  const openStatistics = () => setActiveComponent('statistics');
-  const openArchives = () => setActiveComponent('archiveList');
+  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
+
+  // Récupération des données
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(linkGetAllPersonnel);
+        const data = await response.json();
+        const personnesData = data.map((personne) => ({
+          ...personne,
+          IDPersonneService: personne.IDPersonneService,
+        }));
+        setPersonnes(personnesData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données :", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fonction pour gérer l'exportation
+  const handleExport = () => {
+    const nonArchivedPersonnes = personnes.filter(
+      (personne) => personne.SiArchive === false || personne.SiArchive === "false" || personne.SiArchive === 0
+    );
+    setExportData(nonArchivedPersonnes); // Définir les données à exporter
+  };
 
   return (
     <Layout>
@@ -46,7 +73,7 @@ const Home = () => {
               key: '1',
               icon: <TableOutlined />,
               label: (
-                <Button type="link" onClick={openTableau} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff' }}>
                   TABLEAU
                 </Button>
               ),
@@ -55,7 +82,7 @@ const Home = () => {
               key: '2',
               icon: <UserOutlined />,
               label: (
-                <Button type="link" onClick={openForm} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff' }}>
                   AJOUTER MEMBRE
                 </Button>
               ),
@@ -64,7 +91,7 @@ const Home = () => {
               key: '3',
               icon: <PieChartOutlined />,
               label: (
-                <Button type="link" onClick={openStatistics} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff' }}>
                   STATISTIQUES
                 </Button>
               ),
@@ -73,7 +100,7 @@ const Home = () => {
               key: '4',
               icon: <UploadOutlined />,
               label: (
-                <Button type="link" onClick={openArchives} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff' }}>
                   ARCHIVES
                 </Button>
               ),
@@ -82,12 +109,11 @@ const Home = () => {
               key: '5',
               icon: <ExportOutlined />,
               label: (
-                <Button type="link" onClick={() => setActiveComponent('export')} style={{ color: '#fff' }}>
+                <Button type="link" onClick={handleExport} style={{ color: '#fff' }}>
                   EXPORTER
                 </Button>
               ),
-            }
-
+            },
           ]}
         />
       </Sider>
@@ -100,112 +126,24 @@ const Home = () => {
             onClick: () => setCollapsed(!collapsed),
           })}
         </Header>
-        <Content 
-  className="site-layout-background" 
-  style={{ margin: '24px 16px', padding: 24, minHeight: 800, position: 'relative' }}
->
-  <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '16px' }}>
-    GESTION DU PERSONNEL UCCLE
-  </h1>
-
-  {/* Le tableau reste toujours en arrière-plan */}
-  <div style={{ 
-    position: 'absolute', 
-    top: 0, 
-    left: 0, 
-    width: '100%', 
-    height: '100%', 
-    zIndex: 1 
-  }}>
-    <Tableau />
-  </div>
-
-  {/* Les autres composants se superposent au tableau */}
-  {activeComponent === 'addMemberForm' && (
-    <div 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: '100%', 
-        zIndex: 2, 
-       // backgroundColor: 'rgba(255, 255, 255, 0.9)' // Optionnel : ajoute un fond blanc translucide
-      }}
-    >
-      <AddMemberForm onClose={() => setActiveComponent('tableau')} />
-    </div>
-  )}
-
-  {activeComponent === 'statistics' && (
-    <div 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: '100%', 
-        zIndex: 2
-        // backgroundColor: 'rgba(255, 255, 255, 0.9)' // Optionnel : ajoute un fond blanc translucide
-      }}
-    >
-      <Statistics />
-    </div>
-  )}
-
-  {activeComponent === 'archiveList' && (
-    <div 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: '100%', 
-        zIndex: 2 
-        // backgroundColor: 'rgba(255, 255, 255, 0.9)' // Optionnel : ajoute un fond blanc translucide
-      }}
-    >
-      <ArchiveList />
-    </div>
-  )}
-
-  {activeComponent === 'export' && (
-    <div 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: '100%', 
-        zIndex: 2 
-        // backgroundColor: 'rgba(255, 255, 255, 0.9)' // Optionnel : ajoute un fond blanc translucide
-      }}
-    >
-      <Export personnes={personnes} />
-    </div>
-  )}
-</Content>
-
-
+        <Content
+          className="site-layout-background"
+          style={{ margin: '24px 16px', padding: 24, minHeight: 800 }}
+        >
+          <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '16px' }}>
+            GESTION DU PERSONNEL UCCLE
+          </h1>
+          <Tableau/>
+          {/* Affichage des composants */}
+          {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} />}
+          {activeComponent === 'addMemberForm' && <AddMemberForm onClose={() => setActiveComponent('tableau')} />}
+          {activeComponent === 'statistics' && <Statistics />}
+          {activeComponent === 'archiveList' && <ArchiveList />}
+          
+          {/* Inclure Export uniquement si les données sont prêtes */}
+          {exportData && <Export personnes={exportData} />}
+        </Content>
       </Layout>
-
-      <style>{`
-        .ant-menu-item:hover {
-          background-color: #7498B2 !important;
-        }
-
-        .ant-menu-item a:hover {
-          color: #ffffff !important;
-        }
-
-        .ant-menu-item-selected {
-          background-color: #001529 !important;
-        }
-
-        .trigger:hover {
-          color: #7498B2 !important;
-        }
-      `}</style>
     </Layout>
   );
 };

@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../index.css";
-import Export from "../layout/Export.jsx";
-import ArchiveList from "../layout/ArchiveList.jsx";
-import AddMemberForm from "../layout/AddMemberForm.jsx";
+// import Export from "../layout/Export.jsx";
+// import ArchiveList from "../layout/ArchiveList.jsx";
+// import AddMemberForm from "../layout/AddMemberForm.jsx";
 import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
 // import { IoPersonAddSharp } from "react-icons/io5";
-import Statistics from '../layout/Statistics';
-import logoWhite from '../assets/logo_white.png';
-import MenuPersonnel from "../layout/MenuPersonnel";
+// import Statistics from '../layout/Statistics';
+// import logoWhite from '../assets/logo_white.png';
+// import MenuPersonnel from "../layout/MenuPersonnel";
 
 
 
@@ -48,6 +48,10 @@ function Tableau() {
     fetchData();
   }, []);
 
+
+
+  // Filtrer les données non archivées
+  const nonArchivedPersonnes = personnes.filter((personne) => personne.SiArchive === false);
 
   const handleDeleteSuccess = (deletedId) => {
     setPersonnes((prevPersonnes) =>
@@ -225,6 +229,11 @@ function Tableau() {
     { field: "BatimentNl", headerName: "Batiment(nl)", width: 100, hide: true },
   ];
 
+  // const handleExport = () => {
+  //   // Appeler le composant Export en lui passant les données filtrées
+  //   Export(nonArchivedPersonnes);
+  // };
+
   return (
     <div>
       <div className="main-container">
@@ -245,9 +254,11 @@ function Tableau() {
         {/* <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1> */}
         {/* <MenuPersonnel /> */}
         {/* </div> */}
-        {/* <div className="export-container">
-            <Export personnes={personnes} columns={columns} className="button" />
-          </div> */}
+         {/* <div className="menu-container">
+         <button onClick={handleExport} className="export-button">
+            Exporter les données
+          </button>
+          </div>  */}
         {/* <div className="archive-container">
             <ArchiveList className="archive" />
           </div> */}
@@ -261,7 +272,7 @@ function Tableau() {
           <DataGrid
             rows={personnes}
             columns={columns}
-            pageSize={10}
+            pageSize={15}
             loading={loading}
             checkboxSelection
             disableSelectionOnClick
