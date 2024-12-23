@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { FaPersonArrowDownToLine } from "react-icons/fa6";
-import "../index.css";
+import "../assets/index.css";
 
 const RestoreAction = ({ PersonneID, email, onSuccess, onError }) => {
   const handleClick = async () => {

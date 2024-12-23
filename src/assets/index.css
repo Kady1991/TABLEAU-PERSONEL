@@ -439,13 +439,14 @@ body {
 /* STYLE ARCHIVE*/
 
 .ant-drawer-content{
-  margin-top: 2rem;
-  max-height:46rem;  
+  margin-top: 4rem;
+  max-height:52rem;
+  max-width:99%;
+
+ 
 }
 
 .archive-list-search-input {
-  width: 50%; 
-  min-width: 200px; 
   max-width: 400px; 
   margin-bottom: 20px; 
 }
@@ -476,7 +477,7 @@ body {
 }
 
 .archive-list-drawer .ant-drawer-body {
-  padding: 20px;
+  
   background-color: #f5f5f5;
 }
 
@@ -486,6 +487,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100%;
+
   
 }
 
@@ -500,7 +502,7 @@ body {
 }
 
 .archive-list-header-cell {
-  padding: 8px;
+  padding: 18px;
   color: white;
   text-align: center;
 }

@@ -1,0 +1,43 @@
+.logo img {
+    display: block;
+    margin: auto;
+  }
+  
+  .site-layout-content {
+    margin: 24px 16px;
+    padding: 24px;
+    height: 800px;
+    position: relative; /* Position relative pour gérer les composants superposés */
+  }
+  
+  .header-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10; /* Assure que les composants superposés s'affichent au-dessus */
+    /* background-color: rgba(15, 23, 44, 0.486);  */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ant-select-dropdown,
+  .ant-dropdown {
+    z-index: 1050 !important; /* Fix pour les menus déroulants */
+  }
+  
+  .site-layout {
+    position: relative;
+    z-index: 1;
+  }
+  
+ 

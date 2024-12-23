@@ -3,7 +3,7 @@ import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 import { CloseOutlined } from "@ant-design/icons";
 import { IoPersonAddOutline } from "react-icons/io5";
-import "../index.css";
+import '../assets/index.css';
 import { IoPersonAddSharp } from "react-icons/io5";
 
 const { Option } = Select;

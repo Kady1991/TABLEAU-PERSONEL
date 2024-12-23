@@ -4,7 +4,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { DatePicker, Modal, Button, message } from "antd";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
-import "../index.css";
+import '../assets/index.css';
 
 const Delete = ({
   IDPersonneService,

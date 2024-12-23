@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 'antd';
 import { MdMedicalServices } from "react-icons/md";
 import axios from 'axios';
-import "../index.css";
-
+import '../assets/index.css';
 const { Option } = Select;
 
 const FormService = ({ IDPersonneService }) => {

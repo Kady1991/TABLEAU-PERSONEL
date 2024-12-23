@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import "../index.css";
+import '../assets/index.css';
 // import Export from "../layout/Export.jsx";
 // import ArchiveList from "../layout/ArchiveList.jsx";
 // import AddMemberForm from "../layout/AddMemberForm.jsx";

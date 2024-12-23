@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Drawer, message, Spin, Input } from 'antd';
 import { XMLParser } from 'fast-xml-parser';
 import dayjs from 'dayjs';
-import "../index.css";
+import "../assets/index.css";
 
 const ArchiveList = () => {
   const [data, setData] = useState([]);
@@ -103,7 +103,8 @@ const ArchiveList = () => {
         placement="right" 
         onClose={closeDrawer} 
         open={isDrawerVisible}
-        width={1300} 
+        width={1700} 
+        
       >
         <Input 
           placeholder="Rechercher par prénom ou nom" 

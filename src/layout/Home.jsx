@@ -16,6 +16,7 @@ import Statistics from './Statistics';
 import ArchiveList from './ArchiveList';
 import Export from './Export';
 import logo from '../assets/logo_white.png';
+import '../assets/home.css'; // Import du fichier CSS global pour ce composant
 
 const { Header, Sider, Content } = Layout;
 
@@ -24,8 +25,6 @@ const Home = () => {
   const [activeComponent, setActiveComponent] = useState('tableau');
   const [personnes, setPersonnes] = useState([]); // Données centralisées
   const [loading, setLoading] = useState(true); // Gestion du chargement
-  const [exportData, setExportData] = useState(null); // Nouvelle variable pour gérer les données à exporter
-
 
   const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
 
@@ -55,7 +54,9 @@ const Home = () => {
     const nonArchivedPersonnes = personnes.filter(
       (personne) => personne.SiArchive === false || personne.SiArchive === "false" || personne.SiArchive === 0
     );
-    setExportData(nonArchivedPersonnes); // Définir les données à exporter
+
+    // Déclenche l'export en utilisant le composant Export
+    Export({ personnes: nonArchivedPersonnes });
   };
 
   return (
@@ -126,22 +127,26 @@ const Home = () => {
             onClick: () => setCollapsed(!collapsed),
           })}
         </Header>
-        <Content
-          className="site-layout-background"
-          style={{ margin: '24px 16px', padding: 24, minHeight: 800 }}
-        >
-          <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '16px' }}>
-            GESTION DU PERSONNEL UCCLE
-          </h1>
+        <Content className="site-layout-content">
+          <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
           <Tableau/>
           {/* Affichage des composants */}
           {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} />}
-          {activeComponent === 'addMemberForm' && <AddMemberForm onClose={() => setActiveComponent('tableau')} />}
-          {activeComponent === 'statistics' && <Statistics />}
-          {activeComponent === 'archiveList' && <ArchiveList />}
-          
-          {/* Inclure Export uniquement si les données sont prêtes */}
-          {exportData && <Export personnes={exportData} />}
+          {activeComponent === 'addMemberForm' && (
+            <div className="overlay">
+              <AddMemberForm onClose={() => setActiveComponent('tableau')} />
+            </div>
+          )}
+          {activeComponent === 'statistics' && (
+            <div className="overlay">
+              <Statistics />
+            </div>
+          )}
+          {activeComponent === 'archiveList' && (
+            <div className="overlay">
+              <ArchiveList />
+            </div>
+          )}
         </Content>
       </Layout>
     </Layout>

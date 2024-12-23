@@ -13,7 +13,7 @@ import {
 import { RiFileEditFill } from "react-icons/ri";
 import axios from "axios";
 import dayjs from "dayjs";
-import "../index.css";
+import '../assets/index.css';
 
 const { Option } = Select;
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import { BiSolidDetail } from "react-icons/bi";
 import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
+import '../assets/index.css';
 
 const Detail = ({ IDPersonneService }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
