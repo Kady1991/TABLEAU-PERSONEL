@@ -1,40 +1,15 @@
+/* Conteneur principal */
 .statistics-container {
-    margin-top: 7rem;
-    text-align: center;
-    padding: 10px;
-    background-color:#001529;
-    width: 1700px;
-    height: 730px;
-    position: relative;
-  }
-  
-  .titre-div-statistique{
-    color: aliceblue;
-  }
-  .bar-statistics {
-    width: 700px;
-    height: 40vh;
-    background-color: white;
-    margin-top: 100px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .statistics-title {
-    color: black;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .close-icon:hover{
-    color: red;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Prend 100% de la largeur parent */
+  height: 100%; /* Prend 100% de la hauteur parent */
+  padding: 30px;
+  background-color: #fdffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Empêche le débordement */
+  box-sizing: border-box;
+}

@@ -129,7 +129,7 @@ const Home = () => {
         </Header>
         <Content className="site-layout-content">
           <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
-          <Tableau/>
+          <Tableau />
           {/* Affichage des composants */}
           {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} />}
           {activeComponent === 'addMemberForm' && (
@@ -139,9 +139,10 @@ const Home = () => {
           )}
           {activeComponent === 'statistics' && (
             <div className="overlay">
-              <Statistics />
+              <Statistics onClose={() => setActiveComponent('tableau')} />
             </div>
           )}
+
           {activeComponent === 'archiveList' && (
             <div className="overlay">
               <ArchiveList />
