@@ -1,54 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import { BarChart } from '@mui/x-charts/BarChart';
+import { PieChart } from '@mui/x-charts/PieChart';
 import { CloseOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { XMLParser } from 'fast-xml-parser';
 import '../assets/statistics.css';
 
 const Statistics = ({ onClose }) => {
   const [yearData, setYearData] = useState([]);
   const [selectedYear, setSelectedYear] = useState(2024);
+  const [inputYear, setInputYear] = useState(2024); // Année temporaire saisie par l'utilisateur
   const [loading, setLoading] = useState(false);
-  const [skipAnimation, setSkipAnimation] = useState(false);
+  const [globalTotals, setGlobalTotals] = useState({ totalEntries: 0, totalExits: 0 });
+  const [inputDepartement , setInputDepartement ] = useState(2024); // Année temporaire saisie par l'utilisateur
 
   const fetchData = async (year) => {
     setLoading(true);
+    const parser = new XMLParser();
 
     try {
-      let persons = [];
-      try {
-        const personsResponse = await axios.get(
-          'https://server-iis.uccle.intra/API_PersonneTest/api/Personne'
-        );
-        persons = personsResponse.data;
-      } catch (error) {
-        console.error("Erreur lors de la récupération des personnes:", error);
-      }
+      const personsResponse = await axios.get(
+        'https://server-iis.uccle.intra/API_PersonneTest/api/Personne'
+      );
+      const persons = personsResponse.data;
 
       const monthStats = Array(12).fill({ entries: 0, exits: 0 }).map(() => ({ entries: 0, exits: 0 }));
+      let totalEntries = 0;
+      let totalExits = 0;
 
-      persons.forEach((person) => {
+      for (const person of persons) {
         if (person.DateEntree) {
           const entryDate = dayjs(person.DateEntree);
+          totalEntries++;
           if (entryDate.year() === year) {
             monthStats[entryDate.month()].entries++;
           }
         }
 
-        if (person.SiArchive && person.DateSortie) {
-          const exitDate = dayjs(person.DateSortie);
-          if (exitDate.year() === year) {
-            monthStats[exitDate.month()].exits++;
+        const isArchived = person.SiArchive === true || person.SiArchive === "true" || person.SiArchive === 1;
+        if (isArchived) {
+          try {
+            const detailResponse = await axios.get(
+              `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${person.IDPersonneService}`,
+              { headers: { Accept: "application/xml" } }
+            );
+
+            const personDetail = parser.parse(detailResponse.data);
+            const exitDate = dayjs(personDetail?.WhosWhoModelView?.DateSortie);
+
+            if (exitDate.isValid()) {
+              totalExits++;
+              if (exitDate.year() === year) {
+                monthStats[exitDate.month()].exits++;
+              }
+            }
+          } catch (error) {
+            console.error("Erreur lors de la récupération des détails de la personne:", error);
           }
         }
-      });
+      }
 
       setYearData(monthStats);
+      setGlobalTotals({ totalEntries, totalExits });
     } catch (error) {
       console.error("Erreur lors de la récupération des données:", error);
     } finally {
@@ -60,8 +76,10 @@ const Statistics = ({ onClose }) => {
     fetchData(selectedYear);
   }, [selectedYear]);
 
-  const handleYearChange = (event) => {
-    setSelectedYear(event.target.value);
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      setSelectedYear(inputYear);
+    }
   };
 
   const months = [
@@ -71,57 +89,80 @@ const Statistics = ({ onClose }) => {
 
   const series = [
     {
-      label: 'Entrées',
+      label: 'Entrées mensuel',
       data: yearData.map((month) => month.entries),
+      color: 'rgb(200, 211, 155)', // Couleur pour les entrées (vert)
     },
     {
-      label: 'Sorties',
+      label: 'Sorties mensuel',
       data: yearData.map((month) => month.exits),
+      color: '#AB1519', // Couleur pour les sorties (rouge)
     },
   ];
 
+  const totalEntries = yearData.reduce((acc, month) => acc + month.entries, 0);
+  const totalExits = yearData.reduce((acc, month) => acc + month.exits, 0);
+
   return (
-    <div className="statistics-container" style={{ display: 'flex', width: '100%', height: '100%' }}>
-      <div style={{ width: '45%', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <CloseOutlined className="close-icon" onClick={onClose} />
+    <div className="statistics-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+      <CloseOutlined className="close-icon" onClick={onClose} />
 
-        {loading ? (
-          <p>Chargement des données...</p>
-        ) : (
-          <Box sx={{ width: '100%' }}>
-            {/* <Typography id="select-year" gutterBottom>
-              
-            </Typography> */}
-            <TextField
-              value={selectedYear}
-              onChange={(event) => setSelectedYear(Number(event.target.value))}
-              label="Année"
-              type="number"
-              variant="outlined"
-              size="medium"
-              style={{ marginBottom: '10px', width: '150px' }}
-            />
-
-            <BarChart
-              height={350}
-              xAxis={[{ scaleType: 'band', data: months }]}
-              series={series}
-              skipAnimation={skipAnimation}
-            />
-            {/* <FormControlLabel
-              checked={skipAnimation}
-              control={
-                <Checkbox onChange={(event) => setSkipAnimation(event.target.checked)} />
-              }
-              label="Animation désactivée"
-              labelPlacement="end"
-            /> */}
+      {loading ? (
+        <p>Chargement des données...</p>
+      ) : (
+        <Box sx={{ width: '80%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'space-between', width: '100%' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                value={inputYear}
+                onChange={(event) => setInputYear(Number(event.target.value))}
+                onKeyDown={handleKeyPress}
+                label="Departement"
+                type="test"
+                variant="outlined"
+                size="small"
+                style={{ marginRight: '20px', width: '150px' }}
+              />
+               <TextField
+                value={inputYear}
+                onChange={(event) => setInputYear(Number(event.target.value))}
+                onKeyDown={handleKeyPress}
+                label="Année"
+                type="number"
+                variant="outlined"
+                size="small"
+                style={{ marginRight: '20px', width: '150px' }}
+              />
+            </Box>
+            <div style={{ display: 'block', fontSize: '16px', fontWeight: 'bold' }}>
+             
+              <div style={{ color: '#CFA81E', marginBottom: '10px' }}>Total Global Entrées: {globalTotals.totalEntries}</div>
+              <div style={{ color: '#F71027' }}>Total Global Sorties: {globalTotals.totalExits}</div>
+            </div>
           </Box>
-        )}
-      </div>
-      <div style={{ width: '55%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        {/* Ajoutez ici d'autres composants ou contenu */}
-        {/* <Typography variant="h6">Autres statistiques à venir</Typography> */}
+
+          <BarChart
+            height={350}
+            xAxis={[{ scaleType: 'band', data: months }]}
+            series={series}
+          />
+        </Box>
+      )}
+
+      <div style={{ width: '60%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '5px' }}>
+        <PieChart
+          series={[
+            {
+              data: [
+                { value: totalEntries, label: 'Entrées annuel', color: 'rgb(140, 153, 87)' },
+                { value: totalExits, label: 'Sorties annuel', color: '#94352D' },
+              ],
+              highlightScope: { fade: 'global', highlight: 'item' },
+              faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+            },
+          ]}
+          height={300}
+        />
       </div>
     </div>
   );
