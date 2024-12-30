@@ -13,3 +13,7 @@
   overflow: hidden; /* Empêche le débordement */
   box-sizing: border-box;
 }
+
+.div-sortie-total{
+  margin-top: 2rem;
+}
