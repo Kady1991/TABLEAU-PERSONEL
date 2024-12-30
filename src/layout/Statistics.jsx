@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { CloseOutlined } from '@mui/icons-material';
@@ -13,42 +12,44 @@ import '../assets/statistics.css';
 const Statistics = ({ onClose }) => {
   const [yearData, setYearData] = useState([]);
   const [selectedYear, setSelectedYear] = useState(2024);
-  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedService, setSelectedService] = useState(''); // Service sélectionné
   const [departments, setDepartments] = useState([]);
-  const [servicesByDepartment, setServicesByDepartment] = useState({});
+  const [services, setServices] = useState([]); // Liste des services
   const [loading, setLoading] = useState(false);
   const [globalTotals, setGlobalTotals] = useState({ totalEntries: 0, totalExits: 0 });
 
-  const fetchDepartmentsAndServices = async () => {
+  const fetchDepartments = async () => {
     try {
       const response = await axios.get('https://server-iis.uccle.intra/API_PersonneTest/api/Personne');
       const persons = response.data;
 
-      const departmentsMap = {};
-      persons.forEach((person) => {
-        const department = person.NomDepartementFr;
-        const service = person.NomServiceFr;
+      const uniqueDepartments = Array.from(
+        new Set(persons.map((person) => person.NomDepartementFr))
+      ).map((department) => ({ NomDepartementFr: department }));
 
-        if (!departmentsMap[department]) {
-          departmentsMap[department] = new Set();
-        }
-
-        departmentsMap[department].add(service);
-      });
-
-      const structuredDepartments = Object.keys(departmentsMap).map((dept) => ({
-        department: dept,
-        services: Array.from(departmentsMap[dept]),
-      }));
-
-      setDepartments(structuredDepartments);
-      setServicesByDepartment(departmentsMap);
+      setDepartments(uniqueDepartments);
     } catch (error) {
-      console.error("Erreur lors de la récupération des départements et services:", error);
+      console.error("Erreur lors de la récupération des départements:", error);
     }
   };
 
-  const fetchData = async (year, filter) => {
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get('https://server-iis.uccle.intra/API_PersonneTest/api/Personne');
+      const persons = response.data;
+
+      const uniqueServices = Array.from(
+        new Set(persons.map((person) => person.NomServiceFr))
+      ).map((service) => ({ NomServiceFr: service }));
+
+      setServices(uniqueServices);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des services:", error);
+    }
+  };
+
+  const fetchData = async (year, department, service) => {
     setLoading(true);
     const parser = new XMLParser();
 
@@ -63,10 +64,11 @@ const Statistics = ({ onClose }) => {
       let totalExits = 0;
 
       for (const person of persons) {
-        const department = person.NomDepartementFr;
-        const service = person.NomServiceFr;
+        if (department && person.NomDepartementFr !== department) {
+          continue;
+        }
 
-        if (filter && filter !== department && filter !== service) {
+        if (service && person.NomServiceFr !== service) {
           continue;
         }
 
@@ -111,12 +113,13 @@ const Statistics = ({ onClose }) => {
   };
 
   useEffect(() => {
-    fetchDepartmentsAndServices();
+    fetchDepartments();
+    fetchServices();
   }, []);
 
   useEffect(() => {
-    fetchData(selectedYear, selectedFilter);
-  }, [selectedYear, selectedFilter]);
+    fetchData(selectedYear, selectedDepartment, selectedService);
+  }, [selectedYear, selectedDepartment, selectedService]);
 
   const months = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -127,12 +130,12 @@ const Statistics = ({ onClose }) => {
     {
       label: 'Entrées',
       data: yearData.map((month) => month.entries),
-      color: '#649B88',
+      color: '#649B88', // Couleur pour les entrées (vert)
     },
     {
       label: 'Sorties',
       data: yearData.map((month) => month.exits),
-      color: '#AE4A34',
+      color: '#AE4A34', // Couleur pour les sorties (rouge)
     },
   ];
 
@@ -149,18 +152,19 @@ const Statistics = ({ onClose }) => {
           color: 'red',
           fontSize: '2rem',
           position: 'absolute',
-          left: '20px',
-          top: '20px',
+          right: '20px', // Positionnez-le à gauche
+          top: '20px', // Optionnel, ajustez pour aligner verticalement
           transition: 'color 0.3s ease',
         }}
-        onMouseEnter={(e) => (e.target.style.color = 'darkred')}
-        onMouseLeave={(e) => (e.target.style.color = 'red')}
+        onMouseEnter={(e) => (e.target.style.color = 'darkred')} // Changement de couleur au survol
+        onMouseLeave={(e) => (e.target.style.color = 'red')} // Retour à la couleur rouge après survol
       />
+
 
       {loading ? (
         <p>Chargement des données...</p>
       ) : (
-        <Box sx={{ width: '100%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '80%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'space-between', width: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <TextField
@@ -174,39 +178,52 @@ const Statistics = ({ onClose }) => {
               />
               <TextField
                 select
-                label="Département / Service"
-                value={selectedFilter}
-                onChange={(event) => setSelectedFilter(event.target.value)}
+                label="Département"
+                value={selectedDepartment}
+                onChange={(event) => setSelectedDepartment(event.target.value)}
+                variant="outlined"
+                size="small"
+                style={{ marginLeft: '20px', width: '300px' }}
+                SelectProps={{ native: true }}
+                InputLabelProps={{ shrink: true }} // Ajout pour que le label reste fixe
+              >
+                <option value="">Tous les départements</option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept.NomDepartementFr}>{dept.NomDepartementFr}</option>
+                ))}
+              </TextField>
+              <TextField
+                select
+                label="Service"
+                value={selectedService}
+                onChange={(event) => setSelectedService(event.target.value)}
                 variant="outlined"
                 size="small"
                 style={{ marginLeft: '20px', width: '300px' }}
                 SelectProps={{ native: true }}
                 InputLabelProps={{ shrink: true }}
               >
-                <option value="">Tous les départements</option>
-                {departments.map((dept, index) => (
-                  <optgroup key={index} label={dept.department}>
-                    {dept.services.map((service, idx) => (
-                      <option key={idx} value={service}>{service}</option>
-                    ))}
-                  </optgroup>
+                <option value="">Tous les services</option>
+                {services.map((service, index) => (
+                  <option key={index} value={service.NomServiceFr}>{service.NomServiceFr}</option>
                 ))}
               </TextField>
             </Box>
             <div style={{ display: 'block', fontSize: '16px', fontWeight: 'bold' }}>
               <div className='div-entree-annee'>
-                <div style={{ color: '#649B88', marginBottom: '5px', fontSize: '1.2rem' }}>Entrées personnel (Année): {totalEntries}</div>
-                <div style={{ color: '#AE4A34', marginBottom: '5px', fontSize: '1.2rem'  }}>Sorties personnel (Année): {totalExits}</div>
+                <div style={{ color: '#4caf50', marginBottom: '5px', fontSize: '1.2rem' }}>Entrées personnel (Année): {totalEntries}</div>
+                <div style={{ color: '#f44336', marginBottom: '5px', fontSize: '1.2rem'  }}>Sorties personnel (Année): {totalExits}</div>
               </div>
 
               <div className='div-sortie-total'>
-                <div style={{ color: '#649B88', marginBottom: '5px', fontSize: '1.2rem'  }}>Total Global du personnel: {globalTotals.totalEntries}</div>
-                <div style={{ color: '#AE4A34', fontSize: '1.2rem'  }}>Total des Sorties: {globalTotals.totalExits}</div>
+                <div style={{ color: '#4caf50', marginBottom: '5px', fontSize: '1.2rem'  }}>Total Global du personnel: {globalTotals.totalEntries}</div>
+                <div style={{ color: '#f44336', fontSize: '1.2rem'  }}>Total des Sorties: {globalTotals.totalExits}</div>
               </div>
+
+
             </div>
           </Box>
 
-         
           <BarChart
             height={350}
             xAxis={[{ scaleType: 'band', data: months }]}
@@ -220,8 +237,8 @@ const Statistics = ({ onClose }) => {
           series={[
             {
               data: [
-                { value: globalTotals.totalEntries, label: 'Total Entrées', color: '#649B88' },
-                { value: globalTotals.totalExits, label: 'Total Sorties', color: '#AE4A34' },
+                { value: totalEntries, label: 'Total Entrées', color: '#649B88' },
+                { value: totalExits, label: 'Total Sorties', color: '#AE4A34' },
               ],
               highlightScope: { fade: 'global', highlight: 'item' },
               faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
@@ -235,3 +252,4 @@ const Statistics = ({ onClose }) => {
 };
 
 export default Statistics;
+
