@@ -49,6 +49,11 @@ const Home = () => {
     fetchData();
   }, []);
 
+  // Mise à jour dynamique des données
+  const handleUpdatePersonnes = (updatedPersonnes) => {
+    setPersonnes(updatedPersonnes);
+  };
+
   // Fonction pour gérer l'exportation
   const handleExport = () => {
     const nonArchivedPersonnes = personnes.filter(
@@ -128,24 +133,32 @@ const Home = () => {
           })}
         </Header>
         <Content className="site-layout-content">
+        <Tableau />
+        {/* Affichage du titre */}
           <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
-          <Tableau />
           {/* Affichage des composants */}
           {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} />}
           {activeComponent === 'addMemberForm' && (
             <div className="overlay">
-              <AddMemberForm onClose={() => setActiveComponent('tableau')} />
+              <AddMemberForm 
+                onClose={() => setActiveComponent('tableau')} 
+                onMemberUpdate={handleUpdatePersonnes} 
+                personnes={personnes} 
+              />
             </div>
           )}
           {activeComponent === 'statistics' && (
             <div className="overlay">
-              <Statistics onClose={() => setActiveComponent('tableau')} />
+              <Statistics 
+                onClose={() => setActiveComponent('tableau')} 
+                personnes={personnes} 
+              />
             </div>
           )}
 
           {activeComponent === 'archiveList' && (
             <div className="overlay">
-              <ArchiveList />
+              <ArchiveList onMemberUpdate={handleUpdatePersonnes} personnes={personnes} />
             </div>
           )}
         </Content>

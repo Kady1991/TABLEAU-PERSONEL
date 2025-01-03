@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col, Radio } from "antd";
 import axios from "axios";
 import { CloseOutlined } from "@ant-design/icons";
-import { IoPersonAddOutline } from "react-icons/io5";
+// import { IoPersonAddOutline } from "react-icons/io5";
 import '../assets/index.css';
 import { IoPersonAddSharp } from "react-icons/io5";
 
 const { Option } = Select;
 
-const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onClose pour éviter l'erreur de référence non définie
+const AddMemberForm = ({ onClose, onMemberUpdate }) => { // ✅ Correction: Ajout de la prop onClose pour éviter l'erreur de référence non définie
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [grades, setGrades] = useState([]);
@@ -28,19 +28,19 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
     const fetchData = async () => {
       try {
         const gradesResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades");
-        console.log('Grades:', gradesResponse.data); // ✅ Affichage des données
+        console.log('Grades:', gradesResponse.data); // Affichage des données
         setGrades(gradesResponse.data);
 
         const servicesResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services");
-        console.log('Services:', servicesResponse.data); // ✅ Affichage des données
+        console.log('Services:', servicesResponse.data); // Affichage des données
         setServices(servicesResponse.data);
 
         const addressResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/Adresses");
-        console.log('Adresses:', addressResponse.data); // ✅ Affichage des données
+        console.log('Adresses:', addressResponse.data); // Affichage des données
         setAddressData(addressResponse.data);
 
         const typePersonnelResponse = await axios.get("https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel");
-        console.log('TypePersonnel:', typePersonnelResponse.data); // ✅ Affichage des données
+        console.log('TypePersonnel:', typePersonnelResponse.data); // Affichage des données
         setTypePersonnelList(typePersonnelResponse.data);
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -59,7 +59,7 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
       const dateEntreeFormatted = values.DateEntreeDate
         ? values.DateEntreeDate.format("YYYY-MM-DD")
         : null;
-
+  
       const formData = {
         NomPersonne: values.nom,
         PrenomPersonne: values.prenom,
@@ -71,20 +71,23 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
         ServiceID: values.service,
         SiFrancais: values.siFrancais,
         SiServicePrincipal: values.SiServicePrincipal,
-        SiTypePersonnel: values.SiTypePersonnel
+        SiTypePersonnel: values.SiTypePersonnel,
+        SiArchive: false, // Nouveau membre non archivé par défaut
       };
-
+  
       const response = await axios.post(
         "https://server-iis.uccle.intra/API_PersonneTest/api/Personne",
         formData
       );
-
+  
       if (response.data === "Success") {
+        const newPerson = { ...formData, IDPersonneService: response.data.id }; // Ajout d'un ID fictif
+        const updatedPersonnes = [...personnes, newPerson];
+        onMemberUpdate(updatedPersonnes); // Met à jour les données dans le parent
         alert("Ajout réussi !");
-        closeForm();
+        onClose(); // Ferme le formulaire
       } else if (response.data === "Personne Exists") {
         alert("Ce email est déjà attribué");
-        setIsFormOpen(true);
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données", error);
@@ -93,6 +96,7 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
       setLoading(false);
     }
   };
+  
 
   const handleServiceSelection = async (IDService) => {
     try {
@@ -111,9 +115,9 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
   };
 
   const closeForm = () => {
-    form.resetFields(); // Réinitialise tous les champs du formulaire
-    setIsPersonnelSelected(false); // Réinitialise les champs conditionnels
-    setSelectedServiceDetails(null); // Réinitialise les détails sélectionnés
+    form.resetFields(); 
+    setIsPersonnelSelected(false); 
+    setSelectedServiceDetails(null); 
     setIsFormOpen(false);
   };
 
@@ -152,9 +156,12 @@ const AddMemberForm = ({ onClose }) => { // ✅ Correction: Ajout de la prop onC
   };
 
 
+
   return (
 
+   
     
+
     <div className="modal fade-in">
       <div className="close-icon-container">
         <CloseOutlined onClick={onClose} className="close_icon" />
