@@ -47,3 +47,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.codegpt

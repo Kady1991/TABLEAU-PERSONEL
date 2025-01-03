@@ -36,72 +36,89 @@ const Statistics = ({ onClose }) => {
   const fetchData = async (year, department) => {
     setLoading(true);
     const parser = new XMLParser();
-
+  
     try {
       const personsResponse = await axios.get(
         'https://server-iis.uccle.intra/API_PersonneTest/api/Personne'
       );
       const persons = personsResponse.data;
-
+  
       const stats = {};
       let totalEntries = 0;
       let totalExits = 0;
-
+      let personnelTotalPresent = 0; // Compteur pour le personnel total présent
+  
       for (const person of persons) {
         const personDepartment = person.NomDepartementFr;
-        const service = person.NomServiceFr;
-
+  
+        // Filtrer par département si un département est sélectionné
         if (department && personDepartment !== department) {
           continue;
         }
-
+  
+        const service = person.NomServiceFr;
+  
         if (!stats[service]) {
           stats[service] = { entries: 0, exits: 0 };
         }
-
+  
+        // Comptabiliser les entrées
         if (person.DateEntree) {
           const entryDate = dayjs(person.DateEntree);
-          totalEntries++;
+  
+          // Compter uniquement les entrées pour l'année sélectionnée
           if (entryDate.year() === year) {
             stats[service].entries++;
+            totalEntries++;
           }
         }
-
-        const isArchived = person.SiArchive === true || person.SiArchive === "true" || person.SiArchive === 1;
+  
+        const isArchived = person.SiArchive === true || person.SiArchive === "true";
+        if (!isArchived) {
+          // Si non archivé, ajouter au personnel total présent
+          personnelTotalPresent++;
+        }
+  
         if (isArchived) {
+          // Ajouter aux sorties même sans date de sortie
+          stats[service].exits++;
+          totalExits++;
+  
           try {
             const detailResponse = await axios.get(
               `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${person.IDPersonneService}`,
               { headers: { Accept: "application/xml" } }
             );
-
+  
             const personDetail = parser.parse(detailResponse.data);
             const exitDate = dayjs(personDetail?.WhosWhoModelView?.DateSortie);
-
-            if (exitDate.isValid()) {
+  
+            // Compter les sorties pour l'année sélectionnée si une date de sortie existe
+            if (exitDate.isValid() && exitDate.year() === year) {
+              stats[service].exits++;
               totalExits++;
-              if (exitDate.year() === year) {
-                stats[service].exits++;
-              }
             }
           } catch (error) {
             console.error("Erreur lors de la récupération des détails de la personne:", error);
           }
         }
       }
-
+  
       setYearData(Object.values(stats));
       setChartXAxis(department ? Object.keys(stats) : [
         'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
       ]);
-      setGlobalTotals({ totalEntries, totalExits });
+      setGlobalTotals({ totalEntries, totalExits, personnelTotalPresent });
     } catch (error) {
       console.error("Erreur lors de la récupération des données:", error);
     } finally {
       setLoading(false);
     }
   };
+  
+
+
 
   useEffect(() => {
     fetchDepartments();
@@ -113,12 +130,12 @@ const Statistics = ({ onClose }) => {
 
   const series = [
     {
-      label: 'Entrées',
+      // label: 'Entrées',
       data: yearData.map((data) => data.entries),
       color: '#649B88',
     },
     {
-      label: 'Sorties',
+      // label: 'Sorties',
       data: yearData.map((data) => data.exits),
       color: '#AE4A34',
     },
@@ -164,7 +181,7 @@ const Statistics = ({ onClose }) => {
                 onChange={(event) => setSelectedDepartment(event.target.value)}
                 variant="outlined"
                 size="small"
-                style={{ marginLeft: '20px', width: '300px' }}
+                style={{ marginLeft: '20px', width: '250px' }}
                 SelectProps={{ native: true }}
                 InputLabelProps={{ shrink: true }}
               >
@@ -174,10 +191,21 @@ const Statistics = ({ onClose }) => {
                 ))}
               </TextField>
             </Box>
-            <div style={{ display: 'block', fontSize: '16px', fontWeight: 'bold' }}>
-              <div style={{ color: '#649B88', marginBottom: '5px', fontSize: '1.2rem' }}>Personnel total present : {globalTotals.totalEntries}</div>
+            {/* <div style={{ display: 'block', fontSize: '16px', fontWeight: 'bold' }}>
+              <div style={{ color: '#649B88', marginBottom: '5px', fontSize: '1.2rem' }}>Personnel total présent : {globalTotals.totalEntries}</div>
               <div style={{ color: '#AE4A34', marginBottom: '5px', fontSize: '1.2rem' }}>Sorties total personnel : {globalTotals.totalExits}</div>
-            </div>
+            </div> */}
+
+            {/* <div style={{ display: 'block', fontSize: '16px', fontWeight: 'bold' }}>
+              <div style={{ color: '#649B88', marginBottom: '5px', fontSize: '1.2rem' }}>
+                Total personnel présent ({selectedDepartment || 'Tous les départements'}): {globalTotals[selectedDepartment]?.globalTotals.personnelTotalPresent || globalTotals.personnelTotalPresent}
+              </div>
+              <div style={{ color: '#AE4A34', marginBottom: '5px', fontSize: '1.2rem' }}>
+                Sorties personnel ({selectedDepartment || 'Tous les départements'}): {globalTotals[selectedDepartment]?.totalExits || globalTotals.totalExits}
+              </div>
+            </div> */}
+
+
           </Box>
 
           <BarChart
@@ -188,21 +216,35 @@ const Statistics = ({ onClose }) => {
         </Box>
       )}
 
-      <div style={{ width: '50%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', marginTop:'10'}}>
-        <PieChart
-          series={[
-            {
-              data: [
-                { value: globalTotals.totalEntries, label: 'Total Entrées', color: '#649B88' },
-                { value: globalTotals.totalExits, label: 'Total Sorties', color: '#AE4A34' },
-              ],
-              highlightScope: { fade: 'global', highlight: 'item' },
-              faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-            },
-          ]}
-          height={200}
-        />
-      </div>
+<div style={{ width: '100%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', marginTop: '10' }}>
+  <PieChart
+    series={[
+      {
+        data: [
+          {
+            value: globalTotals.personnelTotalPresent,
+            label: selectedDepartment
+              ? `${selectedYear}: Personnel total ${selectedDepartment}: ${globalTotals.personnelTotalPresent}`
+              : ` ${selectedYear}: Personnel total: (Tous les département):${globalTotals.personnelTotalPresent}`,
+            color: '#649B88'
+          },
+          {
+            value: globalTotals.totalExits,
+            label: selectedDepartment
+              ? `${selectedYear}: Sorties ${selectedDepartment} ${globalTotals.totalExits}`
+              : `${selectedYear}: Sorties (Tous les départements):  ${globalTotals.totalExits}`,
+            color: '#AE4A34'
+          },
+        ],
+        highlightScope: { fade: 'global', highlight: 'item' },
+        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+      },
+    ]}
+    height={200}
+  />
+</div>
+
+
     </div>
   );
 };
