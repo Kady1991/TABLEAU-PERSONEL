@@ -77,46 +77,41 @@ const Home = () => {
           items={[
             {
               key: '1',
-              icon: <TableOutlined />,
               label: (
                 <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff' }}>
-                  TABLEAU
+                  <TableOutlined /> TABLEAU
                 </Button>
               ),
             },
             {
               key: '2',
-              icon: <UserOutlined />,
               label: (
                 <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff' }}>
-                  AJOUTER MEMBRE
+                  <UserOutlined />  AJOUT MEMBRE
                 </Button>
               ),
             },
             {
               key: '3',
-              icon: <PieChartOutlined />,
               label: (
-                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff' }}>
-                  STATISTIQUES
+                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff' }} >
+                  <PieChartOutlined /> STATISTIQUES
                 </Button>
               ),
             },
             {
               key: '4',
-              icon: <UploadOutlined />,
               label: (
                 <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff' }}>
-                  ARCHIVES
+                  <UploadOutlined /> ARCHIVES
                 </Button>
               ),
             },
             {
               key: '5',
-              icon: <ExportOutlined />,
               label: (
                 <Button type="link" onClick={handleExport} style={{ color: '#fff' }}>
-                  EXPORTER
+                  <ExportOutlined /> EXPORTER
                 </Button>
               ),
             },
@@ -133,25 +128,25 @@ const Home = () => {
           })}
         </Header>
         <Content className="site-layout-content">
-        <Tableau />
-        {/* Affichage du titre */}
+          <Tableau />
+          {/* Affichage du titre */}
           <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
           {/* Affichage des composants */}
           {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} />}
           {activeComponent === 'addMemberForm' && (
             <div className="overlay">
-              <AddMemberForm 
-                onClose={() => setActiveComponent('tableau')} 
-                onMemberUpdate={handleUpdatePersonnes} 
-                personnes={personnes} 
+              <AddMemberForm
+                onClose={() => setActiveComponent('tableau')}
+                onMemberUpdate={handleUpdatePersonnes}
+                personnes={personnes}
               />
             </div>
           )}
           {activeComponent === 'statistics' && (
             <div className="overlay">
-              <Statistics 
-                onClose={() => setActiveComponent('tableau')} 
-                personnes={personnes} 
+              <Statistics
+                onClose={() => setActiveComponent('tableau')}
+                personnes={personnes}
               />
             </div>
           )}

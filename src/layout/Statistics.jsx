@@ -72,12 +72,12 @@ const Statistics = ({ onClose, personnes }) => {
     {
       label: 'Présents',
       data: data.map((item) => item.entries),
-      color: '#649B88',
+      color: '#63a2c0',
     },
     {
       label: 'Sorties',
       data: data.map((item) => item.exits),
-      color: '#AE4A34',
+      color: '#C72C48',
     },
   ];
 
@@ -88,10 +88,10 @@ const Statistics = ({ onClose, personnes }) => {
         onClick={onClose}
         style={{
           cursor: 'pointer',
-          color: 'red',
+          color: 'rgb(213, 50, 80)',
           fontSize: '2rem',
           position: 'absolute',
-          left: '20px',
+          right: '20px',
           top: '20px',
           transition: 'color 0.3s ease',
         }}
@@ -99,7 +99,7 @@ const Statistics = ({ onClose, personnes }) => {
         onMouseLeave={(e) => (e.target.style.color = 'red')}
       />
 
-      <Box sx={{ width: '70%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'space-between', width: '100%' }}>
           <TextField
             label="Année"
@@ -122,21 +122,28 @@ const Statistics = ({ onClose, personnes }) => {
             InputLabelProps={{ shrink: true }}
           >
             <option value="">Tous les départements</option>
-            {[...new Set(personnes.map((p) => p.NomDepartementFr))].map((dept, index) => (
+            {[...new Set(personnes.map((p) => p.NomDepartementFr).filter(dept => dept))].map((dept, index) => (
               <option key={index} value={dept}>{dept}</option>
             ))}
           </TextField>
+
         </Box>
 
         <BarChart
           height={350}
-          width={1500}
+          width={1300} /*  largeur totale barre */
           xAxis={[{ scaleType: 'band', data: chartXAxis }]}
           series={series}
+          margin={{ left: 50, right: 50 }} /* Ajuste les marges autour du graphique */
+          barWidth={30} /* Ajuste la largeur des barres */
+          barGap={10} /* Espacement entre les barres */
+          barCategoryGap={20} /* Espacement entre les catégories */
+          style={{ maxWidth: '100%', }} /* Assurez la responsivité */
         />
+
       </Box>
 
-      <div style={{ width: '70%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+      <div style={{ width: '60%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
         <PieChart
           series={[{
             data: [
@@ -145,14 +152,14 @@ const Statistics = ({ onClose, personnes }) => {
                 label: selectedDepartment
                   ? `Présents (${selectedDepartment}): ${globalTotals.totalEntries}`
                   : `Présents (Tous les départements): ${globalTotals.totalEntries}`,
-                color: '#649B88',
+                color: '#63a2c0',
               },
               {
                 value: globalTotals.totalExits,
                 label: selectedDepartment
                   ? `Sorties (${selectedDepartment}): ${globalTotals.totalExits}`
                   : `Sorties (Tous les départements): ${globalTotals.totalExits}`,
-                color: '#AE4A34',
+                color: '	#C72C48',
               },
             ],
             highlightScope: { fade: 'global', highlight: 'item' },

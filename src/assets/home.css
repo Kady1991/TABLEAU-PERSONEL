@@ -52,3 +52,28 @@
   background-color: #5f97b1 !important;
   color: #fff;
 } */
+
+/* Couleur de fond pour l'élément actif */
+.ant-menu-item-selected {
+  background-color: #63a2c0 !important; /* Vert ou remplacez par votre couleur souhaitée */
+}
+
+/* Couleur de survol (hover) */
+.ant-menu-item:hover {
+  background-color: #63a2c0!important; /* Vert clair ou remplacez par votre couleur souhaitée */
+}
+
+/* Couleur du texte pour l'élément actif */
+.ant-menu-item-selected a {
+  color: #ffffff !important; /* Blanc ou remplacez par votre couleur souhaitée */
+}
+
+/* Couleur du texte pour l'état de survol */
+.ant-menu-item a:hover {
+  color: #ffffff !important; /* Blanc ou remplacez par votre couleur souhaitée */
+}
+
+/* Transition pour un effet fluide */
+.ant-menu-item {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
