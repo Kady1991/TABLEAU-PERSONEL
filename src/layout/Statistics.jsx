@@ -8,7 +8,7 @@ import '../assets/statistics.css';
 
 const Statistics = ({ onClose, personnes }) => {
   const [data, setData] = useState([]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState('Global');
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [globalTotals, setGlobalTotals] = useState({ totalEntries: 0, totalExits: 0 });
   const [chartXAxis, setChartXAxis] = useState([]);
@@ -22,41 +22,27 @@ const Statistics = ({ onClose, personnes }) => {
       personnes.forEach((person) => {
         const department = person.NomDepartementFr;
         const service = person.NomServiceFr || 'Non spécifié';
+        const entryYear = person.DateEntree ? new Date(person.DateEntree).getFullYear() : null;
 
-        // Si un département spécifique est sélectionné
-        if (selectedDepartment) {
-          if (department !== selectedDepartment) return;
+        // Filtrer par année si sélectionnée (sauf pour Global)
+        if (selectedYear !== 'Global' && entryYear !== parseInt(selectedYear)) return;
 
-          const key = service;
-          if (!stats[key]) stats[key] = { entries: 0, exits: 0 };
+        // Filtrer par département si sélectionné
+        if (selectedDepartment && department !== selectedDepartment) return;
 
-          // Comptabiliser les présents (SiArchive: false)
-          if (!person.SiArchive) {
-            stats[key].entries++;
-            totalEntries++;
-          }
+        const key = selectedDepartment ? service : department;
+        if (!stats[key]) stats[key] = { entries: 0, exits: 0 };
 
-          // Comptabiliser les sorties (SiArchive: true)
-          if (person.SiArchive) {
-            stats[key].exits++;
-            totalExits++;
-          }
-        } else {
-          // Tous les départements
-          const key = department;
-          if (!stats[key]) stats[key] = { entries: 0, exits: 0 };
+        // Comptabiliser les présents (SiArchive: false)
+        if (!person.SiArchive) {
+          stats[key].entries++;
+          totalEntries++;
+        }
 
-          // Comptabiliser les présents (SiArchive: false)
-          if (!person.SiArchive) {
-            stats[key].entries++;
-            totalEntries++;
-          }
-
-          // Comptabiliser les sorties (SiArchive: true)
-          if (person.SiArchive) {
-            stats[key].exits++;
-            totalExits++;
-          }
+        // Comptabiliser les sorties (SiArchive: true)
+        if (person.SiArchive) {
+          stats[key].exits++;
+          totalExits++;
         }
       });
 
@@ -81,6 +67,8 @@ const Statistics = ({ onClose, personnes }) => {
     },
   ];
 
+  const years = Array.from({ length: 2050 - 2024 + 1 }, (_, i) => 2024 + i);
+
   return (
     <div className="statistics-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <CloseOutlined
@@ -102,14 +90,21 @@ const Statistics = ({ onClose, personnes }) => {
       <Box sx={{ width: '100%', padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'space-between', width: '100%' }}>
           <TextField
+            select
             label="Année"
-            type="number"
             value={selectedYear}
-            onChange={(event) => setSelectedYear(Number(event.target.value))}
+            onChange={(event) => setSelectedYear(event.target.value)}
             variant="outlined"
             size="small"
             style={{ marginRight: '20px', width: '150px' }}
-          />
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="Global">Global</option>
+            {years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </TextField>
           <TextField
             select
             label="Département"
@@ -143,7 +138,7 @@ const Statistics = ({ onClose, personnes }) => {
 
       </Box>
 
-      <div style={{ width: '60%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+      <div style={{ width: '80%', flex: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
         <PieChart
           series={[{
             data: [
@@ -159,7 +154,7 @@ const Statistics = ({ onClose, personnes }) => {
                 label: selectedDepartment
                   ? `Sorties (${selectedDepartment}): ${globalTotals.totalExits}`
                   : `Sorties (Tous les départements): ${globalTotals.totalExits}`,
-                color: '	#C72C48',
+                color: ' #C72C48',
               },
             ],
             highlightScope: { fade: 'global', highlight: 'item' },
