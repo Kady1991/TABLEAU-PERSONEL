@@ -1,21 +1,20 @@
-body { 
+body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
   height: 100vh;
   z-index: 0;
-  background: linear-gradient(to bottom, #81a4c0, #095c83);
+  /* background: linear-gradient(to bottom, #81a4c0, #095c83); */
 }
-
 
 /* STYLE DIV TITRE ET STATICS */
-.titre-et-statistics {
+/* .titre-et-statistics {
   display: flex;
-  justify-content: space-around; 
-  align-items: center; 
+  justify-content: space-around;
+  align-items: center;
   width: 100%;
   margin: auto;
-}
+} */
 
 .subtitle {
   color: #b6d2df;
@@ -29,12 +28,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top:1rem;
+  margin-top: 1rem;
   width: 50%;
   border-radius: 0.4rem;
-  
-  
 }
+
 
 /* style bouton export */
 /* .button {
@@ -62,8 +60,6 @@ body {
 } */
 
 
-
-
 /* style bouton :ajouter membre */
 /* .button {
   margin-right: 1.7rem;
@@ -83,20 +79,18 @@ body {
 } */
 
 
-
 /* texte du menu deroulant sur la gauche dans les formulaire */
 .left-align-form .ant-form-item-control-input-content {
   text-align: left;
 }
 
 /* archive style */
-
 /* Conteneur principal */
 .archive-container {
   padding: 10px;
   font-family: Arial, sans-serif;
   position: relative;
-  margin: auto; 
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,12 +106,12 @@ body {
   height: 500px;
   width: 97%;
   display: flex;
-  flex-direction:row;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  
-  
-  
+
+
+
 }
 
 /* style header tableau*/
@@ -145,6 +139,7 @@ body {
   color: rgb(26, 22, 22);
   cursor: pointer;
 }
+
 /* .archive-row:hover{
   background-color: #455962;
 } */
@@ -267,8 +262,8 @@ body {
   background-color: #fff;
   box-shadow: 10 15px 18px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  
-  
+
+
 }
 
 /* Transition pour faire apparaître le modal */
@@ -290,13 +285,13 @@ body {
 /* Styles pour l'icône de fermeture */
 .close-icon-container {
   text-align: right;
-  
+
 }
 
 .close-icon {
   font-size: 0.2rem;
   color: #095c83;
-  
+
 }
 
 /* style formulaire d'ajout membre: TITRE*/
@@ -304,11 +299,12 @@ body {
   text-align: center;
 
 }
+
 .title-ajouter-membre {
   display: flex;
   justify-content: center;
   color: #095c83;
-  font-weight:bolder;
+  font-weight: bolder;
   font-size: 1.7rem;
 
 }
@@ -324,22 +320,24 @@ body {
   min-width: 100%;
   width: 100%;
   padding: 20px;
-  background-color:"#f0f2f5";
+  background-color: "#f0f2f5";
   border-radius: 8px;
   box-shadow: "0 4px 8px rgba(0,0,0,0.1)";
 }
 
 /* Cible les labels des Form.Item dans Ant Design */
-.ant-form-item-label > label {
-  font-size:15px; /* Taille du texte */
-  line-height: 1rem; /* Hauteur de ligne pour une meilleure lisibilité */
+.ant-form-item-label>label {
+  font-size: 15px;
+  /* Taille du texte */
+  line-height: 1rem;
+  /* Hauteur de ligne pour une meilleure lisibilité */
   color: #034f73 !important;
 }
 
 /* Style pour le bouton radio sélectionné */
 .ant-radio-checked .ant-radio-inner {
-   border: none;
-  background-color: #095c82 !important; 
+  border: none;
+  background-color: #095c82 !important;
 }
 
 
@@ -347,33 +345,34 @@ body {
 .form-buttons {
   display: flex;
   text-align: center;
-  justify-content:center;
+  justify-content: center;
   align-items: center;
 }
 
 .button-validate {
   z-index: 9999;
   background-color: #095c82;
-  width:100px;
+  width: 100px;
   height: 32px;
   font-size: 15px;
-  margin: auto;  
+  margin: auto;
 }
 
-.button-validate:hover{
-  color:#2c648f !important;
+.button-validate:hover {
+  color: #2c648f !important;
   background-color: #f8fcff !important;
   border: solid 0.5px;
   font-weight: lighter;
-  
+
 }
+
 .button-cancel {
   z-index: 9999;
-  margin: 1rem; 
-  width:100px;
+  margin: 1rem;
+  width: 100px;
   height: 32px;
   font-size: 15px;
-  
+
 }
 
 /* .form-buttons .button-cancel:hover {
@@ -389,13 +388,13 @@ body {
   background-color: #f8fcff;
   height: auto;
   border-radius: 0.5rem;
-  
+
 }
 
 .service-details p {
   text-align: left;
   margin: 0.4rem;
-  font-size:13px;  
+  font-size: 13px;
 }
 
 /* Modal principale */
@@ -411,14 +410,14 @@ body {
   border-radius: 8px;
   min-height: 80vh;
   min-width: 80vh;
-  
+
 }
 
 
- /* style modal composant detail.jsx */
- /* Style principal de la modal */
+/* style modal composant detail.jsx */
+/* Style principal de la modal */
 .custom-modal .ant-modal-content {
-  background-color: #6a83a8; 
+  background-color: #6a83a8;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -426,29 +425,30 @@ body {
 /* style close-icon formulaire d'ajout */
 
 .close_icon {
-  color:  #6a83a8; 
-  font-size: 20px; 
-  
+  color: #6a83a8;
+  font-size: 20px;
+
 }
 
-.close_icon:hover{
-  transition: color 0.3s ease-in-out; 
-  color: #f41408; 
-  font-size: 22px; 
+.close_icon:hover {
+  transition: color 0.3s ease-in-out;
+  color: #f41408;
+  font-size: 22px;
 }
+
 /* STYLE ARCHIVE*/
 
-.ant-drawer-content{
+.ant-drawer-content {
   margin-top: 4rem;
-  max-height:52rem;
-  max-width:99%;
+  max-height: 52rem;
+  max-width: 99%;
 
- 
+
 }
 
 .archive-list-search-input {
-  max-width: 400px; 
-  margin-bottom: 20px; 
+  max-width: 400px;
+  margin-bottom: 20px;
 }
 
 
@@ -477,7 +477,7 @@ body {
 }
 
 .archive-list-drawer .ant-drawer-body {
-  
+
   background-color: #f5f5f5;
 }
 
@@ -488,7 +488,7 @@ body {
   align-items: center;
   height: 100%;
 
-  
+
 }
 
 /* Table générale */

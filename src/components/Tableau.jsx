@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import '../assets/index.css';
-// import Export from "../layout/Export.jsx";
-// import ArchiveList from "../layout/ArchiveList.jsx";
-// import AddMemberForm from "../layout/AddMemberForm.jsx";
 import Delete from "../layout/Delete.jsx";
 import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
-// import { IoPersonAddSharp } from "react-icons/io5";
-// import Statistics from '../layout/Statistics';
-// import logoWhite from '../assets/logo_white.png';
-// import MenuPersonnel from "../layout/MenuPersonnel";
-
-
-
 
 
 function Tableau() {
@@ -237,36 +227,6 @@ function Tableau() {
   return (
     <div>
       <div className="main-container">
-        {/* <div className="icon-tableau">
-        <IoPersonAddSharp className="person-icon-tableau" />
-
-        </div> */}
-        {/* <div>
-        </div> */}
-        {/* <div >
-          <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1>
-        </div> */}
-
-
-        {/* <div className="header-container"> */}
-        {/* <div className="titre-et-statistics"> */}
-        {/* <img src={logoWhite} alt="Logo" className="LOGO" style={{ width: '100px' }} /> */}
-        {/* <h1 className="title-tableau">MEMBRES DU PERSONNEL</h1> */}
-        {/* <MenuPersonnel /> */}
-        {/* </div> */}
-         {/* <div className="menu-container">
-         <button onClick={handleExport} className="export-button">
-            Exporter les données
-          </button>
-          </div>  */}
-        {/* <div className="archive-container">
-            <ArchiveList className="archive" />
-          </div> */}
-        {/* <Statistics data={personnes} />
-          <div className="add-member-container">
-            <AddMemberForm />
-          </div> */}
-        {/* </div> */}
 
         <div className="data-grid-container">
           <DataGrid

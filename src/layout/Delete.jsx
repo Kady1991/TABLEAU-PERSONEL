@@ -61,20 +61,20 @@ const Delete = ({
       message.error("Veuillez sélectionner une date de sortie avant d'archiver.");
       return;
     }
-  
+
     const confirmation = window.confirm(
       `Voulez-vous vraiment archiver ? \n\nID: ${IDPersonneService}\nNom: ${nomPersonne}\nPrénom: ${prenomPersonne}\nEmail: ${email}\nDate de sortie : ${selectedDate}`
     );
-  
+
     if (!confirmation) return;
-  
+
     try {
       const response = await axios.put(
         `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
       );
-  
-      console.log("Réponse du backend :", response.data); 
-  
+
+      console.log("Réponse du backend :", response.data);
+
       // ✅ Met à jour l'affichage principal et la liste des archives
       onSuccess(email); // Retire la personne de la liste principale
       message.success(
@@ -88,7 +88,7 @@ const Delete = ({
       message.error("L'archivage a échoué.");
     }
   };
-  
+
 
   const handleCancel = () => {
     console.log("Annulation de la modale. Date sélectionnée réinitialisée."); // Log pour vérifier l'annulation
@@ -104,7 +104,7 @@ const Delete = ({
 
       />
       <Modal
-        title="Choisir une date de sortie"
+        title=" Sélectionnez une date de sortie avant d'archiver"
         open={isModalVisible}
         onCancel={handleCancel}
         footer={[
@@ -116,7 +116,7 @@ const Delete = ({
           </Button>,
         ]}
       >
-        <p>Sélectionnez une date de sortie avant d'archiver</p>
+        {/* <p>Sélectionnez une date de sortie avant d'archiver</p> */}
         <DatePicker
           onChange={handleDateChange}
           format="YYYY-MM-DD"

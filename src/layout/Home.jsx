@@ -78,7 +78,7 @@ const Home = () => {
             {
               key: '1',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff', margin:'-15px' }}>
                   <TableOutlined /> TABLEAU
                 </Button>
               ),
@@ -86,7 +86,7 @@ const Home = () => {
             {
               key: '2',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff', margin:'-15px' }}>
                   <UserOutlined />  AJOUT MEMBRE
                 </Button>
               ),
@@ -94,7 +94,7 @@ const Home = () => {
             {
               key: '3',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff' }} >
+                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff', margin:'-15px' }} >
                   <PieChartOutlined /> STATISTIQUES
                 </Button>
               ),
@@ -102,7 +102,7 @@ const Home = () => {
             {
               key: '4',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff' }}>
+                <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff', margin:'-15px' }}>
                   <UploadOutlined /> ARCHIVES
                 </Button>
               ),
@@ -110,7 +110,7 @@ const Home = () => {
             {
               key: '5',
               label: (
-                <Button type="link" onClick={handleExport} style={{ color: '#fff' }}>
+                <Button type="link" onClick={handleExport} style={{ color: '#fff', margin:'-15px' }}>
                   <ExportOutlined /> EXPORTER
                 </Button>
               ),
