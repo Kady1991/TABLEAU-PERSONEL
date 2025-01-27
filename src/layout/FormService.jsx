@@ -60,7 +60,7 @@ const FormService = ({ IDPersonneService }) => {
             // Récupérer la liste des types de personnel depuis votre API
             try {
                 const typePersonnelResponse = await axios.get(
-                  `${LIEN_API_PERSONNE}/api/typepersonnel`
+                    `${LIEN_API_PERSONNE}/api/typepersonnel`
                 );
                 setTypePersonnelList(typePersonnelResponse.data);
 

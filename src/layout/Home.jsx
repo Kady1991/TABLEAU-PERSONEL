@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  PieChartOutlined,
-  TableOutlined,
-  ExportOutlined,
-} from '@ant-design/icons';
-
+import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, UserOutlined, PieChartOutlined, TableOutlined, ExportOutlined, } from '@ant-design/icons';
 import { Layout, Menu, Button } from 'antd';
 import AddMemberForm from './AddMemberForm';
 import Tableau from '../components/Tableau';
@@ -16,7 +7,7 @@ import Statistics from './Statistics';
 import ArchiveList from './ArchiveList';
 import Export from './Export';
 import logo from '../assets/logo_white.png';
-import '../assets/home.css'; // Import du fichier CSS global pour ce composant
+import '../assets/home.css';
 
 import { LIEN_API_PERSONNE } from '../config';
 
@@ -70,7 +61,7 @@ const Home = () => {
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo">
-          <img src={logo} alt="Logo" style={{ width: '70%', height: 'auto' }} />
+          <img src={logo} alt="Logo" style={{ width: '100%', height: 'auto' }} />
         </div>
         <Menu
           theme="dark"
@@ -80,7 +71,7 @@ const Home = () => {
             {
               key: '1',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff', margin:'-15px' }}>
+                <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff', margin: '-15px' }}>
                   <TableOutlined /> TABLEAU
                 </Button>
               ),
@@ -88,7 +79,7 @@ const Home = () => {
             {
               key: '2',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff', margin:'-15px' }}>
+                <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff', margin: '-15px' }}>
                   <UserOutlined />  AJOUT MEMBRE
                 </Button>
               ),
@@ -96,7 +87,7 @@ const Home = () => {
             {
               key: '3',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff', margin:'-15px' }} >
+                <Button type="link" onClick={() => setActiveComponent('statistics')} style={{ color: '#fff', margin: '-15px' }} >
                   <PieChartOutlined /> STATISTIQUES
                 </Button>
               ),
@@ -104,7 +95,7 @@ const Home = () => {
             {
               key: '4',
               label: (
-                <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff', margin:'-15px' }}>
+                <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff', margin: '-15px' }}>
                   <UploadOutlined /> ARCHIVES
                 </Button>
               ),
@@ -112,7 +103,7 @@ const Home = () => {
             {
               key: '5',
               label: (
-                <Button type="link" onClick={handleExport} style={{ color: '#fff', margin:'-15px' }}>
+                <Button type="link" onClick={handleExport} style={{ color: '#fff', margin: '-15px' }}>
                   <ExportOutlined /> EXPORTER
                 </Button>
               ),

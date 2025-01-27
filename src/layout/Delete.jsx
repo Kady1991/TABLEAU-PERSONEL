@@ -27,7 +27,7 @@ const Delete = ({
   const checkArchivedStatus = async () => {
     try {
       const response = await axios.get(
-      `${LIEN_API_PERSONNE}/api/personne?email=${email}`
+        `${LIEN_API_PERSONNE}/api/personne?email=${email}`
       );
       // Log pour vérifier la réponse de l'API
       // console.log("Réponse API :", response.data); 
@@ -72,7 +72,7 @@ const Delete = ({
 
     try {
       const response = await axios.put(
-       `${LIEN_API_PERSONNE}/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
+        `${LIEN_API_PERSONNE}/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
       );
 
       console.log("Réponse du backend :", response.data);

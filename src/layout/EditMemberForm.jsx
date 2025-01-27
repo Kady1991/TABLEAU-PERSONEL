@@ -53,7 +53,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
       return;
     }
 
-    
+
 
     try {
       console.log("Envoi de la requête pour IDPersonneService :", IDPersonneService);
@@ -89,7 +89,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
         alert(`Erreur serveur : ${error.response.status} - ${error.response.data.message || 'Pas de message'}`);
       } else if (error.request) {
 
-        
+
         alert("Aucune réponse reçue du serveur.");
       } else {
 
@@ -104,9 +104,9 @@ const EditMemberForm = ({ IDPersonneService }) => {
     try {
       console.log("Envoi de la requête pour les grades");
       const gradesResponse = await axios.get(
-       `${LIEN_API_PERSONNE}/api/wwgrades`
+        `${LIEN_API_PERSONNE}/api/wwgrades`
       );
-      
+
       console.log("Données des grades :", gradesResponse.data);
       setGrades(gradesResponse.data);
 

@@ -40,19 +40,19 @@ const Export = ({ personnes }) => {
     // Filtrer uniquement les colonnes visibles
     const visibleColumns = columns.filter((col) => !col.hide);
 
+    // Nettoyage des données avant export
     const cleanData = (value) => {
-      if (!value) return '""';
-      const cleanedValue = String(value)
-        .replace(/(\r\n|\n|\r)/gm, " ")
-        .replace(/"/g, '""')
+      if (!value) return '';
+      return String(value)
+        .replace(/(\r\n|\n|\r)/gm, ' ') // Remplacement des sauts de ligne
+        .replace(/"/g, '""') // Échappement des guillemets
         .trim();
-      return `"${cleanedValue}"`;
     };
 
-    // Générer les en-têtes à partir des colonnes visibles
-    const headers = visibleColumns.map((col) => cleanData(col.headerName)).join(";") + "\n";
+    // Générer les en-têtes du fichier CSV
+    const headers = visibleColumns.map((col) => col.headerName).join(";") + "\n";
 
-    // Générer les lignes à partir des données et des colonnes visibles
+    // Générer les lignes de données du fichier CSV
     const rows = personnes
       .map((item) =>
         visibleColumns.map((col) => cleanData(item[col.field])).join(";")
@@ -65,12 +65,17 @@ const Export = ({ personnes }) => {
   const csvData = generateCsvData();
   if (!csvData) return;
 
+  // Création d'un blob pour le téléchargement
   const blob = new Blob([csvData], { type: "text/csv" });
   const csvUrl = URL.createObjectURL(blob);
+
+  // Création et déclenchement du téléchargement
   const link = document.createElement("a");
   link.href = csvUrl;
   link.setAttribute("download", "export_personnel.csv");
   link.click();
+
+  // Libération de l'URL après le téléchargement
   URL.revokeObjectURL(csvUrl);
 };
 

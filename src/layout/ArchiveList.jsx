@@ -69,8 +69,8 @@ const ArchiveList = () => {
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
-    return data.filter(person => 
-      (person.Prenom && person.Prenom.toLowerCase().includes(searchTerm.toLowerCase())) || 
+    return data.filter(person =>
+      (person.Prenom && person.Prenom.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (person.Nom && person.Nom.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [data, searchTerm]);
@@ -80,13 +80,13 @@ const ArchiveList = () => {
     { Header: 'Nom', accessor: 'Nom' },
     { Header: 'Prénom', accessor: 'Prenom' },
     { Header: 'Email', accessor: 'Email' },
-    { 
-      Header: 'Date d\'entrée', 
+    {
+      Header: 'Date d\'entrée',
       accessor: 'DateEntree',
-      Cell: ({ value }) => value ? dayjs(value).format("DD/MM/YYYY") : '' 
+      Cell: ({ value }) => value ? dayjs(value).format("DD/MM/YYYY") : ''
     },
-    { 
-      Header: 'Date de sortie', 
+    {
+      Header: 'Date de sortie',
       accessor: 'DateSortie',
       Cell: ({ value }) => value ? dayjs(value).format("DD/MM/YYYY") : '',
     },
@@ -100,19 +100,19 @@ const ArchiveList = () => {
 
   return (
     <div className="archive-list-container">
-      <Drawer 
-        title="Liste des Personnes Archivées" 
-        placement="right" 
-        onClose={closeDrawer} 
+      <Drawer
+        title="Liste des Personnes Archivées"
+        placement="right"
+        onClose={closeDrawer}
         open={isDrawerVisible}
-        width={1700} 
-        
+        width={1700}
+
       >
-        <Input 
-          placeholder="Rechercher par prénom ou nom" 
-          value={searchTerm} 
-          onChange={handleSearch} 
-          className="archive-list-search-input" 
+        <Input
+          placeholder="Rechercher par prénom ou nom"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="archive-list-search-input"
         />
         {loading ? (
           <div className="archive-list-spinner">
@@ -124,8 +124,8 @@ const ArchiveList = () => {
               {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()} className="archive-list-header-row">
                   {headerGroup.headers.map(column => (
-                    <th 
-                      {...column.getHeaderProps()} 
+                    <th
+                      {...column.getHeaderProps()}
                       className="archive-list-header-cell"
                     >
                       {column.render('Header')}
