@@ -6,6 +6,8 @@ import { XMLParser } from 'fast-xml-parser';
 import dayjs from 'dayjs';
 import "../assets/index.css";
 
+import { LIEN_API_PERSONNE } from '../config';
+
 const ArchiveList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,12 +17,12 @@ const ArchiveList = () => {
   const fetchArchives = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne`);
+      const response = await axios.get(`${LIEN_API_PERSONNE}/api/Personne`);
       const archivedPersons = response.data.filter((person) => person.SiArchive === true);
 
       const formattedArchives = await Promise.all(archivedPersons.map(async (person) => {
         try {
-          const detailResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${person.IDPersonneService}`, {
+          const detailResponse = await axios.get(`${LIEN_API_PERSONNE}/api/Personne/${person.IDPersonneService}`, {
             headers: { Accept: "application/xml" },
           });
           const parser = new XMLParser();

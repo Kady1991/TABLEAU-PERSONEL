@@ -3,6 +3,9 @@ import { Modal, Form, Input, Button, Radio, Row, Col, DatePicker, Select } from 
 import { MdMedicalServices } from "react-icons/md";
 import axios from 'axios';
 import '../assets/index.css';
+
+import { LIEN_API_PERSONNE } from '../config';
+
 const { Option } = Select;
 
 const FormService = ({ IDPersonneService }) => {
@@ -23,7 +26,7 @@ const FormService = ({ IDPersonneService }) => {
         const fetchData = async () => {
             try {
                 const personResponse = await axios.get(
-                    `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
+                    `${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -40,14 +43,14 @@ const FormService = ({ IDPersonneService }) => {
 
 
             try {
-                const gradesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`);
+                const gradesResponse = await axios.get(`${LIEN_API_PERSONNE}/api/wwgrades`);
                 setGrades(gradesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des grades:', error);
             }
 
             try {
-                const addressesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`);
+                const addressesResponse = await axios.get(`${LIEN_API_PERSONNE}/api/Adresses`);
                 setAddresses(addressesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des adresses:', error);
@@ -57,7 +60,7 @@ const FormService = ({ IDPersonneService }) => {
             // Récupérer la liste des types de personnel depuis votre API
             try {
                 const typePersonnelResponse = await axios.get(
-                    "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
+                  `${LIEN_API_PERSONNE}/api/typepersonnel`
                 );
                 setTypePersonnelList(typePersonnelResponse.data);
 
@@ -66,7 +69,7 @@ const FormService = ({ IDPersonneService }) => {
             }
 
             try {
-                const servicesResponse = await axios.get(`https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`);
+                const servicesResponse = await axios.get(`${LIEN_API_PERSONNE}/api/affectation/services`);
                 setOtherServices(servicesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des autres services:', error);

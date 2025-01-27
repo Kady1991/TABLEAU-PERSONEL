@@ -6,13 +6,13 @@ import FormService from "../layout/FormService.jsx";
 import Detail from "../layout/Detail.jsx";
 import EditMemberForm from "../layout/EditMemberForm.jsx";
 import RestoreAction from "../layout/RestoreAction.jsx";
-
+import { LIEN_API_PERSONNE } from "../config.js";
 
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
+  const linkGetAllPersonnel = `${LIEN_API_PERSONNE}/api/Personne`;
 
   const fetchData = () => {
     fetch(linkGetAllPersonnel)

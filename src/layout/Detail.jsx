@@ -6,6 +6,8 @@ import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
 import '../assets/index.css';
 
+import { LIEN_API_PERSONNE } from "../config";
+
 const Detail = ({ IDPersonneService }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personData, setPersonData] = useState(null);
@@ -15,7 +17,7 @@ const Detail = ({ IDPersonneService }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`,
+        `${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`,
         {
           headers: { Accept: "application/xml" },
         }

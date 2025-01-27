@@ -9,7 +9,7 @@ const RestoreAction = ({ PersonneID, email, onSuccess, onError }) => {
     
     try {
       // Mettre à jour la valeur de SiArchive dans l'API
-      const link = `https://server-iis.uccle.intra/API_PersonneTest/api/personne/desarchiver?id=${PersonneID}`;
+      const link = `${LIEN_API_PERSONNE}/api/personne/desarchiver?id=${PersonneID}`;
       //const link = `https://localhost:44333/api/personne/desarchiver?id=${IDPersonne}`;
 
       await axios.put(link);

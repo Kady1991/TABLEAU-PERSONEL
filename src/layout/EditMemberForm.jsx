@@ -15,6 +15,8 @@ import axios from "axios";
 import dayjs from "dayjs";
 import '../assets/index.css';
 
+import { LIEN_API_PERSONNE } from "../config";
+
 const { Option } = Select;
 
 const EditMemberForm = ({ IDPersonneService }) => {
@@ -56,7 +58,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
     try {
       console.log("Envoi de la requête pour IDPersonneService :", IDPersonneService);
       const personResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Personne/${IDPersonneService}`
+        `${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`
       );
       console.log("Données de l'API pour IDPersonneService :", personResponse.data);
 
@@ -102,7 +104,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
     try {
       console.log("Envoi de la requête pour les grades");
       const gradesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades`
+       `${LIEN_API_PERSONNE}/api/wwgrades`
       );
       
       console.log("Données des grades :", gradesResponse.data);
@@ -115,7 +117,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
     try {
       console.log("Envoi de la requête pour les adresses");
       const addressesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/Adresses`
+        `${LIEN_API_PERSONNE}/api/Adresses`
       );
 
       console.log("Données des adresses :", addressesResponse.data);
@@ -128,7 +130,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
 
       console.log("Envoi de la requête pour les types de personnel");
       const typePersonnelResponse = await axios.get(
-        "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
+        `${LIEN_API_PERSONNE}/api/typepersonnel`
       );
 
       console.log("Données des types de personnel :", typePersonnelResponse.data);
@@ -140,7 +142,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
     try {
       console.log("Envoi de la requête pour les services");
       const servicesResponse = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services`
+        `${LIEN_API_PERSONNE}/api/affectation/services`
       );
       console.log("Données des services :", servicesResponse.data);
       setOtherServices(servicesResponse.data);
@@ -171,7 +173,7 @@ const EditMemberForm = ({ IDPersonneService }) => {
 
     try {
       const response = await axios.put(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/edit?id=${personData?.PersonneID}`,
+        `${LIEN_API_PERSONNE}/api/personne/edit?id=${personData?.PersonneID}`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );

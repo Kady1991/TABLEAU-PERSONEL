@@ -4,7 +4,7 @@ import axios from "axios";
 import { CloseOutlined } from "@ant-design/icons";
 import { IoPersonAddSharp } from "react-icons/io5";
 import "../assets/index.css";
-
+import { LIEN_API_PERSONNE } from "../config";
 const { Option } = Select;
 
 const AddMemberForm = ({ onClose, onMemberUpdate }) => {
@@ -24,22 +24,22 @@ const AddMemberForm = ({ onClose, onMemberUpdate }) => {
     const fetchData = async () => {
       try {
         const gradesResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/wwgrades"
+          `${LIEN_API_PERSONNE}/api/wwgrades`
         );
         setGrades(gradesResponse.data);
 
         const servicesResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/affectation/services"
+          `${LIEN_API_PERSONNE}/api/affectation/services`
         );
         setServices(servicesResponse.data);
 
         const addressResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/Adresses"
+         `${LIEN_API_PERSONNE}/api/Adresses`
         );
         setAddressData(addressResponse.data);
 
         const typePersonnelResponse = await axios.get(
-          "https://server-iis.uccle.intra/API_PersonneTest/api/typepersonnel"
+          `${LIEN_API_PERSONNE}/api/typepersonnel`
         );
         setTypePersonnelList(typePersonnelResponse.data);
       } catch (error) {
@@ -75,7 +75,7 @@ const AddMemberForm = ({ onClose, onMemberUpdate }) => {
       };
 
       const response = await axios.post(
-        "https://server-iis.uccle.intra/API_PersonneTest/api/Personne",
+     `${LIEN_API_PERSONNE}/api/Personne`,
         formData
       );
 
@@ -101,7 +101,7 @@ const AddMemberForm = ({ onClose, onMemberUpdate }) => {
     const handleServiceSelection = async (IDService) => {
       try {
         const response = await axios.get(
-          `https://server-iis.uccle.intra/API_PersonneTest/api/affectation/${IDService}`
+          `${LIEN_API_PERSONNE}/api/affectation/${IDService}`
         );
         setSelectedServiceDetails(response.data);
       } catch (error) {

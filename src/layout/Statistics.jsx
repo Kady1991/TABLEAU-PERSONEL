@@ -126,10 +126,10 @@ const Statistics = ({ onClose, personnes }) => {
 
         <BarChart
           height={350}
-          width={1300} /*  largeur totale barre */
+          width={900} /*  largeur totale barre */
           xAxis={[{ scaleType: 'band', data: chartXAxis }]}
           series={series}
-          margin={{ left: 50, right: 50 }} /* Ajuste les marges autour du graphique */
+          margin={{ left: 20, right: 20 }} /* Ajuste les marges autour du graphique */
           barWidth={30} /* Ajuste la largeur des barres */
           barGap={10} /* Espacement entre les barres */
           barCategoryGap={20} /* Espacement entre les catégories */

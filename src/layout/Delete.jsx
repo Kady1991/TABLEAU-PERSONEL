@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import '../assets/index.css';
 
+import { LIEN_API_PERSONNE } from "../config";
+
 const Delete = ({
   IDPersonneService,
   nomPersonne,
@@ -25,7 +27,7 @@ const Delete = ({
   const checkArchivedStatus = async () => {
     try {
       const response = await axios.get(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne?email=${email}`
+      `${LIEN_API_PERSONNE}/api/personne?email=${email}`
       );
       // Log pour vérifier la réponse de l'API
       // console.log("Réponse API :", response.data); 
@@ -70,7 +72,7 @@ const Delete = ({
 
     try {
       const response = await axios.put(
-        `https://server-iis.uccle.intra/API_PersonneTest/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
+       `${LIEN_API_PERSONNE}/api/personne/delete?email=${email}&dateSortie=${selectedDate}`
       );
 
       console.log("Réponse du backend :", response.data);

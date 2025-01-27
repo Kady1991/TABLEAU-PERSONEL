@@ -18,6 +18,8 @@ import Export from './Export';
 import logo from '../assets/logo_white.png';
 import '../assets/home.css'; // Import du fichier CSS global pour ce composant
 
+import { LIEN_API_PERSONNE } from '../config';
+
 const { Header, Sider, Content } = Layout;
 
 const Home = () => {
@@ -26,7 +28,7 @@ const Home = () => {
   const [personnes, setPersonnes] = useState([]); // Données centralisées
   const [loading, setLoading] = useState(true); // Gestion du chargement
 
-  const linkGetAllPersonnel = "https://server-iis.uccle.intra/API_PersonneTest/api/Personne";
+  const linkGetAllPersonnel = `${LIEN_API_PERSONNE}/api/Personne`;
 
   // Récupération des données
   useEffect(() => {
@@ -68,7 +70,7 @@ const Home = () => {
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo">
-          <img src={logo} alt="Logo" style={{ width: '100%', height: 'auto' }} />
+          <img src={logo} alt="Logo" style={{ width: '70%', height: 'auto' }} />
         </div>
         <Menu
           theme="dark"
