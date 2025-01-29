@@ -11,6 +11,7 @@ import { LIEN_API_PERSONNE } from "../config.js";
 function Tableau() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showStatistics, setShowStatistics] = useState(false);
 
   const linkGetAllPersonnel = `${LIEN_API_PERSONNE}/api/Personne`;
 
@@ -58,6 +59,8 @@ function Tableau() {
   const handleRestoreError = (restoredId) => {
     console.error(`Une erreur s'est produite lors de la restauration de la personne avec l'ID ${restoredId}.`);
   };
+
+  
 
   const columns = [
     { field: "IDPersonneService", headerName: "ID", width: 50, hideable: true },
