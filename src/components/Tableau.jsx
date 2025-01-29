@@ -15,21 +15,14 @@ function Tableau() {
   const linkGetAllPersonnel = `${LIEN_API_PERSONNE}/api/Personne`;
 
   const fetchData = () => {
-    fetch(linkGetAllPersonnel)
+    fetch(`${LIEN_API_PERSONNE}/api/Personne`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("data", data);
-        const personnesData = data.map((personne) => ({
-          ...personne,
-          // id: personne.IDPersonneService,
-          IDPersonneService: personne.IDPersonneService,// L'ID réel retourné par l'API
-          affichageIDPersonneService: personne.PersonneID || personne.IDPersonneService
-        }));
-        setPersonnes(personnesData);
+        setPersonnes(data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Une erreur est survenue lors de la récupération des données :", error);
+        console.error("Erreur lors du chargement des données :", error);
         setLoading(false);
       });
   };
@@ -38,6 +31,11 @@ function Tableau() {
     fetchData();
   }, []);
 
+  // ✅ Fonction qui recharge les données après une action
+  const refreshData = () => {
+    setLoading(true);
+    fetchData();
+  };
 
 
   // Filtrer les données non archivées
@@ -93,39 +91,26 @@ function Tableau() {
           >
             <FormService IDPersonneService={params.row.IDPersonneService} />
             <Detail IDPersonneService={params.row.IDPersonneService} />
-            <EditMemberForm IDPersonneService={params.row.IDPersonneService} />
+            <EditMemberForm IDPersonneService={params.row.IDPersonneService} refreshData={refreshData} />
             <Delete
               IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}
-              onSuccess={handleDeleteSuccess}
-              onError={handleDeleteError}
+              refreshData={refreshData}
             />
-
           </div>
 
 
-          {/* Div pour actions de restauration */}
+          {/* Actions de restauration */}
           <div className={params.row.SiArchive ? "RestoreIcon visible" : "RestoreIcon hidden"}>
-            <Detail IDPersonneService={params.row.IDPersonneService}
-              nomPersonne={params.row.NomPersonne}
-              prenomPersonne={params.row.PrenomPersonne}
-              email={params.row.Email}
-              onSuccess={handleDeleteSuccess}
-              onError={handleDeleteError}
-            />
+            <Detail IDPersonneService={params.row.IDPersonneService} />
             <RestoreAction
               PersonneID={params.row.PersonneID}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}
-              onSuccess={handleRestoreSuccess}
-              onError={(id) =>
-                console.error(
-                  `Une erreur est survenue lors de la restauration de l'ID: ${id}`
-                )
-              }
+              refreshData={refreshData}
             />
           </div>
         </div>

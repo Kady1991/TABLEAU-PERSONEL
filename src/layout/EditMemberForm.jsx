@@ -19,7 +19,7 @@ import { LIEN_API_PERSONNE } from "../config";
 
 const { Option } = Select;
 
-const EditMemberForm = ({ IDPersonneService }) => {
+const EditMemberForm = ({ IDPersonneService, refreshData }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [personData, setPersonData] = useState(null);
   const [grades, setGrades] = useState([]);
@@ -183,6 +183,10 @@ const EditMemberForm = ({ IDPersonneService }) => {
       }
 
       alert("Les modifications ont été enregistrées avec succès !");
+        // ✅ Rafraîchir le tableau après la modification
+    if (refreshData) {
+      refreshData();
+    }
       setFormSubmitted(true);
       handleCloseModal();
     } catch (error) {
