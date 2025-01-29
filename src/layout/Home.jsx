@@ -108,7 +108,8 @@ const Home = () => {
         <Content className="site-layout-content">
           {/* Affichage du titre */}
           <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
-
+          
+          <Tableau personnes={personnes} loading={loading} onRefresh={fetchData} />
           {/* Affichage des composants */}
           {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} onRefresh={fetchData} />}
           {activeComponent === 'addMemberForm' && (
@@ -125,7 +126,7 @@ const Home = () => {
               <Statistics
                 onClose={() => setActiveComponent('tableau')}
                 personnes={personnes}
-                refreshData={fetchData} // ✅ Met à jour avant affichage
+                refreshData={fetchData} //  Met à jour avant affichage
               />
             </div>
           )}
