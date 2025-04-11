@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, UserOutlined, PieChartOutlined, TableOutlined, ExportOutlined } from '@ant-design/icons';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UploadOutlined,
+  UserOutlined,
+  PieChartOutlined,
+  TableOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, Button } from 'antd';
 import AddMemberForm from './AddMemberForm';
 import Tableau from '../components/Tableau';
@@ -16,12 +24,11 @@ const { Header, Sider, Content } = Layout;
 const Home = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeComponent, setActiveComponent] = useState('tableau');
-  const [personnes, setPersonnes] = useState([]); // Données centralisées
-  const [loading, setLoading] = useState(true); // Gestion du chargement
+  const [personnes, setPersonnes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const linkGetAllPersonnel = `${LIEN_API_PERSONNE}/api/Personne`;
 
-  // ✅ Fonction pour récupérer les données depuis l'API
   const fetchData = async () => {
     try {
       const response = await fetch(linkGetAllPersonnel);
@@ -38,29 +45,76 @@ const Home = () => {
     }
   };
 
-  // 🔄 Chargement des données au démarrage
   useEffect(() => {
     fetchData();
   }, []);
 
-  // ✅ Mise à jour des données après modification
   const handleUpdatePersonnes = () => {
     fetchData();
   };
 
-  // ✅ Ouvrir les statistiques et rafraîchir les données
   const handleOpenStatistics = () => {
-    fetchData(); // 🔄 Mettre à jour avant d'afficher les statistiques
+    fetchData();
     setActiveComponent('statistics');
   };
 
-  // ✅ Fonction pour gérer l'exportation
   const handleExport = () => {
     const nonArchivedPersonnes = personnes.filter(
-      (personne) => personne.SiArchive === false || personne.SiArchive === "false" || personne.SiArchive === 0
+      (personne) =>
+        personne.SiArchive === false ||
+        personne.SiArchive === "false" ||
+        personne.SiArchive === 0
     );
     Export({ personnes: nonArchivedPersonnes });
   };
+
+  const menuItems = [
+    {
+      key: '1',
+      icon: <TableOutlined />,
+      label: (
+        <Button type="link" onClick={() => setActiveComponent('tableau')} style={{ color: '#fff', margin: '-15px' }}>
+          TABLEAU
+        </Button>
+      ),
+    },
+    {
+      key: '2',
+      icon: <UserOutlined />,
+      label: (
+        <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff', margin: '-15px' }}>
+          AJOUT MEMBRE
+        </Button>
+      ),
+    },
+    {
+      key: '3',
+      icon: <PieChartOutlined />,
+      label: (
+        <Button type="link" onClick={handleOpenStatistics} style={{ color: '#fff', margin: '-15px' }}>
+          STATISTIQUES
+        </Button>
+      ),
+    },
+    {
+      key: '4',
+      icon: <UploadOutlined />,
+      label: (
+        <Button type="link" onClick={() => setActiveComponent('archiveList')} style={{ color: '#fff', margin: '-15px' }}>
+          ARCHIVES
+        </Button>
+      ),
+    },
+    {
+      key: '5',
+      icon: <ExportOutlined />,
+      label: (
+        <Button type="link" onClick={handleExport} style={{ color: '#fff', margin: '-15px' }}>
+          EXPORTER
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <Layout>
@@ -76,7 +130,7 @@ const Home = () => {
           </Menu.Item>
           <Menu.Item key="2">
             <Button type="link" onClick={() => setActiveComponent('addMemberForm')} style={{ color: '#fff', margin: '-15px' }}>
-              <UserOutlined />  AJOUT MEMBRE
+              <UserOutlined /> AJOUT MEMBRE
             </Button>
           </Menu.Item>
           <Menu.Item key="3">
@@ -96,7 +150,7 @@ const Home = () => {
           </Menu.Item>
         </Menu>
       </Sider>
-
+  
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: 0 }}>
           {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -105,13 +159,16 @@ const Home = () => {
             onClick: () => setCollapsed(!collapsed),
           })}
         </Header>
+  
         <Content className="site-layout-content">
-          {/* Affichage du titre */}
           <h1 className="header-title">GESTION DU PERSONNEL UCCLE</h1>
-          
-          <Tableau personnes={personnes} loading={loading} onRefresh={fetchData} />
-          {/* Affichage des composants */}
-          {activeComponent === 'tableau' && <Tableau personnes={personnes} loading={loading} onRefresh={fetchData} />}
+  
+          {/* Tableau TOUJOURS visible */}
+          <div className="main-content">
+            <Tableau personnes={personnes} loading={loading} onRefresh={fetchData} />
+          </div>
+  
+          {/* Overlays */}
           {activeComponent === 'addMemberForm' && (
             <div className="overlay">
               <AddMemberForm
@@ -121,24 +178,31 @@ const Home = () => {
               />
             </div>
           )}
+  
           {activeComponent === 'statistics' && (
             <div className="overlay">
               <Statistics
                 onClose={() => setActiveComponent('tableau')}
                 personnes={personnes}
-                refreshData={fetchData} //  Met à jour avant affichage
+                refreshData={fetchData}
               />
             </div>
           )}
+  
           {activeComponent === 'archiveList' && (
             <div className="overlay">
-              <ArchiveList onMemberUpdate={handleUpdatePersonnes} personnes={personnes} />
+              <ArchiveList
+                onMemberUpdate={handleUpdatePersonnes}
+                personnes={personnes}
+              />
             </div>
           )}
         </Content>
       </Layout>
     </Layout>
   );
+  
+    
 };
 
 export default Home;

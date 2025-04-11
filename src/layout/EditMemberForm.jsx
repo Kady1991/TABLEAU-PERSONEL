@@ -429,7 +429,7 @@ const EditMemberForm = ({ IDPersonneService, refreshData }) => {
                       style={{ width: "100%" }}
                       allowClear
                       showSearch
-                      disabled={true} // Rend la liste déroulante non modifiable
+                      disabled={false} // Rend la liste déroulante non modifiable
                     >
                       {typePersonnelList.map((typePersonnel) => (
                         <Option key={typePersonnel.IDTypePersonnel} value={typePersonnel.IDTypePersonnel}>
