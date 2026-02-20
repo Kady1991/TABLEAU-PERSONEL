@@ -49,3 +49,5 @@ dist-ssr
 *.sw?
 
 .codegpt
+
+vite.config.js.timestamp-*.mjs
