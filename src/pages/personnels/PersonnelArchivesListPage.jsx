@@ -10,7 +10,7 @@ import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
 import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
-import { LIEN_API_PERSONNE } from "../../config";
+import { LIEN_API_PERSONNE } from "../../config.js";
 
 const CACHE_KEY = "personnels_archives_cache_v2_dates";
 

@@ -1,93 +1,75 @@
-    import * as React from "react";
-    import { NavLink, Outlet, useLocation } from "react-router-dom";
-    import {
-    AppBar,
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-    Typography,
-    } from "@mui/material";
+import * as React from "react";
+import { NavLink, Outlet } from "react-router-dom";
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
-    import MenuIcon from "@mui/icons-material/Menu";
-    import DashboardIcon from "@mui/icons-material/Dashboard";
-    import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-    import ArchiveIcon from "@mui/icons-material/Archive";
-    import AssessmentIcon from "@mui/icons-material/Assessment";
-    import AddIcon from "@mui/icons-material/Add";
-    import logo from "../assets/logo_white.png";
-    const drawerWidth = 240;
+import MenuIcon from "@mui/icons-material/Menu";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import AddIcon from "@mui/icons-material/Add";
+import logo from "../assets/logo_white.png";
+import AjoutFormComponent from "../components/Forms/AjoutFormComponent.jsx";
 
-    const navItems = [
+const drawerWidth = 240;
+
+export default function DashboardLayout() {
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  // ✅ ouverture du dialog
+  const [openAdd, setOpenAdd] = React.useState(false);
+
+  const handleDrawerToggle = () => setMobileOpen((v) => !v);
+
+  // ✅ navItems DANS le composant (mieux)
+  const navItems = [
     { label: "Accueil", path: "/", icon: <DashboardIcon fontSize="small" /> },
     {
-        label: "Liste du personnels",
-        path: "/personnels",
-        icon: <PeopleAltIcon fontSize="small" />,
+      label: "Liste du personnels",
+      path: "/personnels",
+      icon: <PeopleAltIcon fontSize="small" />,
     },
     {
-        label: "Archives",
-        path: "/personnels/archives",
-        icon: <ArchiveIcon fontSize="small" />,
+      label: "Archives",
+      path: "/personnels/archives",
+      icon: <ArchiveIcon fontSize="small" />,
     },
     {
-        label: "Statistiques",
-        path: "/personnels/statistics",
-        icon: <AssessmentIcon fontSize="small" />,
+      label: "Statistiques",
+      path: "/personnels/statistics",
+      icon: <AssessmentIcon fontSize="small" />,
     },
-    {
-        label: "Nouveau membre",
-        path: "/personnels/new",
-        icon: <AddIcon fontSize="small" />,
-    },
-    ];
+  ];
 
-    export default function DashboardLayout() {
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const location = useLocation();
+  const drawer = (
+    <Box sx={{ height: "100%" }}>
+      <Toolbar>
+        <Typography variant="subtitle1" fontWeight={800}>
+          Uccle • Personnel
+        </Typography>
+      </Toolbar>
 
-    const handleDrawerToggle = () => setMobileOpen((v) => !v);
+      <Divider />
 
-    // const getPageTitle = () => {
-    //     const found = navItems.find((n) => n.path === location.pathname);
-    //     if (found) return found.label;
-
-    //     if (location.pathname.startsWith("/personnels/")) {
-    //     return "Détail personnel";
-    //     }
-
-    //     return "Dashboard";
-    // };
-
-    const drawer = (
-        <Box sx={{ height: "100%" }}>
-        <Toolbar>
-            <Typography variant="subtitle1" fontWeight={800}>
-            Uccle • Personnel
-            </Typography>
-        </Toolbar>
-
-        <Divider />
-
-        {/* <Box sx={{ px: 2, pt: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-            Navigation
-            </Typography>
-        </Box> */}
-
-        <List sx={{ px: 1 }}>
-           {navItems.map((item) => (
+     <List sx={{ px: 1 }}>
+  {/* ✅ 1) ACCUEIL tout en haut */}
   <ListItemButton
-    key={item.path}
     component={NavLink}
-    to={item.path}
-    end={item.path === "/" || item.path === "/personnels"}
+    to="/"
+    end
     onClick={() => setMobileOpen(false)}
     sx={{
       borderRadius: 1,
@@ -99,143 +81,176 @@
     }}
   >
     <ListItemIcon sx={{ minWidth: 34 }}>
-      {item.icon}
+      <DashboardIcon fontSize="small" />
     </ListItemIcon>
-    <ListItemText primary={item.label} />
+    <ListItemText primary="Accueil" />
   </ListItemButton>
-))}
 
-        </List>
-        </Box>
-    );
+  {/* ✅ Trait */}
+  <Divider sx={{ my: 1 }} />
 
-    return (
-        <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-
-        {/* HEADER */}
-        <AppBar
-  position="fixed"
-  elevation={0}
-  sx={{
-    bgcolor: "#003B68",
-    color: "#ffffff",
-    zIndex: (theme) => theme.zIndex.drawer + 1,
-  }}
->
-
-            <Toolbar sx={{ gap: 1 }}>
-            <IconButton
-                edge="start"
-                color="inherit"
-                onClick={handleDrawerToggle}
-                sx={{ display: { md: "none" } }}
-            >
-                <MenuIcon />
-            </IconButton>
-
-            {/* <Typography variant="body2" color="text.secondary">
-                {getPageTitle()}
-            </Typography> */}
-
-<Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    gap: 1.2,
-    minWidth: 0, // permet au texte de se couper proprement
-  }}
->
-  <Box
-    component="img"
-    src={logo}
-    alt="Logo"
-    sx={{
-      height: { xs: 28, sm: 50 },
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
+  {/* ✅ 2) BOUTON AJOUT juste après le trait */}
+  <ListItemButton
+    onClick={() => {
+      setMobileOpen(false);
+      setOpenAdd(true);
     }}
-  />
-
-  <Typography
-    variant="subtitle1"
     sx={{
-        color: "#ffffff",
-      fontWeight: 600,
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      maxWidth: { xs: 170, sm: 300, md:500 },
+      borderRadius: 1,
+      my: 0.5,
     }}
   >
-    Gestion du personnel
-  </Typography>
-</Box>
+    <ListItemIcon sx={{ minWidth: 34 }}>
+      <AddIcon fontSize="small" />
+    </ListItemIcon>
+    <ListItemText primary="Nouveau membre" />
+  </ListItemButton>
 
-            <Box sx={{ flex: 1 }} />
+  {/* ✅ 3) AUTRES ITEMS (sans Accueil) */}
+  {navItems
+    .filter((item) => item.path !== "/")
+    .map((item) => (
+      <ListItemButton
+        key={item.path}
+        component={NavLink}
+        to={item.path}
+        end={item.path === "/personnels"}
+        onClick={() => setMobileOpen(false)}
+        sx={{
+          borderRadius: 1,
+          my: 0.5,
+          "&.active": {
+            bgcolor: "action.selected",
+            fontWeight: 700,
+          },
+        }}
+      >
+        <ListItemIcon sx={{ minWidth: 34 }}>{item.icon}</ListItemIcon>
+        <ListItemText primary={item.label} />
+      </ListItemButton>
+    ))}
+</List>
+    </Box>
+  );
 
-            {/* <Typography variant="caption" color="text.secondary">
-                Custom Theme
-            </Typography> */}
-            </Toolbar>
-        </AppBar>
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
 
-        {/* SIDEBAR */}
-        <Box
-            component="nav"
-            sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        >
-            {/* Mobile */}
-            <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{ keepMounted: true }}
+      {/* ✅ DIALOG GLOBAL -> dispo partout */}
+      <AjoutFormComponent open={openAdd} onClose={() => setOpenAdd(false)} />
+
+      {/* HEADER */}
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          bgcolor: "#003B68",
+          color: "#ffffff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
+        <Toolbar sx={{ gap: 1 }}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={handleDrawerToggle}
+            sx={{ display: { md: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          <Box
             sx={{
-                display: { xs: "block", md: "none" },
-                "& .MuiDrawer-paper": { width: drawerWidth },
+              display: "flex",
+              alignItems: "center",
+              gap: 1.2,
+              minWidth: 0,
             }}
+          >
+            <Box
+              component="img"
+              src={logo}
+              alt="Logo"
+              sx={{
+                height: { xs: 28, sm: 50 },
+                width: "auto",
+                objectFit: "contain",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#ffffff",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: { xs: 170, sm: 300, md: 500 },
+              }}
             >
-            {drawer}
-            </Drawer>
+              Gestion du personnel
+            </Typography>
+          </Box>
 
-            {/* Desktop */}
-            <Drawer
-            variant="permanent"
-            open
-            sx={{
-                display: { xs: "none", md: "block" },
-                "& .MuiDrawer-paper": {
-                width: drawerWidth,
-                boxSizing: "border-box",
-                borderRight: "1px solid",
-                borderColor: "divider",
-                backgroundColor: "background.paper",
-                },
-            }}
-            >
-            {drawer}
-            </Drawer>
-        </Box>
+          <Box sx={{ flex: 1 }} />
+        </Toolbar>
+      </AppBar>
 
-        {/* CONTENU */}
-        <Box
-            component="main"
-            sx={{
-            flexGrow: 1,
-            width: { md: `calc(100% - ${drawerWidth}px)` },
-            bgcolor: "background.default",
-            minHeight: "100vh",
-            }}
+      {/* SIDEBAR */}
+      <Box
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { xs: "block", md: "none" },
+            "& .MuiDrawer-paper": { width: drawerWidth },
+          }}
         >
-            <Toolbar />
-            <Box sx={{ p: 3 }}>
-            <Box sx={{ maxWidth: 1400, mx: "auto" }}>
-                <Outlet />
-            </Box>
-            </Box>
+          {drawer}
+        </Drawer>
+
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            display: { xs: "none", md: "block" },
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              backgroundColor: "background.paper",
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      {/* CONTENU */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          bgcolor: "background.default",
+          minHeight: "100vh",
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ p: 3 }}>
+          <Box sx={{ maxWidth: 1400, mx: "auto" }}>
+            <Outlet />
+          </Box>
         </Box>
-        </Box>
-    );
-    }
+      </Box>
+    </Box>
+  );
+}

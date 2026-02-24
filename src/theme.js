@@ -86,28 +86,24 @@ const theme = createTheme({
        APP BAR (BARRE DU HAUT)
     ========================== */
 
-    MuiFormLabel: {
+  MuiInputLabel: {
   styleOverrides: {
     root: {
       fontSize: 13,
       fontWeight: 600,
       color: PRIMARY_BLUE,
+    },
 
-      /* Astérisque avant le texte */
-      "&.Mui-required": {
-        display: "flex",
-        alignItems: "center",
-        gap: 4,
-      },
-
-      "& .MuiFormLabel-asterisk": {
-        order: -1,               //  met l'étoile avant
-        color: "#d32f2f",        // rouge
-        marginRight: 4,
-      },
+    asterisk: {
+      color: "#d32f2f",
+      order: -1,
+      marginRight: 4,
+      marginLeft: 0,
+      fontWeight: 800,
     },
   },
 },
+
     MuiAppBar: {
       styleOverrides: {
         root: {
