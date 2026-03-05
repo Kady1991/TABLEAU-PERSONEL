@@ -1,259 +1,236 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Alert,
   Box,
-  Card,
   CardContent,
-  CircularProgress,
-  MenuItem,
   Stack,
-  TextField,
-  Typography,
+  Button,
+  Popover,
+  Divider,
 } from "@mui/material";
-
-import { BarChart } from "@mui/x-charts/BarChart";
-import { PieChart } from "@mui/x-charts/PieChart";
+import { LocalizationProvider, StaticDatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 import PersonnelService from "../../services/PersonnelService";
+import StatisticsCharts from "../../components/Statistics/StatisticsCharts";
+import AutoCompleteDeptService from "../../components/AutoComplete/AutoCompleteDeptService";
+
+const clean = (s) => (s ? String(s).trim() : "");
+const GLOBAL_LABEL = "Global (tous)";
+const isArchived = (v) => v === true || v === 1 || String(v).toLowerCase() === "true";
 
 function PersonnelStatisticsPage() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-  const [selectedYear, setSelectedYear] = useState("Global");
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  // valeur affichée (Global / Departement / Service)
+  const [selectedLabel, setSelectedLabel] = useState(GLOBAL_LABEL);
 
-  // ✅ Charger les données depuis l'API
-  const load = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  // texte dans l’autocomplete
+  const [inputValue, setInputValue] = useState("");
 
-      const res = await PersonnelService.getAll();
-      const all = Array.isArray(res.data) ? res.data : [];
-
-      setPersonnes(all);
-    } catch (e) {
-      setError(e?.message || "Erreur lors du chargement des données");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // période
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [periodMode, setPeriodMode] = useState("global");
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
-    load();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const res = await PersonnelService.getAll();
+        setPersonnes(Array.isArray(res?.data) ? res.data : []);
+      } catch (e) {
+        console.error(e);
+        setPersonnes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
-  // ✅ Liste des départements
-  const departments = useMemo(() => {
-    const set = new Set(
-      personnes.map((p) => p?.NomDepartementFr).filter(Boolean)
-    );
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [personnes]);
+  // departements + servicesByDept (pour retrouver le dept parent d’un service)
+  const { departments, servicesByDept } = useMemo(() => {
+    const map = new Map();
 
-  // ✅ Liste des années (basée sur les données, + Global)
-  const years = useMemo(() => {
-    const set = new Set();
     personnes.forEach((p) => {
-      if (!p?.DateEntree) return;
-      const y = new Date(p.DateEntree).getFullYear();
-      if (!Number.isNaN(y)) set.add(y);
+      const dept = clean(p?.NomDepartementFr) || "Sans département";
+      const svc = clean(p?.NomServiceFr) || "Sans service";
+      if (!map.has(dept)) map.set(dept, new Set());
+      map.get(dept).add(svc);
     });
-    return Array.from(set).sort((a, b) => b - a); // récentes d'abord
+
+    const departments = Array.from(map.keys()).sort((a, b) => a.localeCompare(b, "fr"));
+    const servicesByDept = {};
+    departments.forEach((d) => {
+      servicesByDept[d] = Array.from(map.get(d) || []).sort((a, b) => a.localeCompare(b, "fr"));
+    });
+
+    return { departments, servicesByDept };
   }, [personnes]);
 
-  // ✅ Calcul des stats (bar chart + pie chart)
+  // type selection (global/dept/service)
+  const selectionInfo = useMemo(() => {
+    if (!selectedLabel || selectedLabel === GLOBAL_LABEL) {
+      return { type: "global", dept: "", service: "", parentDept: "" };
+    }
+
+    if (departments.includes(selectedLabel)) {
+      return { type: "dept", dept: selectedLabel, service: "", parentDept: "" };
+    }
+
+    // sinon service => retrouver le dept parent
+    let parentDept = "";
+    for (const d of departments) {
+      if ((servicesByDept[d] || []).includes(selectedLabel)) {
+        parentDept = d;
+        break;
+      }
+    }
+    return { type: "service", dept: "", service: selectedLabel, parentDept };
+  }, [selectedLabel, departments, servicesByDept]);
+
+  // Filtre data selon période + selection
+  const filteredData = useMemo(() => {
+    return personnes.filter((p) => {
+      const matchDate =
+        periodMode === "date"
+          ? dayjs(p?.DateEntree).isSame(selectedDate, "day")
+          : true;
+
+      if (!matchDate) return false;
+
+      if (selectionInfo.type === "global") return true;
+
+      if (selectionInfo.type === "dept") {
+        return clean(p?.NomDepartementFr) === selectionInfo.dept;
+      }
+
+      if (selectionInfo.type === "service") {
+        return clean(p?.NomServiceFr) === selectionInfo.service;
+      }
+
+      return true;
+    });
+  }, [personnes, periodMode, selectedDate, selectionInfo]);
+
+  // Stats calculées (xAxis + totals)
   const statsComputed = useMemo(() => {
-    const stats = {};
-    let totalEntries = 0;
-    let totalExits = 0;
+    const map = new Map();
+    let entries = 0;
+    let exits = 0;
 
-    personnes.forEach((person) => {
-      const department = person?.NomDepartementFr || "Non spécifié";
-      const service = person?.NomServiceFr || "Non spécifié";
-      const entryYear = person?.DateEntree ? new Date(person.DateEntree).getFullYear() : null;
+    const keyOf = (p) => {
+      if (selectionInfo.type === "global") return clean(p?.NomDepartementFr) || "Inconnu";
+      if (selectionInfo.type === "dept") return clean(p?.NomServiceFr) || "Sans service";
+      if (selectionInfo.type === "service") return clean(p?.NomServiceFr) || selectionInfo.service;
+      return "Inconnu";
+    };
 
-      // Filtrer par année (sauf Global)
-      if (selectedYear !== "Global") {
-        const y = parseInt(selectedYear, 10);
-        if (entryYear !== y) return;
-      }
+    filteredData.forEach((p) => {
+      const key = keyOf(p);
+      if (!map.has(key)) map.set(key, { entries: 0, exits: 0 });
 
-      // Filtrer par département
-      if (selectedDepartment && department !== selectedDepartment) return;
-
-      // Axe X : si on filtre un département => on groupe par service, sinon par département
-      const key = selectedDepartment ? service : department;
-
-      if (!stats[key]) stats[key] = { entries: 0, exits: 0 };
-
-      // Présents (SiArchive false)
-      if (person?.SiArchive === false) {
-        stats[key].entries += 1;
-        totalEntries += 1;
-      }
-
-      // Sorties (SiArchive true)
-      if (person?.SiArchive === true) {
-        stats[key].exits += 1;
-        totalExits += 1;
+      if (isArchived(p?.SiArchive)) {
+        map.get(key).exits += 1;
+        exits += 1;
+      } else {
+        map.get(key).entries += 1;
+        entries += 1;
       }
     });
-
-    const xAxis = Object.keys(stats);
-    const data = xAxis.map((k) => stats[k]);
 
     return {
-      xAxis,
-      data,
-      totalEntries,
-      totalExits,
+      xAxis: Array.from(map.keys()),
+      data: Array.from(map.values()),
+      totalEntries: entries,
+      totalExits: exits,
     };
-  }, [personnes, selectedYear, selectedDepartment]);
+  }, [filteredData, selectionInfo]);
 
   const series = useMemo(() => {
+    const data = statsComputed?.data ?? [];
     return [
-      {
-        label: "Présents",
-        data: statsComputed.data.map((item) => item.entries),
-      },
-      {
-        label: "Sorties",
-        data: statsComputed.data.map((item) => item.exits),
-      },
+      { label: "Actifs", data: data.map((d) => Number(d?.entries ?? 0)) },
+      { label: "Sorties", data: data.map((d) => Number(d?.exits ?? 0)) },
     ];
-  }, [statsComputed.data]);
+  }, [statsComputed]);
 
-  if (loading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  const hideBarChart = selectionInfo.type === "service";
+  const currentSubtitle = selectionInfo.type === "service" ? selectionInfo.parentDept : "";
 
   return (
     <Box>
-      {/* Header style template */}
-      <Stack mb={2}>
-        <Typography variant="h6" fontWeight={700}>
-          Statistiques
-        </Typography>
-        {/* <Typography variant="body2" color="text.secondary">
-          Filtre par année et département, bar chart (présents/sorties) + répartition globale.
-        </Typography> */}
-      </Stack>
-
-      {/* Filtres */}
-      <Card variant="outlined" sx={{ mb: 2 }}>
-        <CardContent>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <TextField
-              select
-              label="Année"
-              size="small"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              sx={{ width: { xs: "100%", sm: 180 } }}
-            >
-              <MenuItem value="Global">Global</MenuItem>
-              {years.map((y) => (
-                <MenuItem key={y} value={String(y)}>
-                  {y}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              select
-              label="Département"
-              size="small"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              sx={{ width: { xs: "100%", sm: 320 } }}
-            >
-              <MenuItem value="">Tous les départements</MenuItem>
-              {departments.map((dept) => (
-                <MenuItem key={dept} value={dept}>
-                  {dept}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Stack>
-        </CardContent>
-      </Card>
-
-      {/* Graph Bar */}
-      <Card variant="outlined" sx={{ mb: 2 }}>
-        <CardContent>
-          <Typography fontWeight={700} mb={1}>
-            Présents / Sorties
-          </Typography>
-
-          {statsComputed.xAxis.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
-              Aucun résultat pour ces filtres.
-            </Typography>
-          ) : (
-            <Box sx={{ width: "100%", overflowX: "auto" }}>
-              <Box sx={{ minWidth: 900 }}>
-                <BarChart
-                  height={360}
-                  xAxis={[{ scaleType: "band", data: statsComputed.xAxis }]}
-                  series={series}
-                  margin={{ left: 40, right: 20, top: 20, bottom: 70 }}
-                />
-              </Box>
-            </Box>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Pie */}
-      <Card variant="outlined">
-        <CardContent>
-          <Typography fontWeight={700} mb={1}>
-            Répartition globale
-          </Typography>
-
-          <PieChart
-            series={[
-              {
-                data: [
-                  {
-                    value: statsComputed.totalEntries,
-                    label: selectedDepartment
-                      ? `Présents (${selectedDepartment})`
-                      : "Présents (Tous)",
-                  },
-                  {
-                    value: statsComputed.totalExits,
-                    label: selectedDepartment
-                      ? `Sorties (${selectedDepartment})`
-                      : "Sorties (Tous)",
-                  },
-                ],
-                highlightScope: { fade: "global", highlight: "item" },
-                faded: { innerRadius: 30, additionalRadius: -30 },
-              },
-            ]}
-            height={320}
+      <CardContent>
+        <Stack direction="row" spacing={3} alignItems="center">
+          <AutoCompleteDeptService
+            personnes={personnes}
+            value={inputValue}
+            onChange={setInputValue}
+            loading={loading}
+            onSelect={(option) => {
+              
+              const next = option?.label ? option.label : GLOBAL_LABEL;
+              setSelectedLabel(next);
+            }}
           />
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
-            <Box sx={{ flex: 1, p: 1.5, borderRadius: 2, bgcolor: "action.hover" }}>
-              <Typography variant="caption" color="text.secondary">
-                PRÉSENTS
-              </Typography>
-              <Typography fontWeight={800}>{statsComputed.totalEntries}</Typography>
-            </Box>
+          <Button
+            variant="contained"
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            sx={{ borderRadius: 1, height: 40, bgcolor: "#5594b1" }}
+          >
+            {periodMode === "global" ? "Période: Global" : selectedDate.format("DD/MM/YYYY")}
+          </Button>
+        </Stack>
+      </CardContent>
 
-            <Box sx={{ flex: 1, p: 1.5, borderRadius: 2, bgcolor: "action.hover" }}>
-              <Typography variant="caption" color="text.secondary">
-                SORTIES
-              </Typography>
-              <Typography fontWeight={800}>{statsComputed.totalExits}</Typography>
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <StaticDatePicker
+            orientation="landscape"
+            value={selectedDate}
+            onChange={(val) => {
+              setSelectedDate(val);
+              setPeriodMode("date");
+            }}
+            onAccept={() => setAnchorEl(null)}
+          />
+        </LocalizationProvider>
+
+        <Divider />
+
+        <Button
+          fullWidth
+          onClick={() => {
+            setPeriodMode("global");
+            setAnchorEl(null);
+          }}
+        >
+          Toutes les dates
+        </Button>
+      </Popover>
+
+      <StatisticsCharts
+        statsComputed={statsComputed}
+        series={series}
+        currentTitle={selectedLabel || GLOBAL_LABEL}
+        currentSubtitle={currentSubtitle}
+        hideBarChart={hideBarChart}
+        mode={
+          selectionInfo.type === "global"
+            ? "global"
+            : selectionInfo.type === "dept"
+            ? "Département"
+            : "Service"
+        }
+      />
     </Box>
   );
 }

@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+// src/pages/Personnels/PersonnelArchivesListPage.jsx
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Alert, Box, Button, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography, Tooltip } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
-import { Tooltip } from "@mui/material";
-
 import dayjs from "dayjs";
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
@@ -13,6 +12,7 @@ import RestoreActionComponent from "../../components/Forms/RestoreActionComponen
 import { LIEN_API_PERSONNE } from "../../config.js";
 
 const CACHE_KEY = "personnels_archives_cache_v2_dates";
+const isArchived = (v) => v === true || v === 1 || String(v).toLowerCase() === "true";
 
 function PersonnelArchivesListPage() {
   const navigate = useNavigate();
@@ -28,10 +28,9 @@ function PersonnelArchivesListPage() {
 
   const fetchPersonDatesXml = async (idPersonneService) => {
     try {
-      const response = await axios.get(
-        `${LIEN_API_PERSONNE}/api/Personne/${idPersonneService}`,
-        { headers: { Accept: "application/xml" } }
-      );
+      const response = await axios.get(`${LIEN_API_PERSONNE}/api/Personne/${idPersonneService}`, {
+        headers: { Accept: "application/xml" },
+      });
 
       if (typeof response.data !== "string") {
         return { DateEntree: "", DateSortie: "" };
@@ -50,7 +49,7 @@ function PersonnelArchivesListPage() {
     }
   };
 
-  const load = async ({ force = false } = {}) => {
+  const load = useCallback(async ({ force = false } = {}) => {
     try {
       setLoading(true);
       setError("");
@@ -66,7 +65,8 @@ function PersonnelArchivesListPage() {
 
       const res = await PersonnelService.getAll();
       const all = Array.isArray(res.data) ? res.data : [];
-      const archived = all.filter((p) => p?.SiArchive === true);
+
+      const archived = all.filter((p) => isArchived(p?.SiArchive));
 
       const enriched = await Promise.all(
         archived.map(async (p) => {
@@ -86,26 +86,23 @@ function PersonnelArchivesListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     sessionStorage.removeItem(CACHE_KEY);
     await load({ force: true });
-  };
+  }, [load]);
 
   const columns = useMemo(
     () => [
-      
-
       { field: "IDPersonneService", headerName: "ID", width: 90 },
       { field: "NomPersonne", headerName: "NOM", width: 220 },
       { field: "PrenomPersonne", headerName: "PRÉNOM", width: 220 },
       { field: "Email", headerName: "E-mail", width: 280 },
-
       {
         field: "DateEntree",
         headerName: "DATE D'ENTRÉE",
@@ -121,10 +118,10 @@ function PersonnelArchivesListPage() {
       {
         field: "actions",
         headerName: "Actions",
-        width: 100,
+        width: 120,
         sortable: false,
         renderCell: (params) => (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", width: "50%" }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
             <RestoreActionComponent
               PersonneID={params.row.PersonneID}
               nomPersonne={params.row.NomPersonne}
@@ -136,7 +133,7 @@ function PersonnelArchivesListPage() {
         ),
       },
     ],
-    []
+    [refreshData]
   );
 
   if (error) return <Alert severity="error">{error}</Alert>;
@@ -144,20 +141,20 @@ function PersonnelArchivesListPage() {
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="h1" fontWeight={700}>
           Personnels archivés
         </Typography>
 
-       <Tooltip title="Retour à la liste des personnels" arrow>
-  <Button
-    variant="contained"
-    size="small"
-    startIcon={<KeyboardReturnIcon />}
-    onClick={() => navigate("/personnels")}
-  >
-    Retour
-  </Button>
-</Tooltip>
+        <Tooltip title="Retour à la liste des personnels" arrow>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<KeyboardReturnIcon />}
+            onClick={() => navigate("/personnels")}
+          >
+            Retour
+          </Button>
+        </Tooltip>
       </Stack>
 
       <Box sx={{ width: "100%", height: "calc(100vh - 220px)" }}>
@@ -183,7 +180,6 @@ function PersonnelArchivesListPage() {
             },
             loadingOverlay: {
               variant: "linear-progress",
-              noRowsVariant: "linear-progress",
             },
           }}
           sx={{

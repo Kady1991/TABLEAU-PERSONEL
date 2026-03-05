@@ -18,8 +18,8 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
 import { LIEN_API_PERSONNE } from "../../config";
+import PropTypes from "prop-types";
 
 function DeleteMembreComponent({
   IDPersonneService,
@@ -194,5 +194,16 @@ function DeleteMembreComponent({
     </>
   );
 }
+DeleteMembreComponent.propTypes = {
+  IDPersonneService: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]).isRequired,
 
+  nomPersonne: PropTypes.string,
+  prenomPersonne: PropTypes.string,
+  email: PropTypes.string,
+
+  refreshData: PropTypes.func,
+};
 export default DeleteMembreComponent;

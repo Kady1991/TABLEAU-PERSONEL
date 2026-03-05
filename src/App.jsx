@@ -7,7 +7,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import Home from "./pages/personnels/HomePage";
 import PersonnelList from "./pages/personnels/PersonnelListPage";
 import PersonnelDetail from "./pages/personnels/PersonnelDetailPage";
-import PersonnelStatistics from "./pages/personnels/PersonnelStatisticsPage";
+import PersonnelStatistics from "./pages/Personnels/PersonnelStatisticsPage";
 import PersonnelArchivesList from "./pages/personnels/PersonnelArchivesListPage";
 
 export default function App() {

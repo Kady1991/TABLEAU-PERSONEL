@@ -6,103 +6,48 @@ const ICON_TEAL = "#02B2AF";
 const theme = createTheme({
   palette: {
     mode: "light",
+    primary: { main: PRIMARY_BLUE, contrastText: "#ffffff" },
+    secondary: { main: ICON_TEAL },
+    background: { default: "#f6f7fb", paper: "#ffffff" },
+  },
 
-    primary: {
-      main: PRIMARY_BLUE,
-      contrastText: "#ffffff",
+  shape: { borderRadius: 12 },
+
+  typography: {
+    fontFamily: "Roboto, Arial, sans-serif",
+
+    h1: {
+      fontSize: "28px",
+      fontWeight: 800,
+      color: PRIMARY_BLUE,
+      letterSpacing: "-0.5px",
     },
+    h2: { fontSize: "20px", fontWeight: 700, color: PRIMARY_BLUE },
+    h3: { fontSize: "16px", fontWeight: 700, color: PRIMARY_BLUE },
+    h4: { fontSize: "15px", fontWeight: 600, color: PRIMARY_BLUE },
 
-    secondary: {
-      main: ICON_TEAL,
-    },
-
-    background: {
-      default: "#f6f7fb",
-      paper: "#ffffff",
-    },
+    subtitle1: { fontWeight: 600, color: PRIMARY_BLUE },
+    body1: { fontSize: "14px" },
+    body2: { fontSize: "13px", color: "#5c6b7a" },
   },
-
-  shape: {
-    borderRadius: 12,
-  },
-
- typography: {
-  fontFamily: "Roboto, Arial, sans-serif",
-
-  /* =========================
-     TITRE PRINCIPAL DE PAGE
-     ========================= */
-  h1: {
-    fontSize: "28px",
-    fontWeight: 800,
-    color: PRIMARY_BLUE,
-    letterSpacing: "-0.5px",
-  },
-
-  /* =========================
-     SOUS TITRE DE PAGE
-     ========================= */
-  h2: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: PRIMARY_BLUE,
-  },
-
-  /* =========================
-     TITRE DE SECTION / CARD
-     ========================= */
-  h3: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: PRIMARY_BLUE,
-  },
-
-  /* =========================
-     PETITS TITRES
-     ========================= */
-  h4: {
-    fontSize: "15px",
-    fontWeight: 600,
-    color: PRIMARY_BLUE,
-  },
-
-  subtitle1: {
-    fontWeight: 600,
-    color: PRIMARY_BLUE,
-  },
-
-  body1: {
-    fontSize: "14px",
-  },
-
-  body2: {
-    fontSize: "13px",
-    color: "#5c6b7a",
-  },
-},
 
   components: {
-    /* =========================
-       APP BAR (BARRE DU HAUT)
-    ========================== */
-
-  MuiInputLabel: {
-  styleOverrides: {
-    root: {
-      fontSize: 13,
-      fontWeight: 600,
-      color: PRIMARY_BLUE,
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: 13,
+          fontWeight: 600,
+          color: PRIMARY_BLUE,
+        },
+        asterisk: {
+          color: "#d32f2f",
+          order: -1,
+          marginRight: 4,
+          marginLeft: 0,
+          fontWeight: 800,
+        },
+      },
     },
-
-    asterisk: {
-      color: "#d32f2f",
-      order: -1,
-      marginRight: 4,
-      marginLeft: 0,
-      fontWeight: 800,
-    },
-  },
-},
 
     MuiAppBar: {
       styleOverrides: {
@@ -110,17 +55,11 @@ const theme = createTheme({
           backgroundColor: PRIMARY_BLUE,
           color: "#ffffff",
           backgroundImage: "none",
-
-          "& .MuiSvgIcon-root": {
-            color: "#ffffff",
-          },
+          "& .MuiSvgIcon-root": { color: "#ffffff" },
         },
       },
     },
 
-    /* =========================
-       SIDEBAR (DRAWER)
-    ========================== */
     MuiDrawer: {
       styleOverrides: {
         paper: {
@@ -131,9 +70,6 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       TEXTE MENU SIDEBAR
-    ========================== */
     MuiListItemText: {
       styleOverrides: {
         primary: {
@@ -143,9 +79,6 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       ICONES MENU
-    ========================== */
     MuiListItemIcon: {
       styleOverrides: {
         root: {
@@ -155,31 +88,12 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       ICONES GENERALES (Cards etc.)
-    ========================== */
     MuiSvgIcon: {
       styleOverrides: {
-        root: {
-          color: ICON_TEAL,
-        },
+        root: { color: ICON_TEAL },
       },
     },
 
-    /* =========================
-       ✅ LABELS (TextField / Select / DatePicker)
-       => plus besoin de InputLabelProps partout
-    ========================== */
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          fontSize: 13,
-          fontWeight: 500,
-        },
-      },
-    },
-
-    /* utile pour RadioGroup / FormLabel ("Personnel", "Langue", etc.) */
     MuiFormLabel: {
       styleOverrides: {
         root: {
@@ -190,23 +104,13 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       ✅ CHAMPS EN "SMALL" PARTOUT
-    ========================== */
     MuiTextField: {
-      defaultProps: {
-        size: "small",
-      },
+      defaultProps: { size: "small" },
     },
     MuiFormControl: {
-      defaultProps: {
-        size: "small",
-      },
+      defaultProps: { size: "small" },
     },
 
-    /* =========================
-       CARD
-    ========================== */
     MuiCard: {
       defaultProps: { variant: "outlined" },
       styleOverrides: {
@@ -216,9 +120,6 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       BUTTON
-    ========================== */
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
@@ -230,9 +131,6 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       TABLE
-    ========================== */
     MuiTableCell: {
       styleOverrides: {
         head: {
@@ -247,9 +145,6 @@ const theme = createTheme({
       },
     },
 
-    /* =========================
-       (OPTIONNEL) Dialog title un peu plus "pro"
-    ========================== */
     MuiDialogTitle: {
       styleOverrides: {
         root: {

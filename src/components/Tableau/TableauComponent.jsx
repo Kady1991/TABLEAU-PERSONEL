@@ -11,14 +11,20 @@ import DeleteMembreComponent from "../../components/Forms/DeleteMembreComponent.
 import AjoutFormComponent from "../../components/Forms/AjoutFormComponent.jsx";
 
 import PersonnelService from "../../services/PersonnelService.js";
+import PropTypes from "prop-types";
 
-function TableauComponent({
+// ✅ helper robuste : true / 1 / "1" / "true"
+const isArchived = (v) => v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
+
+export default function TableauComponent({
   compact = false,
   height = 400,
-  rowsPreview,
+  rowsPreview, // ✅ number | undefined
   showHeader = true,
   showAddButton = true,
   nonArchivedOnly = true,
+
+  // mode contrôlé
   rows: rowsProp,
   loading: loadingProp,
   error: errorProp,
@@ -33,6 +39,7 @@ function TableauComponent({
   const [loadingState, setLoadingState] = useState(true);
   const [errorState, setErrorState] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
+
   const rows = isControlled ? rowsProp : rowsState;
   const loading = typeof loadingProp === "boolean" ? loadingProp : loadingState;
   const error = typeof errorProp === "string" ? errorProp : errorState;
@@ -45,22 +52,11 @@ function TableauComponent({
       const res = await PersonnelService.getAll();
       const data = Array.isArray(res?.data) ? res.data : [];
 
-      const filtered = nonArchivedOnly
-        ? data.filter(
-            (p) =>
-              !(
-                p.SiArchive === true ||
-                p.SiArchive === 1 ||
-                p.SiArchive === "1"
-              ),
-          )
-        : data;
+      const filtered = nonArchivedOnly ? data.filter((p) => !isArchived(p?.SiArchive)) : data;
 
       const finalRows =
-        typeof rowsPreview === "number"
-          ? filtered.slice(0, rowsPreview)
-          : filtered;
-      console.log("[FETCH] après filtre nonArchivedOnly =", filtered.length);
+        typeof rowsPreview === "number" ? filtered.slice(0, rowsPreview) : filtered;
+
       setRowsState(finalRows);
     } catch (e) {
       console.error(e);
@@ -87,43 +83,24 @@ function TableauComponent({
   // ✅ après ajout : refresh + fermer
   const handleMemberUpdate = useCallback(
     async (addedMember) => {
-      // ✅ 1) Ajout immédiat dans l'affichage (si tableau autonome)
+      // 1) Ajout immédiat dans l'affichage (si tableau autonome)
       if (!isControlled && addedMember) {
         setRowsState((prev) => {
           const newId = addedMember?.IDPersonneService ?? Date.now();
-          const exists = prev.some(
-            (r) => String(r.IDPersonneService) === String(newId),
-          );
+          const exists = prev.some((r) => String(r?.IDPersonneService) === String(newId));
           if (exists) return prev;
 
-          // ✅ on met le nouvel élément en 1er (il sera visible même en preview)
           const next = [{ ...addedMember, IDPersonneService: newId }, ...prev];
 
-          // ✅ si tu es en preview (Home), on respecte rowsPreview
-          if (typeof rowsPreview === "number")
-            return next.slice(0, rowsPreview);
-          console.log(
-            "[TABLEAU] next.length =",
-            next.length,
-            "| newId =",
-            newId,
-          );
-          console.log("[TABLEAU] next[0] =", next[0]);
+          if (typeof rowsPreview === "number") return next.slice(0, rowsPreview);
           return next;
         });
-        console.log("[TABLEAU] handleMemberUpdate reçu :", addedMember);
-        console.log(
-          "[TABLEAU] isControlled =",
-          isControlled,
-          "| rowsPreview =",
-          rowsPreview,
-        );
       }
 
-      // ✅ 2) Refetch (pour compléter les champs manquants)
+      // 2) Refetch
       await refreshData();
 
-      // ✅ 3) Ferme le dialog
+      // 3) Ferme le dialog
       setOpenAdd(false);
     },
     [isControlled, refreshData, rowsPreview],
@@ -143,9 +120,7 @@ function TableauComponent({
             <Tooltip title="Voir la fiche">
               <IconButton
                 size="small"
-                onClick={() =>
-                  navigate(`/Personnels/${params.row.IDPersonneService}`)
-                }
+                onClick={() => navigate(`/Personnels/${params.row.IDPersonneService}`)}
               >
                 <VisibilityIcon fontSize="small" />
               </IconButton>
@@ -165,6 +140,7 @@ function TableauComponent({
               IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
+              email={params.row.Email}
               refreshData={refreshData}
             />
           </Stack>
@@ -177,6 +153,7 @@ function TableauComponent({
       { field: "SiFrancaisString", headerName: "LANGUE", width: 100 },
       { field: "DateEntree", headerName: "ENTRÉE", width: 150 },
       { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
+      { field: "NomFonctionFr", headerName: "FONCTION", width: 200 },
       { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
       { field: "NomRueFr", headerName: "RUE", width: 200 },
       { field: "Numero", headerName: "N°", width: 80 },
@@ -198,7 +175,7 @@ function TableauComponent({
         overflow: "hidden",
       }}
     >
-      {/* ✅ FORMULAIRE AJOUT intégré -> dispo partout */}
+      {/* ✅ Formulaire ajout intégré */}
       <AjoutFormComponent
         open={openAdd}
         onClose={() => setOpenAdd(false)}
@@ -206,15 +183,10 @@ function TableauComponent({
         refreshData={refreshData}
       />
 
-      {/* ✅ Header affiché même en compact */}
       {showHeader && (
         <Stack direction="row" justifyContent="space-between" mb={2}>
           {showAddButton && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenAdd(true)}
-            >
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenAdd(true)}>
               Nouveau Membre
             </Button>
           )}
@@ -236,8 +208,10 @@ function TableauComponent({
         <DataGrid
           rows={rows}
           columns={columns}
-          getRowId={(row) => row.IDPersonneService}
+          // ✅ getRowId robuste si ID absent
+          getRowId={(row) => row?.IDPersonneService ?? row?.id ?? `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}_${Math.random()}`}
           loading={loading}
+          checkboxSelection
           disableRowSelectionOnClick
           hideFooter={compact}
           slots={compact ? {} : { toolbar: GridToolbar }}
@@ -245,7 +219,7 @@ function TableauComponent({
           sx={{ height: "100%", border: "none" }}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
+              paginationModel: { pageSize: compact ? (rowsPreview || 5) : 25 },
             },
             sorting: {
               sortModel: [{ field: "IDPersonneService", sort: "desc" }],
@@ -257,4 +231,16 @@ function TableauComponent({
   );
 }
 
-export default TableauComponent;
+TableauComponent.propTypes = {
+  compact: PropTypes.bool,
+  height: PropTypes.number,
+  rowsPreview: PropTypes.number, // ✅ CORRIGÉ (c’était array)
+  showHeader: PropTypes.bool,
+  showAddButton: PropTypes.bool,
+  nonArchivedOnly: PropTypes.bool,
+
+  rows: PropTypes.array,
+  loading: PropTypes.bool,
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  refreshData: PropTypes.func,
+};
