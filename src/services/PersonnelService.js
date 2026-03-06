@@ -29,6 +29,8 @@ const PersonnelService = {
   getTypesPersonnel: () => http.get("/api/infos/typepersonnel"),
   getServices: () => http.get("/api/infos/services"),
   getCodes: () => http.get("/api/infos/codes"),
+  getFunctions: () => http.get("/api/infos/fonctions"),
+  getFunction: (id) => http.get(`/api/infos/fonction?idFonction=${id}`),
 };
 
 export default PersonnelService;
