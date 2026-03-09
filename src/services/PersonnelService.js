@@ -15,13 +15,13 @@ const PersonnelService = {
   getAll: () => http.get("/api/Personnes/liste"),
 
   // Récupérer un personnel par ID
-  getById: (id) => http.get(`/api/Personne/${id}`),
+  getById: (id) => http.get(`/api/Personnes/${id}`),
 
   //Modifier un personnel
-  update: (id, payload) => http.put(`/api/personne/edit?id=${id}`, payload),
+  update: (id, payload) => http.put(`/api/personnes/edit?id=${id}`, payload),
 
   // Restaurer un personnel archivé
-  restore: (id) => http.put(`/api/personne/desarchiver?id=${id}`),
+  restore: (id) => http.put(`/api/personnes/desarchiver?id=${id}`),
 
   // Référentiels
   getGrades: () => http.get("/api/infos/wwgrades"),
