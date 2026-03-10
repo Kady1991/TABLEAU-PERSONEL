@@ -31,23 +31,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import PersonnelService from "../../services/PersonnelService";
 
-// IMPORTANT : sortir initialForm du composant pour éviter les warnings liés à la réinitialisation 
-// du formulaire à l'ouverture du dialog (et éviter de recréer l'objet à chaque render)
-const INITIAL_FORM = {
-  nom: "",
-  prenom: "",
-  telephone: "",
-  email: "",
-  DateEntreeDate: null,
-  grade: "",
-  adresse: "",
-  service: "",
-  SiTypePersonnel: false,
-  TypePersonnelID: "",
-  siFrancais: true,
-};
+import PersonnelService from "../../services/PersonnelService.js";
 
 const AjoutFormComponent = forwardRef(
   ({ open, onClose, onMemberUpdate, refreshData }, ref) => {
@@ -107,10 +92,10 @@ const AjoutFormComponent = forwardRef(
 
         try {
           const [gradesRes, servicesRes, addrRes, typeRes] = await Promise.all([
-            PersonnelService.getGrades(),
-            PersonnelService.getServices(),
-            PersonnelService.getAdresses(),
-            PersonnelService.getTypesPersonnel(),
+            await PersonnelService.getGrades(),
+            await PersonnelService.getServices(),
+            await PersonnelService.getAdresses(),
+            await PersonnelService.getTypesPersonnel(),
           ]);
 
           if (!mounted) return;
@@ -142,9 +127,9 @@ const AjoutFormComponent = forwardRef(
 
       (async () => {
         try {
-          const res = await PersonnelService.getServiceDetails(form.service);
-          if (mounted) setSelectedServiceDetails(res?.data || null);
-        } catch {
+          const res = await PersonnelService.getServices();
+          if (mounted) setSelectedServiceDetails(res.data || null);
+        } catch (e) {
           if (mounted) setSelectedServiceDetails(null);
         }
       })();
@@ -199,6 +184,8 @@ const AjoutFormComponent = forwardRef(
 
           SiFrancais: !!form.siFrancais,
           SiTypePersonnel: !!form.SiTypePersonnel,
+
+          // ✅ d'après ton XML : 0 si vide
           TypePersonnelID: form.SiTypePersonnel
             ? Number(form.TypePersonnelID)
             : 0,
@@ -206,8 +193,21 @@ const AjoutFormComponent = forwardRef(
           SiArchive: false,
         };
 
-        const res = await PersonnelService.create(payload);
-        const data = res?.data;
+        console.log("payload", payload);
+        console.log("[AJOUT] payload JSON =", JSON.stringify(payload, null, 2));
+        console.log("[AJOUT] types payload:", {
+          ServiceID: typeof payload.ServiceID,
+          AdresseID: typeof payload.AdresseID,
+          WWGradeID: typeof payload.WWGradeID,
+          TypePersonnelID: typeof payload.TypePersonnelID,
+          SiFrancais: typeof payload.SiFrancais,
+          SiTypePersonnel: typeof payload.SiTypePersonnel,
+          SiArchive: typeof payload.SiArchive,
+        });
+
+        const response = await PersonnelService.create(payload);
+        console.log("[AJOUT] response.data :", response.data);
+        console.log("[AJOUT] status :", response.status);
 
         if (data === "Personne Exists") {
           alert("Cet email est déjà attribué.");
@@ -221,8 +221,12 @@ const AjoutFormComponent = forwardRef(
           alert(msg);
           return;
         }
+        if (response.data === "OK-create") {
+          alert("Ajout réussi !");
+        }
+        clearCaches();
 
-        PersonnelService.clearCaches?.();
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (typeof refreshData === "function") await refreshData();
 
@@ -243,12 +247,13 @@ const AjoutFormComponent = forwardRef(
           onMemberUpdate(addedMember);
         }
 
-        alert("Ajout réussi !");
         handleClose();
-      } catch (e) {
-        const msg = e?.response?.data || e?.message || "Erreur lors de l'envoi.";
-        setError(String(msg));
-        alert(String(msg));
+      } catch (error) {
+        console.log("Validation errors:", error.response.data.errors);
+
+        const msg = error?.response?.data || "Erreur lors de l'envoi.";
+        setError(msg);
+        alert(msg);
       } finally {
         setSaving(false);
       }
@@ -376,7 +381,7 @@ const AjoutFormComponent = forwardRef(
                       isOptionEqualToValue={(option, value) =>
                         option.IDWWGrade === value.IDWWGrade
                       }
-                      onChange={(_, nv) =>
+                      onChange={(e, nv) =>
                         setField("grade", nv ? nv.IDWWGrade : "")
                       }
                       renderInput={(params) => (
@@ -389,9 +394,7 @@ const AjoutFormComponent = forwardRef(
                     <Autocomplete
                       size="small"
                       options={addresses}
-                      getOptionLabel={(option) =>
-                        option?.AdresseComplete || ""
-                      }
+                      getOptionLabel={(option) => option?.AdresseComplete || ""}
                       value={
                         addresses.find((a) => a.IDAdresse === form.adresse) ||
                         null
@@ -399,7 +402,7 @@ const AjoutFormComponent = forwardRef(
                       isOptionEqualToValue={(option, value) =>
                         option.IDAdresse === value.IDAdresse
                       }
-                      onChange={(_, nv) =>
+                      onChange={(e, nv) =>
                         setField("adresse", nv ? nv.IDAdresse : "")
                       }
                       renderInput={(params) => (

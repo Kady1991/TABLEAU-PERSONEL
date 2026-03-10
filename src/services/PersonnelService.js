@@ -1,105 +1,39 @@
 import axios from "axios";
 import { LIEN_API_PERSONNE } from "../config";
-import { XMLParser } from "fast-xml-parser";
 
 const http = axios.create({
   baseURL: LIEN_API_PERSONNE,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // headers: {
+  //   "Content-Type": "application/json",
+  // },
+  // Décommente si nécessaire pour IIS / SSO
+  withCredentials: true,
 });
 
 const PersonnelService = {
-  // ===============================
-  // PERSONNES
-  // ===============================
+  // Récupérer tous le personnel
+  getAll: () => http.get("/api/Personnes/liste"),
 
-  getAll: () => http.get("/api/Personne"),
+  // Récupérer une personne par ID
+  getById: (id) => http.get(`/api/Personnes/${id}`),
 
-  getById: (id) => http.get(`/api/Personne/${id}`),
+  // créer une personne
+  create: (payload) => http.post(`/api/Personnes/`, payload),
 
-  create: (payload) => http.post("/api/Personne", payload),
+  //Modifier une personne
+  update: (id, payload) => http.put(`/api/personnes/edit?id=${id}`, payload),
 
-  update: (id, payload) =>
-    http.put(`/api/personne/edit?id=${id}`, payload),
+  // Restaurer une personne archivée
+  restore: (id) => http.put(`/api/personnes/desarchiver?id=${id}`),
 
-  restore: (id) =>
-    http.put(`/api/personne/desarchiver?id=${id}`),
-
-  // ===============================
-  // RÉFÉRENTIELS
-  // ===============================
-
-  getGrades: () => http.get("/api/wwgrades"),
-
-  getAdresses: () => http.get("/api/Adresses"),
-
-  getTypesPersonnel: () => http.get("/api/typepersonnel"),
-
-  getServices: () => http.get("/api/affectation/services"),
-
-  // ===============================
-  // SERVICE DETAILS
-  // ===============================
-
-  getServiceDetails: (serviceId) =>
-    http.get(`/api/affectation/${serviceId}`),
-
-  // ===============================
-  // UTILITAIRE CACHE
-  // ===============================
-
-  clearCaches: () => {
-    try {
-      sessionStorage.removeItem("personnels_actifs_cache_v1");
-      sessionStorage.removeItem("Personnels_actifs_cache_v1");
-      sessionStorage.removeItem("home_personnels_actifs_cache_v1");
-      sessionStorage.removeItem("personnels_archives_cache_v2_dates");
-    } catch (e) {
-      console.error("Erreur vidage cache:", e);
-    }
-  },
-
-  // ===============================
-  // XML → JSON (pour DetailMembreComponent)
-  // ===============================
-
-  getByIdXmlParsed: async (id) => {
-    const response = await http.get(`/api/Personne/${id}`, {
-      headers: {
-        Accept: "application/xml",
-      },
-    });
-
-    if (!response?.data) {
-      throw new Error("Réponse API vide.");
-    }
-
-    if (typeof response.data !== "string") {
-      throw new Error("La réponse API n'est pas du XML.");
-    }
-
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-    });
-
-    const jsonData = parser.parse(response.data);
-
-    return jsonData?.WhosWhoModelView ?? null;
-  },
-  //  Recherche par email (utilisée par DeleteMembreComponent)
-getByEmail: async (email) => {
-  const res = await http.get(`/api/personne?email=${encodeURIComponent(email)}`);
-  return res?.data;
-},
-
-//  Archive par email + dateSortie
-archiveByEmail: async (email, dateSortieYYYYMMDD) => {
-  const url = `/api/personne/delete?email=${encodeURIComponent(email)}&dateSortie=${encodeURIComponent(
-    dateSortieYYYYMMDD
-  )}`;
-  return http.put(url);
-},
+  // Référentiels
+  getGrades: () => http.get("/api/infos/wwgrades"),
+  getAdresses: () => http.get("/api/infos/Adresses"),
+  getTypesPersonnel: () => http.get("/api/infos/typepersonnel"),
+  getServices: () => http.get("/api/infos/services"),
+  getCodes: () => http.get("/api/infos/codes"),
+  getFunctions: () => http.get("/api/infos/fonctions"),
+  getFunction: (id) => http.get(`/api/infos/fonction?idFonction=${id}`),
 };
 
 export default PersonnelService;

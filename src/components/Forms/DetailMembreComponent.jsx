@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import PersonnelService from "../../services/PersonnelService";
+import PersonnelService from "../../services/PersonnelService.js";
 
 function DetailMembreComponent({ open, onClose, IDPersonneService }) {
   const [personData, setPersonData] = useState(null);
@@ -45,14 +45,18 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
       setPersonData(null);
 
       try {
-        const view = await PersonnelService.getByIdXmlParsed(IDPersonneService);
+        const response = await PersonnelService.getById(IDPersonneService);
+        console.log("lien", PersonnelService.getById(IDPersonneService));
+        const parser = new XMLParser();
+        const jsonData = parser.parse(response.data);
+        const view = jsonData?.WhosWhoModelView ?? null;
 
         setPersonData(view);
         cacheRef.current.set(IDPersonneService, view);
       } catch (e) {
         console.error(
           "Erreur lors de la récupération des données :",
-          e?.response?.data || e?.message
+          e?.response?.data || e?.message,
         );
         setError(e?.message || "Erreur lors de la récupération des données");
         setPersonData(null);
@@ -86,9 +90,11 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
 
         {!loading && error ? <Alert severity="error">{error}</Alert> : null}
 
-        {!loading && !error && !personData ? (
-          <Alert severity="warning">Aucune donnée trouvée pour cet utilisateur.</Alert>
-        ) : null}
+        {!loading && !error && !personData && (
+          <Alert severity="warning">
+            Aucune donnée trouvée pour cet utilisateur.
+          </Alert>
+        )}
 
         {!loading && !error && personData ? (
           <Box
@@ -109,42 +115,54 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
               <Typography variant="body2" color="text.secondary">
                 Prénom
               </Typography>
-              <Typography fontWeight={700}>{personData.PrenomPersonne || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.PrenomPersonne}
+              </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
                 Email
               </Typography>
-              <Typography fontWeight={700}>{personData.Email || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.Email || "-"}
+              </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
                 Téléphone
               </Typography>
-              <Typography fontWeight={700}>{personData.TelPro || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.TelPro || "-"}
+              </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
                 Service
               </Typography>
-              <Typography fontWeight={700}>{personData.NomServiceFr || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.NomServiceFr || "-"}
+              </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
                 Grade
               </Typography>
-              <Typography fontWeight={700}>{personData.NomWWGradeFr || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.NomWWGradeFr || "-"}
+              </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                Date d&apos;entrée
+                Date d'entrée
               </Typography>
-              <Typography fontWeight={700}>{formatDate(personData.DateEntree)}</Typography>
+              <Typography fontWeight={700}>
+                {formatDate(personData.DateEntree)}
+              </Typography>
             </Box>
 
             <Box>
@@ -152,7 +170,9 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
                 Date de sortie
               </Typography>
               <Typography fontWeight={700}>
-                {personData.DateSortie ? formatDate(personData.DateSortie) : "Non spécifiée"}
+                {personData.DateSortie
+                  ? formatDate(personData.DateSortie)
+                  : "Non spécifiée"}
               </Typography>
             </Box>
 
@@ -161,8 +181,9 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
                 Adresse
               </Typography>
               <Typography fontWeight={700}>
-                {personData.NomRueFr || "-"} {personData.Numero || ""} — Bâtiment:{" "}
-                {personData.Batiment || "-"} — Étage: {personData.Etage || "-"}
+                {personData.NomRueFr || "-"} {personData.Numero || ""} —
+                Bâtiment: {personData.Batiment || "-"} — Étage:{" "}
+                {personData.Etage || "-"}
               </Typography>
             </Box>
 
@@ -171,7 +192,8 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
                 Chef de service
               </Typography>
               <Typography fontWeight={700}>
-                {personData.NomChefService || "-"} {personData.PrenomChefService || ""}
+                {personData.NomChefService || "-"}{" "}
+                {personData.PrenomChefService || ""}
               </Typography>
             </Box>
 
@@ -179,7 +201,9 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
               <Typography variant="body2" color="text.secondary">
                 Département
               </Typography>
-              <Typography fontWeight={700}>{personData.NomDepartementFr || "-"}</Typography>
+              <Typography fontWeight={700}>
+                {personData.NomDepartementFr || "-"}
+              </Typography>
             </Box>
 
             <Box sx={{ gridColumn: { xs: "1 / -1", sm: "1 / -1" } }}>
@@ -187,7 +211,8 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
                 Chef de département
               </Typography>
               <Typography fontWeight={700}>
-                {personData.NomChefDepartement || "-"} {personData.PrenomChefDepartement || ""}
+                {personData.NomChefDepartement || "-"}{" "}
+                {personData.PrenomChefDepartement || ""}
               </Typography>
             </Box>
           </Box>
