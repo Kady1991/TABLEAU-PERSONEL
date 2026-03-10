@@ -28,6 +28,7 @@ import {
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CloseIcon from "@mui/icons-material/Close";
+
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -47,7 +48,21 @@ const AjoutFormComponent = forwardRef(
 
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
-    const [form, setForm] = useState(INITIAL_FORM);
+    const initialForm = {
+      nom: "",
+      prenom: "",
+      telephone: "",
+      email: "",
+      DateEntreeDate: null,
+      grade: "",
+      adresse: "",
+      service: "",
+      SiTypePersonnel: false,
+      TypePersonnelID: "",
+      siFrancais: true,
+    };
+
+    const [form, setForm] = useState(initialForm);
 
     const isPersonnelSelected = form.SiTypePersonnel === true;
 
@@ -56,8 +71,8 @@ const AjoutFormComponent = forwardRef(
 
     const generateEmail = (prenom, nom) => {
       if (!prenom || !nom) return "";
-      const prenoms = String(prenom).split(/[\s-]+/);
-      const noms = String(nom).split(/[\s-]+/);
+      const prenoms = prenom.split(/[\s-]+/);
+      const noms = nom.split(/[\s-]+/);
 
       const firstLettersPrenom = prenoms
         .filter((p) => p.trim() !== "")
@@ -73,15 +88,15 @@ const AjoutFormComponent = forwardRef(
       setField("email", email);
     };
 
-    // Reset à l'ouverture (plus de warning initialForm)
+    // Reset à l'ouverture du Dialog
     useEffect(() => {
       if (!open) return;
       setError("");
       setSelectedServiceDetails(null);
-      setForm(INITIAL_FORM);
+      setForm(initialForm);
     }, [open]);
 
-    // Chargement listes
+    // Chargement initial des listes (API)
     useEffect(() => {
       if (!open) return;
       let mounted = true;
@@ -89,7 +104,6 @@ const AjoutFormComponent = forwardRef(
       (async () => {
         setLoadingInit(true);
         setError("");
-
         try {
           const [gradesRes, servicesRes, addrRes, typeRes] = await Promise.all([
             await PersonnelService.getGrades(),
@@ -100,12 +114,12 @@ const AjoutFormComponent = forwardRef(
 
           if (!mounted) return;
 
-          setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
-          setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
-          setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
-          setTypePersonnelList(Array.isArray(typeRes?.data) ? typeRes.data : []);
+          setGrades(Array.isArray(gradesRes.data) ? gradesRes.data : []);
+          setServices(Array.isArray(servicesRes.data) ? servicesRes.data : []);
+          setAddresses(Array.isArray(addrRes.data) ? addrRes.data : []);
+          setTypePersonnelList(Array.isArray(typeRes.data) ? typeRes.data : []);
         } catch (e) {
-          if (mounted) setError("Erreur lors du chargement des listes.");
+          setError("Erreur lors du chargement des listes.");
         } finally {
           if (mounted) setLoadingInit(false);
         }
@@ -116,37 +130,39 @@ const AjoutFormComponent = forwardRef(
       };
     }, [open]);
 
-    // Détails service
+    // Récupération automatique des détails du chef de service
     useEffect(() => {
-      if (!open || !form.service) {
+      if (!form.service) {
         setSelectedServiceDetails(null);
         return;
       }
 
-      let mounted = true;
+      const service = services.find(
+        (s) => Number(s.IDService) === Number(form.service),
+      );
 
-      (async () => {
-        try {
-          const res = await PersonnelService.getServices();
-          if (mounted) setSelectedServiceDetails(res.data || null);
-        } catch (e) {
-          if (mounted) setSelectedServiceDetails(null);
-        }
-      })();
+      setSelectedServiceDetails(service || null);
+    }, [form.service, services]);
 
-      return () => {
-        mounted = false;
-      };
-    }, [open, form.service]);
+    const clearCaches = () => {
+      try {
+        sessionStorage.removeItem("personnels_actifs_cache_v1");
+        sessionStorage.removeItem("Personnels_actifs_cache_v1");
+        sessionStorage.removeItem("home_personnels_actifs_cache_v1");
+      } catch (e) {
+        console.error("Erreur vidage cache:", e);
+      }
+    };
 
     const handleClose = () => {
-      setForm(INITIAL_FORM);
+      setForm(initialForm);
       setSelectedServiceDetails(null);
       setError("");
       onClose?.();
     };
 
     const handleSubmit = async () => {
+      // Validation simple
       if (
         !form.nom ||
         !form.prenom ||
@@ -159,6 +175,7 @@ const AjoutFormComponent = forwardRef(
         return;
       }
 
+      // Si personnel = Oui => TypePersonnel obligatoire
       if (form.SiTypePersonnel === true && !form.TypePersonnelID) {
         alert("Veuillez sélectionner un type de personnel.");
         return;
@@ -169,7 +186,7 @@ const AjoutFormComponent = forwardRef(
 
       try {
         const payload = {
-          NomPersonne: String(form.nom).toUpperCase(),
+          NomPersonne: form.nom.toUpperCase(),
           PrenomPersonne: form.prenom,
           Email: form.email?.trim(),
           TelPro: form.telephone ? String(form.telephone).trim() : null,
@@ -178,10 +195,14 @@ const AjoutFormComponent = forwardRef(
             ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
             : null,
 
+          // ✅ IDs en nombre
           ServiceID: form.service ? Number(form.service) : null,
           AdresseID: form.adresse ? Number(form.adresse) : null,
+
+          // ✅ d'après ton XML : 0 si vide
           WWGradeID: form.grade ? Number(form.grade) : 0,
 
+          // ✅ bool
           SiFrancais: !!form.siFrancais,
           SiTypePersonnel: !!form.SiTypePersonnel,
 
@@ -209,12 +230,12 @@ const AjoutFormComponent = forwardRef(
         console.log("[AJOUT] response.data :", response.data);
         console.log("[AJOUT] status :", response.status);
 
-        if (data === "Personne Exists") {
+        if (response.data === "Personne Exists") {
           alert("Cet email est déjà attribué.");
           return;
         }
 
-        if (data === "NOK") {
+        if (response.data === "NOK") {
           const msg =
             "L'API a refusé l'ajout (NOK). Vérifie les champs / règles serveur.";
           setError(msg);
@@ -231,16 +252,14 @@ const AjoutFormComponent = forwardRef(
         if (typeof refreshData === "function") await refreshData();
 
         if (typeof onMemberUpdate === "function") {
-          const serviceIdNum = payload.ServiceID;
-
+          const serviceIdNum = payload.ServiceID; // déjà number
           const nomService =
-            services.find(
-              (s) => Number(s.IDService) === Number(serviceIdNum),
-            )?.NomServiceFr || "";
+            services.find((s) => Number(s.IDService) === Number(serviceIdNum))
+              ?.NomServiceFr || "";
 
           const addedMember = {
             ...payload,
-            IDPersonneService: data?.IDPersonneService || Date.now(),
+            IDPersonneService: response.data?.IDPersonneService || Date.now(),
             NomServiceFr: nomService,
           };
 
