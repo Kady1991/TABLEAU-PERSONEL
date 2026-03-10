@@ -49,7 +49,7 @@ function StatisticsCharts({
     Array.isArray(series) &&
     series.length >= 2;
 
-  // ✅ sécurise les data pour éviter le crash x-charts
+  //  sécurise les data pour éviter le crash x-charts
   const actifsData = padToLength(series?.[0]?.data, xAxis.length);
   const sortiesData = padToLength(series?.[1]?.data, xAxis.length);
 

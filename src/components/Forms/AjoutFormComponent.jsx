@@ -1,6 +1,5 @@
 import { useEffect, useState, forwardRef } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
 import dayjs from "dayjs";
 import { IoPersonAddSharp } from "react-icons/io5";
 
@@ -29,12 +28,26 @@ import {
 
 import Autocomplete from "@mui/material/Autocomplete";
 import CloseIcon from "@mui/icons-material/Close";
-
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import PersonnelService from "../../services/PersonnelService";
 
-import { LIEN_API_PERSONNE } from "../../config";
+// IMPORTANT : sortir initialForm du composant pour éviter les warnings liés à la réinitialisation 
+// du formulaire à l'ouverture du dialog (et éviter de recréer l'objet à chaque render)
+const INITIAL_FORM = {
+  nom: "",
+  prenom: "",
+  telephone: "",
+  email: "",
+  DateEntreeDate: null,
+  grade: "",
+  adresse: "",
+  service: "",
+  SiTypePersonnel: false,
+  TypePersonnelID: "",
+  siFrancais: true,
+};
 
 const AjoutFormComponent = forwardRef(
   ({ open, onClose, onMemberUpdate, refreshData }, ref) => {
@@ -49,21 +62,7 @@ const AjoutFormComponent = forwardRef(
 
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
-    const initialForm = {
-      nom: "",
-      prenom: "",
-      telephone: "",
-      email: "",
-      DateEntreeDate: null,
-      grade: "",
-      adresse: "",
-      service: "",
-      SiTypePersonnel: false,
-      TypePersonnelID: "",
-      siFrancais: true,
-    };
-
-    const [form, setForm] = useState(initialForm);
+    const [form, setForm] = useState(INITIAL_FORM);
 
     const isPersonnelSelected = form.SiTypePersonnel === true;
 
@@ -72,8 +71,8 @@ const AjoutFormComponent = forwardRef(
 
     const generateEmail = (prenom, nom) => {
       if (!prenom || !nom) return "";
-      const prenoms = prenom.split(/[\s-]+/);
-      const noms = nom.split(/[\s-]+/);
+      const prenoms = String(prenom).split(/[\s-]+/);
+      const noms = String(nom).split(/[\s-]+/);
 
       const firstLettersPrenom = prenoms
         .filter((p) => p.trim() !== "")
@@ -89,15 +88,15 @@ const AjoutFormComponent = forwardRef(
       setField("email", email);
     };
 
-    // Reset à l'ouverture du Dialog
+    // Reset à l'ouverture (plus de warning initialForm)
     useEffect(() => {
       if (!open) return;
       setError("");
       setSelectedServiceDetails(null);
-      setForm(initialForm);
+      setForm(INITIAL_FORM);
     }, [open]);
 
-    // Chargement initial des listes (API)
+    // Chargement listes
     useEffect(() => {
       if (!open) return;
       let mounted = true;
@@ -105,22 +104,23 @@ const AjoutFormComponent = forwardRef(
       (async () => {
         setLoadingInit(true);
         setError("");
+
         try {
           const [gradesRes, servicesRes, addrRes, typeRes] = await Promise.all([
-            axios.get(`${LIEN_API_PERSONNE}/api/wwgrades`),
-            axios.get(`${LIEN_API_PERSONNE}/api/affectation/services`),
-            axios.get(`${LIEN_API_PERSONNE}/api/Adresses`),
-            axios.get(`${LIEN_API_PERSONNE}/api/typepersonnel`),
+            PersonnelService.getGrades(),
+            PersonnelService.getServices(),
+            PersonnelService.getAdresses(),
+            PersonnelService.getTypesPersonnel(),
           ]);
 
           if (!mounted) return;
 
-          setGrades(Array.isArray(gradesRes.data) ? gradesRes.data : []);
-          setServices(Array.isArray(servicesRes.data) ? servicesRes.data : []);
-          setAddresses(Array.isArray(addrRes.data) ? addrRes.data : []);
-          setTypePersonnelList(Array.isArray(typeRes.data) ? typeRes.data : []);
+          setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
+          setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
+          setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
+          setTypePersonnelList(Array.isArray(typeRes?.data) ? typeRes.data : []);
         } catch (e) {
-          setError("Erreur lors du chargement des listes.");
+          if (mounted) setError("Erreur lors du chargement des listes.");
         } finally {
           if (mounted) setLoadingInit(false);
         }
@@ -131,21 +131,20 @@ const AjoutFormComponent = forwardRef(
       };
     }, [open]);
 
-    // Récupération automatique des détails du chef de service
+    // Détails service
     useEffect(() => {
       if (!open || !form.service) {
         setSelectedServiceDetails(null);
         return;
       }
+
       let mounted = true;
 
       (async () => {
         try {
-          const res = await axios.get(
-            `${LIEN_API_PERSONNE}/api/affectation/${form.service}`
-          );
-          if (mounted) setSelectedServiceDetails(res.data || null);
-        } catch (e) {
+          const res = await PersonnelService.getServiceDetails(form.service);
+          if (mounted) setSelectedServiceDetails(res?.data || null);
+        } catch {
           if (mounted) setSelectedServiceDetails(null);
         }
       })();
@@ -155,25 +154,14 @@ const AjoutFormComponent = forwardRef(
       };
     }, [open, form.service]);
 
-    const clearCaches = () => {
-      try {
-        sessionStorage.removeItem("personnels_actifs_cache_v1");
-        sessionStorage.removeItem("Personnels_actifs_cache_v1");
-        sessionStorage.removeItem("home_personnels_actifs_cache_v1");
-      } catch (e) {
-        console.error("Erreur vidage cache:", e);
-      }
-    };
-
     const handleClose = () => {
-      setForm(initialForm);
+      setForm(INITIAL_FORM);
       setSelectedServiceDetails(null);
       setError("");
       onClose?.();
     };
 
     const handleSubmit = async () => {
-      // Validation simple
       if (
         !form.nom ||
         !form.prenom ||
@@ -186,7 +174,6 @@ const AjoutFormComponent = forwardRef(
         return;
       }
 
-      // Si personnel = Oui => TypePersonnel obligatoire
       if (form.SiTypePersonnel === true && !form.TypePersonnelID) {
         alert("Veuillez sélectionner un type de personnel.");
         return;
@@ -197,7 +184,7 @@ const AjoutFormComponent = forwardRef(
 
       try {
         const payload = {
-          NomPersonne: form.nom.toUpperCase(),
+          NomPersonne: String(form.nom).toUpperCase(),
           PrenomPersonne: form.prenom,
           Email: form.email?.trim(),
           TelPro: form.telephone ? String(form.telephone).trim() : null,
@@ -206,46 +193,28 @@ const AjoutFormComponent = forwardRef(
             ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
             : null,
 
-          // ✅ IDs en nombre
           ServiceID: form.service ? Number(form.service) : null,
           AdresseID: form.adresse ? Number(form.adresse) : null,
-
-          // ✅ d'après ton XML : 0 si vide
           WWGradeID: form.grade ? Number(form.grade) : 0,
 
-          // ✅ bool
           SiFrancais: !!form.siFrancais,
           SiTypePersonnel: !!form.SiTypePersonnel,
-
-          // ✅ d'après ton XML : 0 si vide
-          TypePersonnelID: form.SiTypePersonnel ? Number(form.TypePersonnelID) : 0,
+          TypePersonnelID: form.SiTypePersonnel
+            ? Number(form.TypePersonnelID)
+            : 0,
 
           SiArchive: false,
         };
 
-        console.log("[AJOUT] LIEN_API_PERSONNE =", LIEN_API_PERSONNE);
-        console.log("[AJOUT] payload JSON =", JSON.stringify(payload, null, 2));
-        console.log("[AJOUT] types payload:", {
-          ServiceID: typeof payload.ServiceID,
-          AdresseID: typeof payload.AdresseID,
-          WWGradeID: typeof payload.WWGradeID,
-          TypePersonnelID: typeof payload.TypePersonnelID,
-          SiFrancais: typeof payload.SiFrancais,
-          SiTypePersonnel: typeof payload.SiTypePersonnel,
-          SiArchive: typeof payload.SiArchive,
-        });
+        const res = await PersonnelService.create(payload);
+        const data = res?.data;
 
-        const response = await axios.post(`${LIEN_API_PERSONNE}/api/Personne`, payload);
-
-        console.log("[AJOUT] response.data :", response.data);
-        console.log("[AJOUT] status :", response.status);
-
-        if (response.data === "Personne Exists") {
+        if (data === "Personne Exists") {
           alert("Cet email est déjà attribué.");
           return;
         }
 
-        if (response.data === "NOK") {
+        if (data === "NOK") {
           const msg =
             "L'API a refusé l'ajout (NOK). Vérifie les champs / règles serveur.";
           setError(msg);
@@ -253,21 +222,21 @@ const AjoutFormComponent = forwardRef(
           return;
         }
 
-        clearCaches();
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        PersonnelService.clearCaches?.();
 
         if (typeof refreshData === "function") await refreshData();
 
         if (typeof onMemberUpdate === "function") {
-          const serviceIdNum = payload.ServiceID; // déjà number
+          const serviceIdNum = payload.ServiceID;
+
           const nomService =
-            services.find((s) => Number(s.IDService) === Number(serviceIdNum))
-              ?.NomServiceFr || "";
+            services.find(
+              (s) => Number(s.IDService) === Number(serviceIdNum),
+            )?.NomServiceFr || "";
 
           const addedMember = {
             ...payload,
-            IDPersonneService: response.data?.IDPersonneService || Date.now(),
+            IDPersonneService: data?.IDPersonneService || Date.now(),
             NomServiceFr: nomService,
           };
 
@@ -277,19 +246,22 @@ const AjoutFormComponent = forwardRef(
         alert("Ajout réussi !");
         handleClose();
       } catch (e) {
-        console.log("[AJOUT] error.response?.data :", e?.response?.data);
-        console.log("[AJOUT] error.response?.status :", e?.response?.status);
-
-        const msg = e?.response?.data || "Erreur lors de l'envoi.";
-        setError(msg);
-        alert(msg);
+        const msg = e?.response?.data || e?.message || "Erreur lors de l'envoi.";
+        setError(String(msg));
+        alert(String(msg));
       } finally {
         setSaving(false);
       }
     };
 
     return (
-      <Dialog open={!!open} onClose={handleClose} fullWidth maxWidth="md" ref={ref}>
+      <Dialog
+        open={!!open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="md"
+        ref={ref}
+      >
         <DialogTitle
           sx={{
             pb: 1,
@@ -390,7 +362,10 @@ const AjoutFormComponent = forwardRef(
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
-                      options={[{ IDWWGrade: "", NomWWGradeFr: "Aucun" }, ...grades]}
+                      options={[
+                        { IDWWGrade: "", NomWWGradeFr: "Aucun" },
+                        ...grades,
+                      ]}
                       getOptionLabel={(option) => option?.NomWWGradeFr || ""}
                       value={
                         grades.find((g) => g.IDWWGrade === form.grade) || {
@@ -401,8 +376,12 @@ const AjoutFormComponent = forwardRef(
                       isOptionEqualToValue={(option, value) =>
                         option.IDWWGrade === value.IDWWGrade
                       }
-                      onChange={(e, nv) => setField("grade", nv ? nv.IDWWGrade : "")}
-                      renderInput={(params) => <TextField {...params} label="Grade" />}
+                      onChange={(_, nv) =>
+                        setField("grade", nv ? nv.IDWWGrade : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Grade" />
+                      )}
                     />
                   </Grid>
 
@@ -410,14 +389,25 @@ const AjoutFormComponent = forwardRef(
                     <Autocomplete
                       size="small"
                       options={addresses}
-                      getOptionLabel={(option) => option?.AdresseComplete || ""}
-                      value={addresses.find((a) => a.IDAdresse === form.adresse) || null}
+                      getOptionLabel={(option) =>
+                        option?.AdresseComplete || ""
+                      }
+                      value={
+                        addresses.find((a) => a.IDAdresse === form.adresse) ||
+                        null
+                      }
                       isOptionEqualToValue={(option, value) =>
                         option.IDAdresse === value.IDAdresse
                       }
-                      onChange={(e, nv) => setField("adresse", nv ? nv.IDAdresse : "")}
+                      onChange={(_, nv) =>
+                        setField("adresse", nv ? nv.IDAdresse : "")
+                      }
                       renderInput={(params) => (
-                        <TextField {...params} label="Adresse d'affectation" required />
+                        <TextField
+                          {...params}
+                          label="Adresse d'affectation"
+                          required
+                        />
                       )}
                     />
                   </Grid>
@@ -451,20 +441,38 @@ const AjoutFormComponent = forwardRef(
                         setField("SiTypePersonnel", e.target.value === "true")
                       }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="Oui" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="Non" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="Oui"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="Non"
+                      />
                     </RadioGroup>
 
                     {isPersonnelSelected && (
-                      <FormControl fullWidth size="small" sx={{ mt: 1.5 }} required>
+                      <FormControl
+                        fullWidth
+                        size="small"
+                        sx={{ mt: 1.5 }}
+                        required
+                      >
                         <InputLabel>Type de personnel</InputLabel>
                         <Select
                           label="Type de personnel"
                           value={form.TypePersonnelID}
-                          onChange={(e) => setField("TypePersonnelID", e.target.value)}
+                          onChange={(e) =>
+                            setField("TypePersonnelID", e.target.value)
+                          }
                         >
                           {typePersonnelList.map((tp) => (
-                            <MenuItem key={tp.IDTypePersonnel} value={tp.IDTypePersonnel}>
+                            <MenuItem
+                              key={tp.IDTypePersonnel}
+                              value={tp.IDTypePersonnel}
+                            >
                               {tp.NomTypePersonnelFr}
                             </MenuItem>
                           ))}
@@ -481,10 +489,20 @@ const AjoutFormComponent = forwardRef(
                     <RadioGroup
                       row
                       value={form.siFrancais ? "true" : "false"}
-                      onChange={(e) => setField("siFrancais", e.target.value === "true")}
+                      onChange={(e) =>
+                        setField("siFrancais", e.target.value === "true")
+                      }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="FR" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="NL" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="FR"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="NL"
+                      />
                     </RadioGroup>
                   </Grid>
                 </Grid>
@@ -505,11 +523,13 @@ const AjoutFormComponent = forwardRef(
                     Détails du service
                   </Typography>
                   <Typography variant="caption" display="block">
-                    <strong>Chef Service :</strong> {selectedServiceDetails.NomChefService}{" "}
+                    <strong>Chef Service :</strong>{" "}
+                    {selectedServiceDetails.NomChefService}{" "}
                     {selectedServiceDetails.PrenomChefService}
                   </Typography>
                   <Typography variant="caption" display="block">
-                    <strong>Chef Département :</strong> {selectedServiceDetails.NomChefDepartement}{" "}
+                    <strong>Chef Département :</strong>{" "}
+                    {selectedServiceDetails.NomChefDepartement}{" "}
                     {selectedServiceDetails.PrenomChefDepartement}
                   </Typography>
                 </Box>
@@ -519,16 +539,24 @@ const AjoutFormComponent = forwardRef(
         </DialogContent>
 
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={handleClose} color="inherit" disabled={saving || loadingInit}>
+          <Button
+            onClick={handleClose}
+            color="inherit"
+            disabled={saving || loadingInit}
+          >
             Annuler
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={saving || loadingInit}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={saving || loadingInit}
+          >
             {saving ? "Enregistrement..." : "Valider"}
           </Button>
         </DialogActions>
       </Dialog>
     );
-  }
+  },
 );
 
 AjoutFormComponent.propTypes = {

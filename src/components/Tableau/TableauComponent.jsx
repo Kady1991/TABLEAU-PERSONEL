@@ -1,6 +1,13 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Alert, Box, Button, Stack, IconButton, Tooltip } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Stack,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddIcon from "@mui/icons-material/Add";
@@ -13,18 +20,18 @@ import AjoutFormComponent from "../../components/Forms/AjoutFormComponent.jsx";
 import PersonnelService from "../../services/PersonnelService.js";
 import PropTypes from "prop-types";
 
-// ✅ helper robuste : true / 1 / "1" / "true"
-const isArchived = (v) => v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
+// helper robuste : true / 1 / "1" / "true"
+const isArchived = (v) =>
+  v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
 
-export default function TableauComponent({
+function TableauComponent({
   compact = false,
   height = 400,
-  rowsPreview, // ✅ number | undefined
+  rowsPreview,
   showHeader = true,
   showAddButton = true,
   nonArchivedOnly = true,
 
-  // mode contrôlé
   rows: rowsProp,
   loading: loadingProp,
   error: errorProp,
@@ -32,7 +39,6 @@ export default function TableauComponent({
 }) {
   const navigate = useNavigate();
 
-  // ✅ si la page fournit rows => mode "contrôlé"
   const isControlled = Array.isArray(rowsProp);
 
   const [rowsState, setRowsState] = useState([]);
@@ -41,8 +47,10 @@ export default function TableauComponent({
   const [openAdd, setOpenAdd] = useState(false);
 
   const rows = isControlled ? rowsProp : rowsState;
-  const loading = typeof loadingProp === "boolean" ? loadingProp : loadingState;
-  const error = typeof errorProp === "string" ? errorProp : errorState;
+  const loading =
+    typeof loadingProp === "boolean" ? loadingProp : loadingState;
+  const error =
+    typeof errorProp === "string" ? errorProp : errorState;
 
   const fetchDataInternal = useCallback(async () => {
     try {
@@ -52,10 +60,14 @@ export default function TableauComponent({
       const res = await PersonnelService.getAll();
       const data = Array.isArray(res?.data) ? res.data : [];
 
-      const filtered = nonArchivedOnly ? data.filter((p) => !isArchived(p?.SiArchive)) : data;
+      const filtered = nonArchivedOnly
+        ? data.filter((p) => !isArchived(p?.SiArchive))
+        : data;
 
       const finalRows =
-        typeof rowsPreview === "number" ? filtered.slice(0, rowsPreview) : filtered;
+        typeof rowsPreview === "number"
+          ? filtered.slice(0, rowsPreview)
+          : filtered;
 
       setRowsState(finalRows);
     } catch (e) {
@@ -75,46 +87,49 @@ export default function TableauComponent({
     await fetchDataInternal();
   }, [refreshDataProp, fetchDataInternal]);
 
-  // ✅ si non contrôlé => fetch interne
   useEffect(() => {
-    if (!isControlled) fetchDataInternal();
+    if (!isControlled) {
+      fetchDataInternal();
+    }
   }, [isControlled, fetchDataInternal]);
 
-  // ✅ après ajout : refresh + fermer
   const handleMemberUpdate = useCallback(
     async (addedMember) => {
-      // 1) Ajout immédiat dans l'affichage (si tableau autonome)
       if (!isControlled && addedMember) {
         setRowsState((prev) => {
           const newId = addedMember?.IDPersonneService ?? Date.now();
-          const exists = prev.some((r) => String(r?.IDPersonneService) === String(newId));
+          const exists = prev.some(
+            (r) => String(r?.IDPersonneService) === String(newId)
+          );
+
           if (exists) return prev;
 
           const next = [{ ...addedMember, IDPersonneService: newId }, ...prev];
 
-          if (typeof rowsPreview === "number") return next.slice(0, rowsPreview);
+          if (typeof rowsPreview === "number") {
+            return next.slice(0, rowsPreview);
+          }
+
           return next;
         });
       }
 
-      // 2) Refetch
       await refreshData();
-
-      // 3) Ferme le dialog
       setOpenAdd(false);
     },
-    [isControlled, refreshData, rowsPreview],
+    [isControlled, refreshData, rowsPreview]
   );
 
-  const columns = useMemo(
-    () => [
-      { field: "IDPersonneService", headerName: "ID", width: 70 },
+const columns = useMemo(() => [
+  { field: "IDPersonneService", headerName: "ID", width: 70, disableExport: true },
       {
         field: "actions",
         headerName: "Actions",
         width: 220,
         sortable: false,
         filterable: false,
+        disableExport: true,
+        hideable: false,
         renderCell: (params) => (
           <Stack direction="row" spacing={0.5} alignItems="center">
             <Tooltip title="Voir la fiche">
@@ -146,25 +161,33 @@ export default function TableauComponent({
           </Stack>
         ),
       },
-      { field: "NomPersonne", headerName: "NOM", width: 180 },
-      { field: "PrenomPersonne", headerName: "PRÉNOM", width: 180 },
-      { field: "Email", headerName: "E-MAIL", width: 220 },
-      { field: "TelPro", headerName: "TEL", width: 130 },
-      { field: "SiFrancaisString", headerName: "LANGUE", width: 100 },
-      { field: "DateEntree", headerName: "ENTRÉE", width: 150 },
-      { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
-      { field: "NomFonctionFr", headerName: "FONCTION", width: 200 },
-      { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
-      { field: "NomRueFr", headerName: "RUE", width: 200 },
-      { field: "Numero", headerName: "N°", width: 80 },
-      { field: "NomChefService", headerName: "CHEF SERVICE", width: 200 },
-      { field: "NomChefDepartement", headerName: "CHEF DEPT", width: 200 },
-      { field: "NomDepartementFr", headerName: "DÉPARTEMENT", width: 250 },
-      { field: "Batiment", headerName: "BÂTIMENT", width: 100 },
-      { field: "Etage", headerName: "ÉTAGE", width: 80 },
-    ],
-    [navigate, refreshData],
-  );
+  { field: "NomPersonne", headerName: "NOM", width: 180, hideable: false },
+  { field: "PrenomPersonne", headerName: "PRENOM", width: 180, hideable: false },
+  { field: "SiFrancaisString", headerName: "RÔLE", width: 120, hideable: false },
+  { field: "Email", headerName: "E-mail", width: 220, hideable: false },
+  { field: "DateEntree", headerName: "ENTREE SERVICE", width: 150, hideable: false },
+  { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200 },
+  { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
+  { field: "NomServiceNl", headerName: "AFFECTATION(nl)", width: 250 },
+  { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
+  { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 200 },
+  { field: "NomRueFr", headerName: "LOCALISATION", width: 200 },
+  { field: "Numero", headerName: "N°", width: 80 },
+  { field: "NomChefService", headerName: "NOM CHEF DU SERVICE", width: 220 },
+  { field: "PrenomChefService", headerName: "PRENOM CHEF DU SERVICE", width: 220 },
+  { field: "EmailChefService", headerName: "E-MAIL CHEF SERVICE", width: 240 },
+  { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 220 },
+  { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 220 },
+  { field: "NomChefDepartement", headerName: "NOM CHEF DEPARTEMENT", width: 220 },
+  { field: "PrenomChefDepartement", headerName: "PRENOM CHEF DEPARTEMENT", width: 220 },
+  { field: "EmailChefDepartement", headerName: "E-MAIL CHEF DEPARTEMENT", width: 240 },
+  { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
+  { field: "TelPro", headerName: "TEL", width: 130 },
+  { field: "Batiment", headerName: "Batiment", width: 100 },
+  { field: "Etage", headerName: "Etage", width: 80 },
+  { field: "BatimentNl", headerName: "Batiment(nl)", width: 130 }
+
+], [navigate]);
 
   return (
     <Box
@@ -175,7 +198,6 @@ export default function TableauComponent({
         overflow: "hidden",
       }}
     >
-      {/* ✅ Formulaire ajout intégré */}
       <AjoutFormComponent
         open={openAdd}
         onClose={() => setOpenAdd(false)}
@@ -185,11 +207,17 @@ export default function TableauComponent({
 
       {showHeader && (
         <Stack direction="row" justifyContent="space-between" mb={2}>
-          {showAddButton && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenAdd(true)}>
-              Nouveau Membre
-            </Button>
-          )}
+          <Stack direction="row" spacing={1}>
+            {showAddButton && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenAdd(true)}
+              >
+                Nouveau Membre
+              </Button>
+            )}
+          </Stack>
         </Stack>
       )}
 
@@ -205,27 +233,48 @@ export default function TableauComponent({
           overflow: "hidden",
         }}
       >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          // ✅ getRowId robuste si ID absent
-          getRowId={(row) => row?.IDPersonneService ?? row?.id ?? `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}_${Math.random()}`}
-          loading={loading}
-          checkboxSelection
-          disableRowSelectionOnClick
-          hideFooter={compact}
-          slots={compact ? {} : { toolbar: GridToolbar }}
-          slotProps={compact ? {} : { toolbar: { showQuickFilter: true } }}
-          sx={{ height: "100%", border: "none" }}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: compact ? (rowsPreview || 5) : 25 },
+       <DataGrid
+  rows={rows}
+  columns={columns}
+  getRowId={(row) =>
+    row?.IDPersonneService ??
+    row?.id ??
+    `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}`
+  }
+  loading={loading}
+  checkboxSelection
+  disableRowSelectionOnClick
+  disableColumnReorder
+  hideFooter={compact}
+  slots={compact ? {} : { toolbar: GridToolbar }}
+  slotProps={
+    compact
+      ? {}
+      : {
+          toolbar: {
+            showQuickFilter: true,
+            csvOptions: {
+              fileName: "export_personnel",
+              delimiter: ";",
+              utf8WithBom: true,
+              allColumns: true,
             },
-            sorting: {
-              sortModel: [{ field: "IDPersonneService", sort: "desc" }],
+            printOptions: {
+              disableToolbarButton: true,
             },
-          }}
-        />
+          },
+        }
+  }
+  sx={{ height: "100%", border: "none" }}
+  initialState={{
+    pagination: {
+      paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
+    },
+    sorting: {
+      sortModel: [{ field: "IDPersonneService", sort: "desc" }],
+    },
+  }}
+/>
       </Box>
     </Box>
   );
@@ -234,13 +283,14 @@ export default function TableauComponent({
 TableauComponent.propTypes = {
   compact: PropTypes.bool,
   height: PropTypes.number,
-  rowsPreview: PropTypes.number, // ✅ CORRIGÉ (c’était array)
+  rowsPreview: PropTypes.number,
   showHeader: PropTypes.bool,
   showAddButton: PropTypes.bool,
   nonArchivedOnly: PropTypes.bool,
-
   rows: PropTypes.array,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   refreshData: PropTypes.func,
 };
+
+export default TableauComponent;

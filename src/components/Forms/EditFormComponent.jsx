@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import { RiFileEditFill } from "react-icons/ri";
 
@@ -29,7 +29,23 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { LIEN_API_PERSONNE } from "../../config";
+import PersonnelService from "../../services/PersonnelService";
+
+const initialForm = {
+  IDPersonneService: null,
+  PersonneID: null,
+  NomPersonne: "",
+  PrenomPersonne: "",
+  Email: "",
+  TelPro: "",
+  DateEntreeDate: null, // dayjs
+  WWGradeID: "",
+  AdresseID: "",
+  ServiceID: "",
+  SiFrancais: true,
+  SiTypePersonnel: false,
+  TypePersonnelID: "",
+};
 
 function EditFormComponent({ IDPersonneService, refreshData }) {
   const [open, setOpen] = useState(false);
@@ -41,38 +57,24 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   const [services, setServices] = useState([]);
   const [typePersonnelList, setTypePersonnelList] = useState([]);
 
-  const initialForm = {
-    IDPersonneService: null,
-    PersonneID: null,
-    NomPersonne: "",
-    PrenomPersonne: "",
-    Email: "",
-    TelPro: "",
-    DateEntreeDate: null, // dayjs
-    WWGradeID: "",
-    AdresseID: "",
-    ServiceID: "",
-    SiFrancais: true,
-    SiTypePersonnel: false, // personnel?
-    TypePersonnelID: "",
-  };
-
+  const [serviceDetails, setServiceDetails] = useState(null);
   const [form, setForm] = useState(initialForm);
 
-  const selectedServiceDetails = useMemo(() => {
-    return services.find((s) => s.IDService === form.ServiceID) || null;
+  const selectedServiceLabel = useMemo(() => {
+    const s = services.find((x) => String(x.IDService) === String(form.ServiceID));
+    return s?.NomServiceFr || "";
   }, [services, form.ServiceID]);
 
   const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }));
 
   const handleOpen = () => setOpen(true);
-
   const handleClose = () => {
     setOpen(false);
+    setServiceDetails(null);
     setForm(initialForm);
   };
 
-  // Load when dialog opens
+  // Chargement quand le dialog s’ouvre
   useEffect(() => {
     if (!open || !IDPersonneService) return;
 
@@ -81,25 +83,22 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
     (async () => {
       setLoadingInit(true);
       try {
-        const [personRes, gradesRes, addrRes, typeRes, servicesRes] =
-          await Promise.all([
-            axios.get(`${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`),
-            axios.get(`${LIEN_API_PERSONNE}/api/wwgrades`),
-            axios.get(`${LIEN_API_PERSONNE}/api/Adresses`),
-            axios.get(`${LIEN_API_PERSONNE}/api/typepersonnel`),
-            axios.get(`${LIEN_API_PERSONNE}/api/affectation/services`),
-          ]);
+        const [personRes, gradesRes, addrRes, typeRes, servicesRes] = await Promise.all([
+          PersonnelService.getById(IDPersonneService),
+          PersonnelService.getGrades(),
+          PersonnelService.getAdresses(),
+          PersonnelService.getTypesPersonnel(),
+          PersonnelService.getServices(),
+        ]);
 
         if (!mounted) return;
 
-        setGrades(gradesRes.data || []);
-        setAddresses(addrRes.data || []);
-        setTypePersonnelList(typeRes.data || []);
-        setServices(servicesRes.data || []);
+        setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
+        setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
+        setTypePersonnelList(Array.isArray(typeRes?.data) ? typeRes.data : []);
+        setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
 
-        const p = personRes.data || {};
-
-        // Date: certaines APIs donnent DateEntreeDate ou DateEntree — on gère les 2
+        const p = personRes?.data || {};
         const rawDate = p.DateEntreeDate || p.DateEntree || null;
         const parsedDate = rawDate ? dayjs(rawDate) : null;
 
@@ -130,6 +129,29 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
       mounted = false;
     };
   }, [open, IDPersonneService]);
+
+  // Détails service (chef) quand ServiceID change
+  useEffect(() => {
+    if (!open || !form.ServiceID) {
+      setServiceDetails(null);
+      return;
+    }
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        const res = await PersonnelService.getServiceDetails(form.ServiceID);
+        if (mounted) setServiceDetails(res?.data || null);
+      } catch {
+        if (mounted) setServiceDetails(null);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [open, form.ServiceID]);
 
   const validate = () => {
     if (!form.NomPersonne) return "Nom obligatoire";
@@ -162,30 +184,20 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         PrenomPersonne: form.PrenomPersonne,
         Email: form.Email,
         TelPro: form.TelPro || null,
-
-        // API attendait un ISO dans ton ancien code
         DateEntree: form.DateEntreeDate ? dayjs(form.DateEntreeDate).toISOString() : null,
-
         WWGradeID: form.WWGradeID || null,
         AdresseID: form.AdresseID,
         ServiceID: form.ServiceID,
-
         SiFrancais: form.SiFrancais,
         SiTypePersonnel: form.SiTypePersonnel,
         TypePersonnelID: form.SiTypePersonnel ? form.TypePersonnelID : null,
-
-        // Tu avais aussi SiServicePrincipal dans l'ancien code,
-        // mais il n'est pas présent dans le formulaire => on ne l'envoie pas.
       };
 
-      const url = `${LIEN_API_PERSONNE}/api/personne/edit?id=${form.PersonneID}`;
-      const res = await axios.put(url, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await PersonnelService.update(form.PersonneID, payload);
 
-      if (res.status !== 200) throw new Error("Échec de l'enregistrement");
+      PersonnelService.clearCaches?.();
 
-      alert("Les modifications ont été enregistrées avec succès !");
+      alert("Modifications enregistrées !");
       setOpen(false);
 
       if (typeof refreshData === "function") {
@@ -323,6 +335,12 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                       ))}
                     </Select>
                   </FormControl>
+
+                  {selectedServiceLabel ? (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                      Service sélectionné : <b>{selectedServiceLabel}</b>
+                    </Typography>
+                  ) : null}
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
@@ -376,18 +394,16 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                 </Grid>
               </Grid>
 
-              {selectedServiceDetails && (
+              {serviceDetails && (
                 <Box sx={{ mt: 1, p: 2, borderRadius: 2, bgcolor: "action.hover" }}>
                   <Typography fontWeight={700} mb={1}>
                     Informations du service
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Chef du Service :</strong> {selectedServiceDetails.NomChefService}{" "}
-                    {selectedServiceDetails.PrenomChefService}
+                    <strong>Chef du Service :</strong> {serviceDetails.NomChefService} {serviceDetails.PrenomChefService}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Chef du Département :</strong> {selectedServiceDetails.NomChefDepartement}{" "}
-                    {selectedServiceDetails.PrenomChefDepartement}
+                    <strong>Chef du Département :</strong> {serviceDetails.NomChefDepartement} {serviceDetails.PrenomChefDepartement}
                   </Typography>
                 </Box>
               )}
@@ -407,5 +423,10 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
     </>
   );
 }
+
+EditFormComponent.propTypes = {
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  refreshData: PropTypes.func,
+};
 
 export default EditFormComponent;

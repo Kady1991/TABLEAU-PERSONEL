@@ -6,10 +6,14 @@ import {
   Button,
   Popover,
   Divider,
+  Typography,
 } from "@mui/material";
-import { LocalizationProvider, StaticDatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween);
 
 import PersonnelService from "../../services/PersonnelService";
 import StatisticsCharts from "../../components/Statistics/StatisticsCharts";
@@ -17,21 +21,18 @@ import AutoCompleteDeptService from "../../components/AutoComplete/AutoCompleteD
 
 const clean = (s) => (s ? String(s).trim() : "");
 const GLOBAL_LABEL = "Global (tous)";
-const isArchived = (v) => v === true || v === 1 || String(v).toLowerCase() === "true";
+const isArchived = (v) =>
+  v === true || v === 1 || String(v).toLowerCase() === "true";
 
 function PersonnelStatisticsPage() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // valeur affichée (Global / Departement / Service)
   const [selectedLabel, setSelectedLabel] = useState(GLOBAL_LABEL);
-
-  // texte dans l’autocomplete
   const [inputValue, setInputValue] = useState("");
 
-  // période
-  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [periodMode, setPeriodMode] = useState("global");
+  const [startDate, setStartDate] = useState(dayjs().startOf("year"));
+  const [endDate, setEndDate] = useState(dayjs().endOf("day"));
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -50,7 +51,6 @@ function PersonnelStatisticsPage() {
     loadData();
   }, []);
 
-  // departements + servicesByDept (pour retrouver le dept parent d’un service)
   const { departments, servicesByDept } = useMemo(() => {
     const map = new Map();
 
@@ -61,16 +61,20 @@ function PersonnelStatisticsPage() {
       map.get(dept).add(svc);
     });
 
-    const departments = Array.from(map.keys()).sort((a, b) => a.localeCompare(b, "fr"));
-    const servicesByDept = {};
-    departments.forEach((d) => {
-      servicesByDept[d] = Array.from(map.get(d) || []).sort((a, b) => a.localeCompare(b, "fr"));
+    const depts = Array.from(map.keys()).sort((a, b) =>
+      a.localeCompare(b, "fr")
+    );
+    const svcs = {};
+
+    depts.forEach((d) => {
+      svcs[d] = Array.from(map.get(d) || []).sort((a, b) =>
+        a.localeCompare(b, "fr")
+      );
     });
 
-    return { departments, servicesByDept };
+    return { departments: depts, servicesByDept: svcs };
   }, [personnes]);
 
-  // type selection (global/dept/service)
   const selectionInfo = useMemo(() => {
     if (!selectedLabel || selectedLabel === GLOBAL_LABEL) {
       return { type: "global", dept: "", service: "", parentDept: "" };
@@ -80,7 +84,6 @@ function PersonnelStatisticsPage() {
       return { type: "dept", dept: selectedLabel, service: "", parentDept: "" };
     }
 
-    // sinon service => retrouver le dept parent
     let parentDept = "";
     for (const d of departments) {
       if ((servicesByDept[d] || []).includes(selectedLabel)) {
@@ -88,51 +91,87 @@ function PersonnelStatisticsPage() {
         break;
       }
     }
+
     return { type: "service", dept: "", service: selectedLabel, parentDept };
   }, [selectedLabel, departments, servicesByDept]);
 
-  // Filtre data selon période + selection
   const filteredData = useMemo(() => {
     return personnes.filter((p) => {
-      const matchDate =
-        periodMode === "date"
-          ? dayjs(p?.DateEntree).isSame(selectedDate, "day")
-          : true;
+      if (periodMode === "range") {
+        const dEntree = p?.DateEntree ? dayjs(p.DateEntree) : null;
+        const dSortie = p?.DateSortie ? dayjs(p.DateSortie) : null;
 
-      if (!matchDate) return false;
+        const estDejaEntre =
+          dEntree && dEntree.isValid()
+            ? dEntree.startOf("day").isBefore(endDate.endOf("day").add(1, "millisecond"))
+            : false;
+
+        const estPasPartiAvant =
+          !dSortie || !dSortie.isValid()
+            ? true
+            : dSortie.endOf("day").isAfter(startDate.startOf("day").subtract(1, "millisecond"));
+
+        if (!estDejaEntre || !estPasPartiAvant) return false;
+      }
 
       if (selectionInfo.type === "global") return true;
-
       if (selectionInfo.type === "dept") {
         return clean(p?.NomDepartementFr) === selectionInfo.dept;
       }
-
       if (selectionInfo.type === "service") {
         return clean(p?.NomServiceFr) === selectionInfo.service;
       }
-
       return true;
     });
-  }, [personnes, periodMode, selectedDate, selectionInfo]);
+  }, [personnes, periodMode, startDate, endDate, selectionInfo]);
 
-  // Stats calculées (xAxis + totals)
   const statsComputed = useMemo(() => {
     const map = new Map();
     let entries = 0;
     let exits = 0;
 
     const keyOf = (p) => {
-      if (selectionInfo.type === "global") return clean(p?.NomDepartementFr) || "Inconnu";
-      if (selectionInfo.type === "dept") return clean(p?.NomServiceFr) || "Sans service";
-      if (selectionInfo.type === "service") return clean(p?.NomServiceFr) || selectionInfo.service;
-      return "Inconnu";
+      if (selectionInfo.type === "global") {
+        return clean(p?.NomDepartementFr) || "Inconnu";
+      }
+      if (selectionInfo.type === "dept") {
+        return clean(p?.NomServiceFr) || "Sans service";
+      }
+      return clean(p?.NomServiceFr) || selectionInfo.service;
     };
 
     filteredData.forEach((p) => {
       const key = keyOf(p);
-      if (!map.has(key)) map.set(key, { entries: 0, exits: 0 });
+      if (!map.has(key)) {
+        map.set(key, { entries: 0, exits: 0 });
+      }
 
-      if (isArchived(p?.SiArchive)) {
+      const dSortie =
+        p?.DateSortie && dayjs(p.DateSortie).isValid()
+          ? dayjs(p.DateSortie)
+          : null;
+
+      const archived = isArchived(
+        p?.SiArchive ?? p?.Archive ?? p?.Archived ?? p?.archive ?? p?.IsArchived
+      );
+
+      let isExit = false;
+
+      if (periodMode === "global") {
+        isExit = Boolean(dSortie) || archived;
+      } else {
+        isExit =
+          (dSortie &&
+            dSortie.isBetween(
+              startDate.startOf("day"),
+              endDate.endOf("day"),
+              "day",
+              "[]"
+            )) ||
+          (!dSortie && archived);
+      }
+
+      if (isExit) {
         map.get(key).exits += 1;
         exits += 1;
       } else {
@@ -147,18 +186,23 @@ function PersonnelStatisticsPage() {
       totalEntries: entries,
       totalExits: exits,
     };
-  }, [filteredData, selectionInfo]);
+  }, [filteredData, selectionInfo, startDate, endDate, periodMode]);
 
   const series = useMemo(() => {
     const data = statsComputed?.data ?? [];
     return [
-      { label: "Actifs", data: data.map((d) => Number(d?.entries ?? 0)) },
-      { label: "Sorties", data: data.map((d) => Number(d?.exits ?? 0)) },
+      {
+        label: "Effectifs Actifs",
+        data: data.map((d) => Number(d?.entries ?? 0)),
+        color: "#5594b1",
+      },
+      {
+        label: "Sorties (Départs)",
+        data: data.map((d) => Number(d?.exits ?? 0)),
+        color: "#d32f2f",
+      },
     ];
   }, [statsComputed]);
-
-  const hideBarChart = selectionInfo.type === "service";
-  const currentSubtitle = selectionInfo.type === "service" ? selectionInfo.parentDept : "";
 
   return (
     <Box>
@@ -169,19 +213,22 @@ function PersonnelStatisticsPage() {
             value={inputValue}
             onChange={setInputValue}
             loading={loading}
-            onSelect={(option) => {
-              
-              const next = option?.label ? option.label : GLOBAL_LABEL;
-              setSelectedLabel(next);
-            }}
+            onSelect={(opt) => setSelectedLabel(opt?.label || GLOBAL_LABEL)}
           />
 
           <Button
             variant="contained"
             onClick={(e) => setAnchorEl(e.currentTarget)}
-            sx={{ borderRadius: 1, height: 40, bgcolor: "#5594b1" }}
+            sx={{
+              borderRadius: 1,
+              height: 40,
+              bgcolor: "#5594b1",
+              textTransform: "none",
+            }}
           >
-            {periodMode === "global" ? "Période: Global" : selectedDate.format("DD/MM/YYYY")}
+            {periodMode === "global"
+              ? "Période: Global"
+              : `Du ${startDate.format("DD/MM/YY")} au ${endDate.format("DD/MM/YY")}`}
           </Button>
         </Stack>
       </CardContent>
@@ -192,37 +239,76 @@ function PersonnelStatisticsPage() {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <StaticDatePicker
-            orientation="landscape"
-            value={selectedDate}
-            onChange={(val) => {
-              setSelectedDate(val);
-              setPeriodMode("date");
+        <Box sx={{ p: 2, width: 320 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Filtrer par intervalle
+          </Typography>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Stack spacing={2}>
+              <DesktopDatePicker
+                label="Date de début"
+                value={startDate}
+                onChange={(v) => {
+                  if (v) {
+                    setStartDate(dayjs(v).startOf("day"));
+                    setPeriodMode("range");
+                  }
+                }}
+                slotProps={{
+                  actionBar: { actions: ["today"] },
+                  textField: { size: "small" },
+                }}
+              />
+
+              <DesktopDatePicker
+                label="Date de fin"
+                value={endDate}
+                onChange={(v) => {
+                  if (v) {
+                    setEndDate(dayjs(v).endOf("day"));
+                    setPeriodMode("range");
+                  }
+                }}
+                slotProps={{
+                  actionBar: { actions: ["today"] },
+                  textField: { size: "small" },
+                }}
+              />
+            </Stack>
+          </LocalizationProvider>
+
+          <Divider sx={{ my: 1.5 }} />
+
+          <Button
+            fullWidth
+            onClick={() => {
+              setPeriodMode("global");
+              setAnchorEl(null);
             }}
-            onAccept={() => setAnchorEl(null)}
-          />
-        </LocalizationProvider>
+          >
+            Toutes les dates
+          </Button>
 
-        <Divider />
-
-        <Button
-          fullWidth
-          onClick={() => {
-            setPeriodMode("global");
-            setAnchorEl(null);
-          }}
-        >
-          Toutes les dates
-        </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mt: 1, bgcolor: "#5594b1" }}
+            onClick={() => setAnchorEl(null)}
+          >
+            Appliquer
+          </Button>
+        </Box>
       </Popover>
 
       <StatisticsCharts
         statsComputed={statsComputed}
         series={series}
         currentTitle={selectedLabel || GLOBAL_LABEL}
-        currentSubtitle={currentSubtitle}
-        hideBarChart={hideBarChart}
+        currentSubtitle={
+          selectionInfo.type === "service" ? selectionInfo.parentDept : ""
+        }
+        hideBarChart={selectionInfo.type === "service"}
         mode={
           selectionInfo.type === "global"
             ? "global"

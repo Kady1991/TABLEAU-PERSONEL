@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import dayjs from "dayjs";
 import { MdDeleteForever } from "react-icons/md";
 import {
@@ -18,8 +17,9 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LIEN_API_PERSONNE } from "../../config";
 import PropTypes from "prop-types";
+
+import PersonnelService from "../../services/PersonnelService";
 
 function DeleteMembreComponent({
   IDPersonneService,
@@ -38,22 +38,27 @@ function DeleteMembreComponent({
   const showToast = (type, text) => setToast({ open: true, type, text });
   const closeToast = () => setToast((t) => ({ ...t, open: false }));
 
+  // ✅ Vérifie si la personne est déjà archivée
   useEffect(() => {
     let mounted = true;
 
     const checkArchivedStatus = async () => {
       try {
         if (!email) return;
-        const response = await axios.get(
-          `${LIEN_API_PERSONNE}/api/personne?email=${encodeURIComponent(email)}`
-        );
-        if (mounted && response?.data?.SiArchive !== undefined) {
-          setIsArchived(!!response.data.SiArchive);
+
+        const data = await PersonnelService.getByEmail(email);
+
+        if (!mounted) return;
+
+        if (data?.SiArchive !== undefined) {
+          setIsArchived(Boolean(data.SiArchive));
+        } else {
+          setIsArchived(false);
         }
       } catch (error) {
         console.error(
-          "Erreur lors de la récupération des informations de la personne :",
-          error
+          "Erreur check archive :",
+          error?.response?.data || error?.message
         );
       }
     };
@@ -92,29 +97,28 @@ function DeleteMembreComponent({
 
     setLoading(true);
     try {
-      const url = `${LIEN_API_PERSONNE}/api/personne/delete?email=${encodeURIComponent(
-        email
-      )}&dateSortie=${encodeURIComponent(formattedDate)}`;
+      await PersonnelService.archiveByEmail(email, formattedDate);
 
-      const response = await axios.put(url);
+      showToast(
+        "success",
+        `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`
+      );
 
-      if (response.status === 200) {
-        showToast(
-          "success",
-          `La personne ${prenomPersonne} ${nomPersonne} a été archivée avec succès.`
-        );
-        setIsArchived(true);
-        setOpen(false);
-        setSelectedDate(null);
+      setIsArchived(true);
+      setOpen(false);
+      setSelectedDate(null);
 
-        if (typeof refreshData === "function") {
-          await refreshData();
-        }
-      } else {
-        throw new Error("Échec de l'archivage");
+      // ✅ vider caches + refresh
+      PersonnelService.clearCaches?.();
+
+      if (typeof refreshData === "function") {
+        await refreshData();
       }
     } catch (error) {
-      console.error("Une erreur s'est produite :", error);
+      console.error(
+        "Erreur archivage :",
+        error?.response?.data || error?.message
+      );
       showToast("error", "L'archivage a échoué.");
     } finally {
       setLoading(false);
@@ -123,18 +127,18 @@ function DeleteMembreComponent({
 
   return (
     <>
-     <IconButton
-  size="small"
-  title={isArchived ? "Déjà archivé" : "Archiver"}
-  onClick={handleClick}
-  disabled={isArchived}
-  sx={{
-    ml: 0.5,
-    color: isArchived ? "grey.400" : "error.main",
-  }}
->
-  <MdDeleteForever style={{ fontSize: 20 }} />
-</IconButton>
+      <IconButton
+        size="small"
+        title={isArchived ? "Déjà archivé" : "Archiver"}
+        onClick={handleClick}
+        disabled={isArchived}
+        sx={{
+          ml: 0.5,
+          color: isArchived ? "grey.400" : "error.main",
+        }}
+      >
+        <MdDeleteForever style={{ fontSize: 20 }} />
+      </IconButton>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
         <DialogTitle>Archiver la personne</DialogTitle>
@@ -171,11 +175,7 @@ function DeleteMembreComponent({
           <Button onClick={handleClose} color="inherit">
             Annuler
           </Button>
-          <Button
-            onClick={handleConfirm}
-            variant="contained"
-            disabled={loading}
-          >
+          <Button onClick={handleConfirm} variant="contained" disabled={loading}>
             {loading ? "Archivage..." : "Archiver"}
           </Button>
         </DialogActions>
@@ -194,16 +194,14 @@ function DeleteMembreComponent({
     </>
   );
 }
-DeleteMembreComponent.propTypes = {
-  IDPersonneService: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
 
+DeleteMembreComponent.propTypes = {
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
   nomPersonne: PropTypes.string,
   prenomPersonne: PropTypes.string,
   email: PropTypes.string,
-
   refreshData: PropTypes.func,
 };
+
 export default DeleteMembreComponent;

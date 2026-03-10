@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState, forwardRef } from "react";
-import PropTypes from "prop-types"; // 1. Ajout pour la validation des props
-import axios from "axios";
+import PropTypes from "prop-types";
 import dayjs from "dayjs";
-import { LIEN_API_PERSONNE } from "../../config";
 
 import {
   Box,
@@ -28,7 +26,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 
-const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...props }, ref) => {
+import PersonnelService from "../../services/PersonnelService";
+
+const FormServiceComponent = forwardRef(function FormServiceComponent(
+  { IDPersonneService, refreshData, ...props },
+  ref
+) {
   const [open, setOpen] = useState(false);
   const [loadingInit, setLoadingInit] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -36,7 +39,6 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
   const [grades, setGrades] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [otherServices, setOtherServices] = useState([]);
-  // typePersonnelList a été retiré car marqué comme inutilisé par ESLint
 
   const initialForm = {
     NomPersonne: "",
@@ -48,18 +50,20 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
     WWGradeID: "",
     AdresseID: "",
     ServiceID: "",
-    siPersonnel: false,
-    TypePersonnelID: "",
     SiFrancais: true,
   };
 
   const [form, setForm] = useState(initialForm);
 
   const selectedServiceDetails = useMemo(() => {
-    return otherServices.find((s) => s.IDService === form.ServiceID) || null;
+    return (
+      otherServices.find((s) => String(s.IDService) === String(form.ServiceID)) ||
+      null
+    );
   }, [otherServices, form.ServiceID]);
 
-  const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }));
+  const setField = (name, value) =>
+    setForm((prev) => ({ ...prev, [name]: value }));
 
   const handleOpen = () => setOpen(true);
 
@@ -68,6 +72,7 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
     setForm(initialForm);
   };
 
+  //  Chargement: personne + référentiels (via PersonnelService)
   useEffect(() => {
     if (!open || !IDPersonneService) return;
     let mounted = true;
@@ -76,19 +81,19 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
       setLoadingInit(true);
       try {
         const [personRes, gradesRes, addrRes, servicesRes] = await Promise.all([
-          axios.get(`${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`),
-          axios.get(`${LIEN_API_PERSONNE}/api/wwgrades`),
-          axios.get(`${LIEN_API_PERSONNE}/api/Adresses`),
-          axios.get(`${LIEN_API_PERSONNE}/api/affectation/services`),
+          PersonnelService.getById(IDPersonneService),
+          PersonnelService.getGrades(),
+          PersonnelService.getAdresses(),
+          PersonnelService.getServices(),
         ]);
 
         if (!mounted) return;
 
-        setGrades(gradesRes.data || []);
-        setAddresses(addrRes.data || []);
-        setOtherServices(servicesRes.data || []);
+        setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
+        setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
+        setOtherServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
 
-        const p = personRes.data || {};
+        const p = personRes?.data || {};
         setForm((prev) => ({
           ...prev,
           NomPersonne: p.NomPersonne || "",
@@ -104,7 +109,9 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
       }
     })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [open, IDPersonneService]);
 
   const validate = () => {
@@ -116,6 +123,7 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
     return "";
   };
 
+  //  Submit via PersonnelService.create (comme ton code axios.post)
   const handleSubmit = async () => {
     const err = validate();
     if (err) {
@@ -128,20 +136,28 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
       const payload = {
         NomPersonne: form.NomPersonne,
         PrenomPersonne: form.PrenomPersonne,
-        Email: form.Email,
-        TelPro: form.TelPro || null,
-        DateEntree: form.DateEntree ? dayjs(form.DateEntree).format("YYYY-MM-DD") : null,
-        WWGradeID: form.WWGradeID,
-        AdresseID: form.AdresseID,
-        ServiceID: form.ServiceID,
-        SiFrancais: form.SiFrancais,
-        SiTypePersonnel: form.siPersonnel,
-        TypePersonnelID: form.TypePersonnelID || null,
+        Email: form.Email?.trim(),
+        TelPro: form.TelPro ? String(form.TelPro).trim() : null,
+        DateEntree: form.DateEntree
+          ? dayjs(form.DateEntree).format("YYYY-MM-DD")
+          : null,
+
+        WWGradeID: form.WWGradeID ? Number(form.WWGradeID) : 0,
+        AdresseID: form.AdresseID ? Number(form.AdresseID) : null,
+        ServiceID: form.ServiceID ? Number(form.ServiceID) : null,
+
+        SiFrancais: !!form.SiFrancais,
+
+        // on garde le même comportement (tu avais false / null)
+        SiTypePersonnel: false,
+        TypePersonnelID: 0,
         SiArchive: false,
       };
 
-      await axios.post(`${LIEN_API_PERSONNE}/api/Personne`, payload);
-      sessionStorage.clear();
+      await PersonnelService.create(payload);
+
+      //  évite sessionStorage.clear() (trop violent)
+      PersonnelService.clearCaches?.();
 
       alert("Ajout réussi !");
       setOpen(false);
@@ -165,6 +181,7 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle>Ajouter un service supplémentaire</DialogTitle>
+
         <DialogContent dividers>
           {loadingInit ? (
             <Stack direction="row" alignItems="center" spacing={2} p={3}>
@@ -175,11 +192,25 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
             <Stack spacing={2} sx={{ mt: 1 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Nom" value={form.NomPersonne} fullWidth disabled size="small" />
+                  <TextField
+                    label="Nom"
+                    value={form.NomPersonne}
+                    fullWidth
+                    disabled
+                    size="small"
+                  />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Prénom" value={form.PrenomPersonne} fullWidth disabled size="small" />
+                  <TextField
+                    label="Prénom"
+                    value={form.PrenomPersonne}
+                    fullWidth
+                    disabled
+                    size="small"
+                  />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="E-mail"
@@ -189,13 +220,16 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
                     size="small"
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       label="Date d'entrée"
                       value={form.DateEntree}
                       onChange={(val) => setField("DateEntree", val)}
-                      slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                      slotProps={{
+                        textField: { fullWidth: true, size: "small" },
+                      }}
                     />
                   </LocalizationProvider>
                 </Grid>
@@ -209,7 +243,9 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
                       onChange={(e) => setField("WWGradeID", e.target.value)}
                     >
                       {grades.map((g) => (
-                        <MenuItem key={g.IDWWGrade} value={g.IDWWGrade}>{g.NomWWGradeFr}</MenuItem>
+                        <MenuItem key={g.IDWWGrade} value={g.IDWWGrade}>
+                          {g.NomWWGradeFr}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -234,7 +270,6 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
 
                 <Grid item xs={12}>
                   <FormControl fullWidth size="small">
-                    {/* Correction 2 : Apostrophe échappée */}
                     <InputLabel>Adresse d&apos;affectation</InputLabel>
                     <Select
                       label="Adresse d'affectation"
@@ -242,24 +277,34 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
                       onChange={(e) => setField("AdresseID", e.target.value)}
                     >
                       {addresses.map((a) => (
-                        <MenuItem key={a.IDAdresse} value={a.IDAdresse}>{a.AdresseComplete}</MenuItem>
+                        <MenuItem key={a.IDAdresse} value={a.IDAdresse}>
+                          {a.AdresseComplete}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
               </Grid>
 
-              {selectedServiceDetails && (
+              {selectedServiceDetails ? (
                 <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
-                  <Typography variant="subtitle2" color="primary">Détails du service sélectionné :</Typography>
-                  <Typography variant="body2">Chef: {selectedServiceDetails.NomChefService} {selectedServiceDetails.PrenomChefService}</Typography>
+                  <Typography variant="subtitle2" color="primary">
+                    Détails du service sélectionné :
+                  </Typography>
+                  <Typography variant="body2">
+                    Chef: {selectedServiceDetails.NomChefService}{" "}
+                    {selectedServiceDetails.PrenomChefService}
+                  </Typography>
                 </Box>
-              )}
+              ) : null}
             </Stack>
           )}
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={handleClose} color="inherit">Annuler</Button>
+          <Button onClick={handleClose} color="inherit" disabled={saving}>
+            Annuler
+          </Button>
           <Button onClick={handleSubmit} variant="contained" disabled={saving}>
             {saving ? "Enregistrement..." : "Valider"}
           </Button>
@@ -269,9 +314,9 @@ const FormServiceComponent = forwardRef(({ IDPersonneService, refreshData, ...pr
   );
 });
 
-// 3. Correction : Définition des PropTypes pour valider les entrées
 FormServiceComponent.propTypes = {
-  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
   refreshData: PropTypes.func,
 };
 

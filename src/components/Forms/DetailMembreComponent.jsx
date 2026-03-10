@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import { XMLParser } from "fast-xml-parser";
+import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import {
   Alert,
@@ -13,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { LIEN_API_PERSONNE } from "../../config";
+import PersonnelService from "../../services/PersonnelService";
 
 function DetailMembreComponent({ open, onClose, IDPersonneService }) {
   const [personData, setPersonData] = useState(null);
@@ -46,18 +45,7 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
       setPersonData(null);
 
       try {
-        const response = await axios.get(
-          `${LIEN_API_PERSONNE}/api/Personne/${IDPersonneService}`,
-          { headers: { Accept: "application/xml" } }
-        );
-
-        if (typeof response.data !== "string") {
-          throw new Error("La réponse API n'est pas une chaîne XML.");
-        }
-
-        const parser = new XMLParser();
-        const jsonData = parser.parse(response.data);
-        const view = jsonData?.WhosWhoModelView ?? null;
+        const view = await PersonnelService.getByIdXmlParsed(IDPersonneService);
 
         setPersonData(view);
         cacheRef.current.set(IDPersonneService, view);
@@ -79,30 +67,30 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
   const handleClose = () => {
     onClose?.();
     setError("");
-    // on garde le cache, c'est voulu
+    // ✅ on garde le cache, c'est voulu
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+    <Dialog open={!!open} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle sx={{ fontWeight: 800 }}>Détails de la personne</DialogTitle>
 
       <DialogContent dividers>
-        {loading && (
+        {loading ? (
           <Stack direction="row" alignItems="center" spacing={2}>
             <CircularProgress size={20} />
             <Typography variant="body2" color="text.secondary">
               Chargement des données…
             </Typography>
           </Stack>
-        )}
+        ) : null}
 
-        {!loading && error && <Alert severity="error">{error}</Alert>}
+        {!loading && error ? <Alert severity="error">{error}</Alert> : null}
 
-        {!loading && !error && !personData && (
+        {!loading && !error && !personData ? (
           <Alert severity="warning">Aucune donnée trouvée pour cet utilisateur.</Alert>
-        )}
+        ) : null}
 
-        {!loading && !error && personData && (
+        {!loading && !error && personData ? (
           <Box
             sx={{
               display: "grid",
@@ -114,14 +102,14 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
               <Typography variant="body2" color="text.secondary">
                 Nom
               </Typography>
-              <Typography fontWeight={700}>{personData.NomPersonne}</Typography>
+              <Typography fontWeight={700}>{personData.NomPersonne || "-"}</Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
                 Prénom
               </Typography>
-              <Typography fontWeight={700}>{personData.PrenomPersonne}</Typography>
+              <Typography fontWeight={700}>{personData.PrenomPersonne || "-"}</Typography>
             </Box>
 
             <Box>
@@ -154,7 +142,7 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                Date d'entrée
+                Date d&apos;entrée
               </Typography>
               <Typography fontWeight={700}>{formatDate(personData.DateEntree)}</Typography>
             </Box>
@@ -203,10 +191,16 @@ function DetailMembreComponent({ open, onClose, IDPersonneService }) {
               </Typography>
             </Box>
           </Box>
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
   );
 }
+
+DetailMembreComponent.propTypes = {
+  open: PropTypes.any,
+  onClose: PropTypes.func,
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
 
 export default DetailMembreComponent;

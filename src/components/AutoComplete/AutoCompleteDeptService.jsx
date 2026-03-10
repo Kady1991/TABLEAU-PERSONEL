@@ -27,16 +27,16 @@ function AutoCompleteDeptService({
 }) {
   const [expandedDepts, setExpandedDepts] = useState([]);
 
-  // pour empêcher la sélection quand on clique la flèche
+  // empêcher la sélection quand clic sur flèche
   const ignoreNextSelectRef = useRef(false);
 
-  // selection interne (comme ton autre autocomplete)
+  // sélection interne (on remet à null pour vider le champ)
   const [selected, setSelected] = useState(null);
 
   const { departments, servicesByDept } = useMemo(() => {
     const map = new Map();
 
-    personnes.forEach((p) => {
+    (personnes || []).forEach((p) => {
       const dept = clean(p?.NomDepartementFr) || "Sans département";
       const svc = clean(p?.NomServiceFr) || "Sans service";
       if (!map.has(dept)) map.set(dept, new Set());
@@ -57,24 +57,31 @@ function AutoCompleteDeptService({
     return { departments, servicesByDept };
   }, [personnes]);
 
-  // options visibles : global + dept + (services si dept déplié OU recherche)
+  const toggleDept = (dept) => {
+    setExpandedDepts((prev) =>
+      prev.includes(dept) ? prev.filter((d) => d !== dept) : [...prev, dept],
+    );
+  };
+
+  // options visibles : global + dept + services (si déplié ou recherche)
+// options visibles : global + dept + services (si déplié ou recherche)
   const options = useMemo(() => {
+    const total = (personnes || []).length;
 
-  const total = personnes.length;
+    const opts = [
+      {
+        label: GLOBAL_LABEL,
+        type: "global",
+        count: total,
+      },
+    ];
 
-  const opts = [
-    {
-      label: GLOBAL_LABEL,
-      type: "global",
-      count: total,
-    },
-  ];
-
-    const search = value.trim().toLowerCase();
+    const search = (value || "").trim().toLowerCase();
     const isSearchActive = search.length > 0;
 
     departments.forEach((dept) => {
       const services = servicesByDept[dept] || [];
+
       opts.push({
         label: dept,
         type: "dept",
@@ -97,13 +104,8 @@ function AutoCompleteDeptService({
     });
 
     return opts;
-  }, [departments, servicesByDept, expandedDepts, value]);
-
-  const toggleDept = (dept) => {
-    setExpandedDepts((prev) =>
-      prev.includes(dept) ? prev.filter((d) => d !== dept) : [...prev, dept],
-    );
-  };
+    // ✅ On met 'personnes' directement au lieu de 'personnes.length'
+  }, [departments, servicesByDept, expandedDepts, value, personnes]);
 
   return (
     <Box sx={{ width, maxWidth: "100%" }}>
@@ -114,12 +116,13 @@ function AutoCompleteDeptService({
         options={options}
         getOptionLabel={(opt) => opt?.label || ""}
         isOptionEqualToValue={(a, b) =>
-          a?.type === b?.type && a?.label === b?.label && a?.parentDept === b?.parentDept
+          a?.type === b?.type &&
+          a?.label === b?.label &&
+          a?.parentDept === b?.parentDept
         }
-        filterOptions={(x) => x} // on gère nous-mêmes
+        filterOptions={(x) => x} // on gère la visibilité nous-mêmes
         value={selected}
         onChange={(_, newVal) => {
-          // si clic sur flèche => ne pas sélectionner
           if (ignoreNextSelectRef.current) {
             ignoreNextSelectRef.current = false;
             return;
@@ -127,10 +130,9 @@ function AutoCompleteDeptService({
 
           if (!newVal) return;
 
-          // transmettre
           onSelect?.(newVal);
 
-          // vider le champ (UX)
+          // UX : on vide le champ après sélection
           setSelected(null);
           onChange?.("");
         }}
@@ -145,7 +147,6 @@ function AutoCompleteDeptService({
         }}
         noOptionsText={loading ? "Chargement…" : "Aucun résultat"}
         renderOption={(liProps, option) => {
-          // clé stable
           const keyBase =
             option.type === "service"
               ? `svc_${option.parentDept}_${option.label}`
@@ -153,33 +154,34 @@ function AutoCompleteDeptService({
           const safeKey = `${keyBase}__${liProps.id}`;
 
           // GLOBAL
-       if (option.type === "global") {
-  return (
-    <li {...liProps} key={safeKey}>
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          py: 0.5,
-        }}
-      >
-        <Typography sx={{ fontWeight: 600, color: "#0f172a" }}>
-          {option.label}
-        </Typography>
+          if (option.type === "global") {
+            return (
+              <li {...liProps} key={safeKey}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.5,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: "#0f172a" }}>
+                    {option.label}
+                  </Typography>
 
-        <Chip
-          label={`${option.count || 0}`}
-          size="small"
-          variant="outlined"
-          sx={{ height: 15, fontSize: "0.60rem" }}
-        />
-      </Box>
-    </li>
-  );
-}
-          // DEPARTEMENT
+                  <Chip
+                    label={`${option.count || 0}`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 18, fontSize: "0.70rem" }}
+                  />
+                </Box>
+              </li>
+            );
+          }
+
+          // DÉPARTEMENT
           if (option.type === "dept") {
             const isExpanded = expandedDepts.includes(option.label);
 
@@ -212,31 +214,31 @@ function AutoCompleteDeptService({
                       )}
                     </IconButton>
 
-                    {/*  le dept reste sélectionnable au clic sur le texte */}
-                    <Typography sx={{ fontWeight: 600, color: "#0f172a" }}>
+                    {/* ✅ le dept reste sélectionnable */}
+                    <Typography sx={{ fontWeight: 700, color: "#0f172a" }}>
                       {option.label}
                     </Typography>
                   </Stack>
 
                   <Chip
-                    label={`${option.count || 0} services`}
+                    label={`${option.count || 0}`}
                     size="small"
                     variant="outlined"
-                    sx={{ height: 15, fontSize: "0.65rem" }}
+                    sx={{ height: 18, fontSize: "0.70rem" }}
                   />
                 </Box>
               </li>
             );
           }
 
-          // SERVICE ( UNIQUEMENT LE NOM DU SERVICE, sans répéter le département)
+          // SERVICE (seulement le nom)
           return (
             <li {...liProps} key={safeKey}>
               <Box
                 sx={{
                   width: "100%",
                   pl: 6,
-                  py: 0.4,
+                  py: 0.5,
                   display: "flex",
                   alignItems: "center",
                   gap: 1,

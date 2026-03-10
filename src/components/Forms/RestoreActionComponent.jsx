@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import PropTypes from "prop-types";
 import { MdRestore } from "react-icons/md";
 import {
   Button,
@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { LIEN_API_PERSONNE } from "../../config";
+import PersonnelService from "../../services/PersonnelService";
 
 function RestoreActionComponent({
   PersonneID,
@@ -29,9 +29,10 @@ function RestoreActionComponent({
 
     setLoading(true);
     try {
-      await axios.put(
-        `${LIEN_API_PERSONNE}/api/personne/desarchiver?id=${PersonneID}`
-      );
+      await PersonnelService.restore(PersonneID);
+
+      //  vider caches + refresh
+      PersonnelService.clearCaches?.();
 
       if (typeof refreshData === "function") {
         await refreshData();
@@ -39,7 +40,10 @@ function RestoreActionComponent({
 
       setOpen(false);
     } catch (error) {
-      console.error("Erreur restauration :", error?.response?.data || error?.message);
+      console.error(
+        "Erreur restauration :",
+        error?.response?.data || error?.message
+      );
       alert("Erreur lors de la restauration.");
     } finally {
       setLoading(false);
@@ -49,13 +53,13 @@ function RestoreActionComponent({
   return (
     <>
       <IconButton
-  size="small"
-  title="Restaurer"
-  onClick={() => setOpen(true)}
-  sx={{ ml: 0.5, color: "success.main" }}
->
-  <MdRestore style={{ fontSize: 20 }} />
-</IconButton>
+        size="small"
+        title="Restaurer"
+        onClick={() => setOpen(true)}
+        sx={{ ml: 0.5, color: "success.main" }}
+      >
+        <MdRestore style={{ fontSize: 20 }} />
+      </IconButton>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>Restaurer la personne</DialogTitle>
@@ -89,5 +93,14 @@ function RestoreActionComponent({
     </>
   );
 }
+
+RestoreActionComponent.propTypes = {
+  PersonneID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  nomPersonne: PropTypes.string,
+  prenomPersonne: PropTypes.string,
+  email: PropTypes.string,
+  refreshData: PropTypes.func,
+};
 
 export default RestoreActionComponent;
