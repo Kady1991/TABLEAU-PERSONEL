@@ -34,7 +34,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { LIEN_API_PERSONNE } from "../../config";
+import PersonnelService from "../../services/PersonnelService.js";
 
 const AjoutFormComponent = forwardRef(
   ({ open, onClose, onMemberUpdate, refreshData }, ref) => {
@@ -107,10 +107,10 @@ const AjoutFormComponent = forwardRef(
         setError("");
         try {
           const [gradesRes, servicesRes, addrRes, typeRes] = await Promise.all([
-            axios.get(`${LIEN_API_PERSONNE}/api/wwgrades`),
-            axios.get(`${LIEN_API_PERSONNE}/api/affectation/services`),
-            axios.get(`${LIEN_API_PERSONNE}/api/Adresses`),
-            axios.get(`${LIEN_API_PERSONNE}/api/typepersonnel`),
+            await PersonnelService.getGrades(),
+            await PersonnelService.getServices(),
+            await PersonnelService.getAdresses(),
+            await PersonnelService.getTypesPersonnel(),
           ]);
 
           if (!mounted) return;
@@ -141,9 +141,7 @@ const AjoutFormComponent = forwardRef(
 
       (async () => {
         try {
-          const res = await axios.get(
-            `${LIEN_API_PERSONNE}/api/affectation/${form.service}`
-          );
+          const res = await PersonnelService.getServices();
           if (mounted) setSelectedServiceDetails(res.data || null);
         } catch (e) {
           if (mounted) setSelectedServiceDetails(null);
@@ -218,12 +216,14 @@ const AjoutFormComponent = forwardRef(
           SiTypePersonnel: !!form.SiTypePersonnel,
 
           // ✅ d'après ton XML : 0 si vide
-          TypePersonnelID: form.SiTypePersonnel ? Number(form.TypePersonnelID) : 0,
+          TypePersonnelID: form.SiTypePersonnel
+            ? Number(form.TypePersonnelID)
+            : 0,
 
           SiArchive: false,
         };
 
-        console.log("[AJOUT] LIEN_API_PERSONNE =", LIEN_API_PERSONNE);
+        console.log("payload", payload);
         console.log("[AJOUT] payload JSON =", JSON.stringify(payload, null, 2));
         console.log("[AJOUT] types payload:", {
           ServiceID: typeof payload.ServiceID,
@@ -235,8 +235,7 @@ const AjoutFormComponent = forwardRef(
           SiArchive: typeof payload.SiArchive,
         });
 
-        const response = await axios.post(`${LIEN_API_PERSONNE}/api/Personne`, payload);
-
+        const response = await PersonnelService.create(payload);
         console.log("[AJOUT] response.data :", response.data);
         console.log("[AJOUT] status :", response.status);
 
@@ -252,7 +251,9 @@ const AjoutFormComponent = forwardRef(
           alert(msg);
           return;
         }
-
+        if (response.data === "OK-create") {
+          alert("Ajout réussi !");
+        }
         clearCaches();
 
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -274,13 +275,11 @@ const AjoutFormComponent = forwardRef(
           onMemberUpdate(addedMember);
         }
 
-        alert("Ajout réussi !");
         handleClose();
-      } catch (e) {
-        console.log("[AJOUT] error.response?.data :", e?.response?.data);
-        console.log("[AJOUT] error.response?.status :", e?.response?.status);
+      } catch (error) {
+        console.log("Validation errors:", error.response.data.errors);
 
-        const msg = e?.response?.data || "Erreur lors de l'envoi.";
+        const msg = error?.response?.data || "Erreur lors de l'envoi.";
         setError(msg);
         alert(msg);
       } finally {
@@ -289,7 +288,13 @@ const AjoutFormComponent = forwardRef(
     };
 
     return (
-      <Dialog open={!!open} onClose={handleClose} fullWidth maxWidth="md" ref={ref}>
+      <Dialog
+        open={!!open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="md"
+        ref={ref}
+      >
         <DialogTitle
           sx={{
             pb: 1,
@@ -390,7 +395,10 @@ const AjoutFormComponent = forwardRef(
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
-                      options={[{ IDWWGrade: "", NomWWGradeFr: "Aucun" }, ...grades]}
+                      options={[
+                        { IDWWGrade: "", NomWWGradeFr: "Aucun" },
+                        ...grades,
+                      ]}
                       getOptionLabel={(option) => option?.NomWWGradeFr || ""}
                       value={
                         grades.find((g) => g.IDWWGrade === form.grade) || {
@@ -401,8 +409,12 @@ const AjoutFormComponent = forwardRef(
                       isOptionEqualToValue={(option, value) =>
                         option.IDWWGrade === value.IDWWGrade
                       }
-                      onChange={(e, nv) => setField("grade", nv ? nv.IDWWGrade : "")}
-                      renderInput={(params) => <TextField {...params} label="Grade" />}
+                      onChange={(e, nv) =>
+                        setField("grade", nv ? nv.IDWWGrade : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Grade" />
+                      )}
                     />
                   </Grid>
 
@@ -411,13 +423,22 @@ const AjoutFormComponent = forwardRef(
                       size="small"
                       options={addresses}
                       getOptionLabel={(option) => option?.AdresseComplete || ""}
-                      value={addresses.find((a) => a.IDAdresse === form.adresse) || null}
+                      value={
+                        addresses.find((a) => a.IDAdresse === form.adresse) ||
+                        null
+                      }
                       isOptionEqualToValue={(option, value) =>
                         option.IDAdresse === value.IDAdresse
                       }
-                      onChange={(e, nv) => setField("adresse", nv ? nv.IDAdresse : "")}
+                      onChange={(e, nv) =>
+                        setField("adresse", nv ? nv.IDAdresse : "")
+                      }
                       renderInput={(params) => (
-                        <TextField {...params} label="Adresse d'affectation" required />
+                        <TextField
+                          {...params}
+                          label="Adresse d'affectation"
+                          required
+                        />
                       )}
                     />
                   </Grid>
@@ -451,20 +472,38 @@ const AjoutFormComponent = forwardRef(
                         setField("SiTypePersonnel", e.target.value === "true")
                       }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="Oui" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="Non" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="Oui"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="Non"
+                      />
                     </RadioGroup>
 
                     {isPersonnelSelected && (
-                      <FormControl fullWidth size="small" sx={{ mt: 1.5 }} required>
+                      <FormControl
+                        fullWidth
+                        size="small"
+                        sx={{ mt: 1.5 }}
+                        required
+                      >
                         <InputLabel>Type de personnel</InputLabel>
                         <Select
                           label="Type de personnel"
                           value={form.TypePersonnelID}
-                          onChange={(e) => setField("TypePersonnelID", e.target.value)}
+                          onChange={(e) =>
+                            setField("TypePersonnelID", e.target.value)
+                          }
                         >
                           {typePersonnelList.map((tp) => (
-                            <MenuItem key={tp.IDTypePersonnel} value={tp.IDTypePersonnel}>
+                            <MenuItem
+                              key={tp.IDTypePersonnel}
+                              value={tp.IDTypePersonnel}
+                            >
                               {tp.NomTypePersonnelFr}
                             </MenuItem>
                           ))}
@@ -481,10 +520,20 @@ const AjoutFormComponent = forwardRef(
                     <RadioGroup
                       row
                       value={form.siFrancais ? "true" : "false"}
-                      onChange={(e) => setField("siFrancais", e.target.value === "true")}
+                      onChange={(e) =>
+                        setField("siFrancais", e.target.value === "true")
+                      }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="FR" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="NL" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="FR"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="NL"
+                      />
                     </RadioGroup>
                   </Grid>
                 </Grid>
@@ -505,11 +554,13 @@ const AjoutFormComponent = forwardRef(
                     Détails du service
                   </Typography>
                   <Typography variant="caption" display="block">
-                    <strong>Chef Service :</strong> {selectedServiceDetails.NomChefService}{" "}
+                    <strong>Chef Service :</strong>{" "}
+                    {selectedServiceDetails.NomChefService}{" "}
                     {selectedServiceDetails.PrenomChefService}
                   </Typography>
                   <Typography variant="caption" display="block">
-                    <strong>Chef Département :</strong> {selectedServiceDetails.NomChefDepartement}{" "}
+                    <strong>Chef Département :</strong>{" "}
+                    {selectedServiceDetails.NomChefDepartement}{" "}
                     {selectedServiceDetails.PrenomChefDepartement}
                   </Typography>
                 </Box>
@@ -519,16 +570,24 @@ const AjoutFormComponent = forwardRef(
         </DialogContent>
 
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={handleClose} color="inherit" disabled={saving || loadingInit}>
+          <Button
+            onClick={handleClose}
+            color="inherit"
+            disabled={saving || loadingInit}
+          >
             Annuler
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={saving || loadingInit}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={saving || loadingInit}
+          >
             {saving ? "Enregistrement..." : "Valider"}
           </Button>
         </DialogActions>
       </Dialog>
     );
-  }
+  },
 );
 
 AjoutFormComponent.propTypes = {

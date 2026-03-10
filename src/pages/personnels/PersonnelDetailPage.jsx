@@ -36,11 +36,7 @@ export default function PersonnelDetail() {
         const response = await PersonnelService.getById(id);
         console.log("type", typeof response.data);
         console.log("res", response.data);
-        // const parser = new XMLParser();
-        //const data = parser.parse(response.data);
-        // console.log("data", data);
-
-        //const data = jsonData?.WhosWhoModelView ?? null;
+       
 
         if (mounted) setPersonData(response.data);
       } catch (e) {

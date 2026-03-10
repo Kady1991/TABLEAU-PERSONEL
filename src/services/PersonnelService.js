@@ -11,16 +11,19 @@ const http = axios.create({
 });
 
 const PersonnelService = {
-  // Récupérer tous les personnels
+  // Récupérer tous le personnel
   getAll: () => http.get("/api/Personnes/liste"),
 
-  // Récupérer un personnel par ID
+  // Récupérer une personne par ID
   getById: (id) => http.get(`/api/Personnes/${id}`),
 
-  //Modifier un personnel
+  // créer une personne
+  create: (payload) => http.post(`/api/Personnes/`, payload),
+
+  //Modifier une personne
   update: (id, payload) => http.put(`/api/personnes/edit?id=${id}`, payload),
 
-  // Restaurer un personnel archivé
+  // Restaurer une personne archivée
   restore: (id) => http.put(`/api/personnes/desarchiver?id=${id}`),
 
   // Référentiels
