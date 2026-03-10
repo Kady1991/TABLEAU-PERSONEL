@@ -212,7 +212,7 @@ function HomePage() {
 
           {error && <Alert severity="error">{error}</Alert>}
 
-          <Box sx={{ height: "70vh" }}>
+          <Box sx={{ height: "60vh" }}>
             <TableauComponent
               compact={false}
               showHeader={false}
