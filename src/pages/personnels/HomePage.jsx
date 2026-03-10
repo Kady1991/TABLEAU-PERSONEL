@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types"; // ✅ Correction : Import de PropTypes
+import PropTypes from "prop-types";
 import {
   Alert,
   Box,
@@ -16,21 +16,12 @@ import TableauComponent from "../../components/Tableau/TableauComponent.jsx";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import AddIcon from "@mui/icons-material/Add";
-
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-
 import PersonnelService from "../../services/PersonnelService";
-
-// ✅ on réutilise le même tableau
-
 
 const CACHE_KEY = "home_personnels_actifs_cache_v1";
 
-/**
- * ✅ Correction ESLint : Validation des props pour StatCard
- */
 function StatCard({ title, subtitle, icon, onClick, right }) {
   return (
     <Card variant="outlined">
@@ -68,7 +59,6 @@ function StatCard({ title, subtitle, icon, onClick, right }) {
   );
 }
 
-// ✅ Définition des types attendus pour StatCard
 StatCard.propTypes = {
   title: PropTypes.string.isRequired,
   subtitle: PropTypes.string,
@@ -103,8 +93,13 @@ function HomePage() {
             const actifs = all.filter((p) => p?.SiArchive !== true).length;
 
             setStats({ actifs, archives });
-            sessionStorage.setItem(CACHE_KEY, JSON.stringify(all.filter((p) => p?.SiArchive !== true)));
-          } catch { /* ignore */ }
+            sessionStorage.setItem(
+              CACHE_KEY,
+              JSON.stringify(all.filter((p) => p?.SiArchive !== true))
+            );
+          } catch {
+            // ignore
+          }
           return;
         }
       }
@@ -136,18 +131,11 @@ function HomePage() {
           gridTemplateColumns: {
             xs: "1fr",
             sm: "1fr 1fr",
-            lg: "1fr 1fr 1fr ",
+            lg: "1fr 1fr 1fr",
           },
           mb: 2,
         }}
       >
-        {/* <StatCard
-          title="Nouveau"
-          subtitle="Ajouter un nouveau membre"
-          icon={<AddIcon fontSize="small" />}
-          onClick={() => navigate("/Personnels/new")}
-        /> */}
-
         <StatCard
           title="Personnels"
           subtitle="Liste des personnels actifs"
@@ -164,7 +152,7 @@ function HomePage() {
           title="Archives"
           subtitle="Personnels archivés"
           icon={<ArchiveIcon fontSize="small" />}
-          onClick={() => navigate("/Personnels/archives")} // ✅ Majuscule harmonisée
+          onClick={() => navigate("/Personnels/archives")}
           right={
             <Typography variant="body2" fontWeight={800}>
               {loadingStats ? "…" : stats.archives}
@@ -176,7 +164,7 @@ function HomePage() {
           title="Statistiques"
           subtitle="Vue globale"
           icon={<AssessmentIcon fontSize="small" />}
-          onClick={() => navigate("/Personnels/statistics")} // ✅ Majuscule harmonisée
+          onClick={() => navigate("/Personnels/statistics")}
           right={
             <Stack spacing={0.2} alignItems="flex-end">
               <Stack direction="row" spacing={1} alignItems="center">
@@ -204,7 +192,7 @@ function HomePage() {
       </Box>
 
       <Card variant="outlined">
-        <CardContent sx={{ height: 500 }} >
+        <CardContent>
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -214,6 +202,7 @@ function HomePage() {
             <Typography fontWeight={700}>
               Liste du personnel actif
             </Typography>
+
             <Button size="small" onClick={() => navigate("/Personnels")}>
               Ouvrir en plein écran
             </Button>
@@ -223,13 +212,14 @@ function HomePage() {
 
           {error && <Alert severity="error">{error}</Alert>}
 
-         
-  <TableauComponent
-  compact
-  rowsPreview={5}
-  showHeader
-  showAddButton
-/>
+          <Box sx={{ height: "70vh" }}>
+            <TableauComponent
+              compact={false}
+              showHeader={false}
+              showAddButton
+              nonArchivedOnly
+            />
+          </Box>
         </CardContent>
       </Card>
     </Box>
