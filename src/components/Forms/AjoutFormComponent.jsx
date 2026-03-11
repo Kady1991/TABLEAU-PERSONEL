@@ -45,6 +45,7 @@ const AjoutFormComponent = forwardRef(
     const [services, setServices] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [typePersonnelList, setTypePersonnelList] = useState([]);
+    const [fonctions, setFonctions] = useState([]);
 
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
 
@@ -57,6 +58,8 @@ const AjoutFormComponent = forwardRef(
       grade: "",
       adresse: "",
       service: "",
+      fonction: "",
+      codeFonction: "",
       SiTypePersonnel: false,
       TypePersonnelID: "",
       siFrancais: true,
@@ -83,6 +86,12 @@ const AjoutFormComponent = forwardRef(
       return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
     };
 
+    const selectedFonction = fonctions.find(
+      (f) => f.IDFonction === form.fonction,
+    );
+
+    const codesDisponibles = selectedFonction?.Codes || [];
+
     const handleNameChange = (nextNom, nextPrenom) => {
       const email = generateEmail(nextPrenom, nextNom);
       setField("email", email);
@@ -105,12 +114,14 @@ const AjoutFormComponent = forwardRef(
         setLoadingInit(true);
         setError("");
         try {
-          const [gradesRes, servicesRes, addrRes, typeRes] = await Promise.all([
-            await PersonnelService.getGrades(),
-            await PersonnelService.getServices(),
-            await PersonnelService.getAdresses(),
-            await PersonnelService.getTypesPersonnel(),
-          ]);
+          const [gradesRes, servicesRes, addrRes, typeRes, fonRes] =
+            await Promise.all([
+              await PersonnelService.getGrades(),
+              await PersonnelService.getServices(),
+              await PersonnelService.getAdresses(),
+              await PersonnelService.getTypesPersonnel(),
+              await PersonnelService.getFonctions(),
+            ]);
 
           if (!mounted) return;
 
@@ -118,6 +129,7 @@ const AjoutFormComponent = forwardRef(
           setServices(Array.isArray(servicesRes.data) ? servicesRes.data : []);
           setAddresses(Array.isArray(addrRes.data) ? addrRes.data : []);
           setTypePersonnelList(Array.isArray(typeRes.data) ? typeRes.data : []);
+          setFonctions(Array.isArray(fonRes.data) ? fonRes.data : []);
         } catch (e) {
           setError("Erreur lors du chargement des listes.");
         } finally {
@@ -201,6 +213,8 @@ const AjoutFormComponent = forwardRef(
 
           // ✅ d'après ton XML : 0 si vide
           WWGradeID: form.grade ? Number(form.grade) : 0,
+          FonctionID: form.fonction ? Number(form.fonction) : 0,
+          CodeID: form.codeFonction ? Number(form.codeFonction) : 0,
 
           // ✅ bool
           SiFrancais: !!form.siFrancais,
@@ -330,7 +344,6 @@ const AjoutFormComponent = forwardRef(
                       }}
                     />
                   </Grid>
-
                   <Grid item xs={12} sm={6}>
                     <TextField
                       label="Prénom"
@@ -344,250 +357,284 @@ const AjoutFormComponent = forwardRef(
                       }}
                     />
                   </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Téléphone"
-                        fullWidth
-                        size="small"
-                        value={form.telephone}
-                        onChange={(e) => setField("telephone", e.target.value)}
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Téléphone"
+                      fullWidth
+                      size="small"
+                      value={form.telephone}
+                      onChange={(e) => setField("telephone", e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Email"
+                      required
+                      fullWidth
+                      size="small"
+                      value={form.email}
+                      onChange={(e) => setField("email", e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Date d'entrée"
+                        value={form.DateEntreeDate}
+                        onChange={(val) => setField("DateEntreeDate", val)}
+                        slotProps={{
+                          textField: {
+                            required: true,
+                            fullWidth: true,
+                            size: "small",
+                          },
+                        }}
                       />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Email"
-                        required
-                        fullWidth
-                        size="small"
-                        value={form.email}
-                        onChange={(e) => setField("email", e.target.value)}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Date d'entrée"
-                          value={form.DateEntreeDate}
-                          onChange={(val) => setField("DateEntreeDate", val)}
-                          slotProps={{
-                            textField: {
-                              required: true,
-                              fullWidth: true,
-                              size: "small",
-                            },
-                          }}
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      size="small"
+                      options={[
+                        { IDWWGrade: "", NomWWGradeFr: "Aucun" },
+                        ...grades,
+                      ]}
+                      getOptionLabel={(option) => option?.NomWWGradeFr || ""}
+                      value={
+                        grades.find((g) => g.IDWWGrade === form.grade) || {
+                          IDWWGrade: "",
+                          NomWWGradeFr: "Aucun",
+                        }
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.IDWWGrade === value.IDWWGrade
+                      }
+                      onChange={(e, nv) =>
+                        setField("grade", nv ? nv.IDWWGrade : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Grade" />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      size="small"
+                      options={addresses}
+                      getOptionLabel={(option) => option?.AdresseComplete || ""}
+                      value={
+                        addresses.find((a) => a.IDAdresse === form.adresse) ||
+                        null
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.IDAdresse === value.IDAdresse
+                      }
+                      onChange={(e, nv) =>
+                        setField("adresse", nv ? nv.IDAdresse : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Adresse d'affectation"
+                          required
                         />
-                      </LocalizationProvider>
-                    </Grid>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small" required>
+                      <InputLabel>Service</InputLabel>
+                      <Select
+                        label="Service"
+                        value={form.service}
+                        onChange={(e) => setField("service", e.target.value)}
+                      >
+                        {services.map((s) => (
+                          <MenuItem key={s.IDService} value={s.IDService}>
+                            {s.NomServiceFr}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>{" "}
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      size="small"
+                      options={fonctions}
+                      getOptionLabel={(option) => option?.NomFonctionFr || ""}
+                      value={
+                        fonctions.find((a) => a.IDFonction === form.fonction) ||
+                        null
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.IDFonction === value.IDFonction
+                      }
+                      onChange={(e, nv) => {
+                        setField("fonction", nv ? nv.IDFonction : "");
+                        setField("codeFonction", "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Fonctions" required />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      size="small"
+                      options={codesDisponibles}
+                      getOptionLabel={(option) => option?.NomCode || ""}
+                      value={
+                        codesDisponibles.find(
+                          (c) => c.Idcode === form.codeFonction,
+                        ) || null
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.Idcode === value.Idcode
+                      }
+                      onChange={(e, nv) =>
+                        setField("codeFonction", nv ? nv.Idcode : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Code fonction" required />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                      <span style={{ color: "#d32f2f" }}>*</span> Personnel
+                    </Typography>
 
-                    <Grid item xs={12} sm={6}>
-                      <Autocomplete
-                        size="small"
-                        options={[
-                          { IDWWGrade: "", NomWWGradeFr: "Aucun" },
-                          ...grades,
-                        ]}
-                        getOptionLabel={(option) => option?.NomWWGradeFr || ""}
-                        value={
-                          grades.find((g) => g.IDWWGrade === form.grade) || {
-                            IDWWGrade: "",
-                            NomWWGradeFr: "Aucun",
-                          }
-                        }
-                        isOptionEqualToValue={(option, value) =>
-                          option.IDWWGrade === value.IDWWGrade
-                        }
-                        onChange={(e, nv) =>
-                          setField("grade", nv ? nv.IDWWGrade : "")
-                        }
-                        renderInput={(params) => (
-                          <TextField {...params} label="Grade" />
-                        )}
+                    <RadioGroup
+                      row
+                      value={form.SiTypePersonnel ? "true" : "false"}
+                      onChange={(e) =>
+                        setField("SiTypePersonnel", e.target.value === "true")
+                      }
+                    >
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="Oui"
                       />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Autocomplete
-                        size="small"
-                        options={addresses}
-                        getOptionLabel={(option) => option?.AdresseComplete || ""}
-                        value={
-                          addresses.find((a) => a.IDAdresse === form.adresse) ||
-                          null
-                        }
-                        isOptionEqualToValue={(option, value) =>
-                          option.IDAdresse === value.IDAdresse
-                        }
-                        onChange={(e, nv) =>
-                          setField("adresse", nv ? nv.IDAdresse : "")
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Adresse d'affectation"
-                            required
-                          />
-                        )}
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="Non"
                       />
-                    </Grid>
+                    </RadioGroup>
 
-                    <Grid item xs={12} sm={6}>
-                      <FormControl fullWidth size="small" required>
-                        <InputLabel>Service</InputLabel>
+                    {isPersonnelSelected && (
+                      <FormControl
+                        fullWidth
+                        size="small"
+                        sx={{ mt: 1.5 }}
+                        required
+                      >
+                        <InputLabel>Type de personnel</InputLabel>
                         <Select
-                          label="Service"
-                          value={form.service}
-                          onChange={(e) => setField("service", e.target.value)}
+                          label="Type de personnel"
+                          value={form.TypePersonnelID}
+                          onChange={(e) =>
+                            setField("TypePersonnelID", e.target.value)
+                          }
                         >
-                          {services.map((s) => (
-                            <MenuItem key={s.IDService} value={s.IDService}>
-                              {s.NomServiceFr}
+                          {typePersonnelList.map((tp) => (
+                            <MenuItem
+                              key={tp.IDTypePersonnel}
+                              value={tp.IDTypePersonnel}
+                            >
+                              {tp.NomTypePersonnelFr}
                             </MenuItem>
                           ))}
                         </Select>
                       </FormControl>
+                    )}
                   </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                      <span style={{ color: "#d32f2f" }}>*</span> Langue
+                    </Typography>
 
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        <span style={{ color: "#d32f2f" }}>*</span> Personnel
-                      </Typography>
-
-                      <RadioGroup
-                        row
-                        value={form.SiTypePersonnel ? "true" : "false"}
-                        onChange={(e) =>
-                          setField("SiTypePersonnel", e.target.value === "true")
-                        }
-                      >
-                        <FormControlLabel
-                          value="true"
-                          control={<Radio size="small" />}
-                          label="Oui"
-                        />
-                        <FormControlLabel
-                          value="false"
-                          control={<Radio size="small" />}
-                          label="Non"
-                        />
-                      </RadioGroup>
-
-                      {isPersonnelSelected && (
-                        <FormControl
-                          fullWidth
-                          size="small"
-                          sx={{ mt: 1.5 }}
-                          required
-                        >
-                          <InputLabel>Type de personnel</InputLabel>
-                          <Select
-                            label="Type de personnel"
-                            value={form.TypePersonnelID}
-                            onChange={(e) =>
-                              setField("TypePersonnelID", e.target.value)
-                            }
-                          >
-                            {typePersonnelList.map((tp) => (
-                              <MenuItem
-                                key={tp.IDTypePersonnel}
-                                value={tp.IDTypePersonnel}
-                              >
-                                {tp.NomTypePersonnelFr}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" sx={{ mb: 0.5 }}>
-                        <span style={{ color: "#d32f2f" }}>*</span> Langue
-                      </Typography>
-
-                      <RadioGroup
-                        row
-                        value={form.siFrancais ? "true" : "false"}
-                        onChange={(e) =>
-                          setField("siFrancais", e.target.value === "true")
-                        }
-                      >
-                        <FormControlLabel
-                          value="true"
-                          control={<Radio size="small" />}
-                          label="FR"
-                        />
-                        <FormControlLabel
-                          value="false"
-                          control={<Radio size="small" />}
-                          label="NL"
-                        />
-                      </RadioGroup>
-                    </Grid>
+                    <RadioGroup
+                      row
+                      value={form.siFrancais ? "true" : "false"}
+                      onChange={(e) =>
+                        setField("siFrancais", e.target.value === "true")
+                      }
+                    >
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="FR"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="NL"
+                      />
+                    </RadioGroup>
                   </Grid>
+                </Grid>
+              </Box>
+
+              {selectedServiceDetails && (
+                <Box
+                  sx={{
+                    mt: 1,
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: "action.hover",
+                    border: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <Typography fontWeight={700} variant="subtitle2" mb={1}>
+                    Détails du service
+                  </Typography>
+                  <Typography variant="caption" display="block">
+                    <strong>Chef Service :</strong>{" "}
+                    {selectedServiceDetails.NomChefService}{" "}
+                    {selectedServiceDetails.PrenomChefService}
+                  </Typography>
+                  <Typography variant="caption" display="block">
+                    <strong>Chef Département :</strong>{" "}
+                    {selectedServiceDetails.NomChefDepartement}{" "}
+                    {selectedServiceDetails.PrenomChefDepartement}
+                  </Typography>
                 </Box>
-  
-                {selectedServiceDetails && (
-                  <Box
-                    sx={{
-                      mt: 1,
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: "action.hover",
-                      border: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Typography fontWeight={700} variant="subtitle2" mb={1}>
-                      Détails du service
-                    </Typography>
-                    <Typography variant="caption" display="block">
-                      <strong>Chef Service :</strong>{" "}
-                      {selectedServiceDetails.NomChefService}{" "}
-                      {selectedServiceDetails.PrenomChefService}
-                    </Typography>
-                    <Typography variant="caption" display="block">
-                      <strong>Chef Département :</strong>{" "}
-                      {selectedServiceDetails.NomChefDepartement}{" "}
-                      {selectedServiceDetails.PrenomChefDepartement}
-                    </Typography>
-                  </Box>
-                )}
-              </Stack>
-            )}
-          </DialogContent>
-  
-          <DialogActions sx={{ px: 3, py: 2 }}>
-            <Button
-              onClick={handleClose}
-              color="inherit"
-              disabled={saving || loadingInit}
-            >
-              Annuler
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              disabled={saving || loadingInit}
-            >
-              {saving ? "Enregistrement..." : "Valider"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      );
-    },
-  );
-  
-  AjoutFormComponent.propTypes = {
-    open: PropTypes.any,
-    onClose: PropTypes.func,
-    onMemberUpdate: PropTypes.func,
-    refreshData: PropTypes.func,
-  };
-  
-  AjoutFormComponent.displayName = "AjoutFormComponent";
-  
-  export default AjoutFormComponent;
+              )}
+            </Stack>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleClose}
+            color="inherit"
+            disabled={saving || loadingInit}
+          >
+            Annuler
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={saving || loadingInit}
+          >
+            {saving ? "Enregistrement..." : "Valider"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  },
+);
+
+AjoutFormComponent.propTypes = {
+  open: PropTypes.any,
+  onClose: PropTypes.func,
+  onMemberUpdate: PropTypes.func,
+  refreshData: PropTypes.func,
+};
+
+AjoutFormComponent.displayName = "AjoutFormComponent";
+
+export default AjoutFormComponent;

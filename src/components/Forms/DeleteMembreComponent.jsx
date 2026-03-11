@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import dayjs from "dayjs";
 import { MdDeleteForever } from "react-icons/md";
 import {
@@ -39,36 +39,36 @@ function DeleteMembreComponent({
   const closeToast = () => setToast((t) => ({ ...t, open: false }));
 
   // ✅ Vérifie si la personne est déjà archivée
-  useEffect(() => {
-    let mounted = true;
+  // useEffect(() => {
+  // let mounted = true;
 
-    const checkArchivedStatus = async () => {
-      try {
-        if (!email) return;
+  // const checkArchivedStatus = async () => {
+  //   try {
+  //     if (!email) return;
 
-        const data = await PersonnelService.getByEmail(email);
+  //     const data = await PersonnelService.getByEmail(email);
 
-        if (!mounted) return;
+  //     if (!mounted) return;
 
-        if (data?.SiArchive !== undefined) {
-          setIsArchived(Boolean(data.SiArchive));
-        } else {
-          setIsArchived(false);
-        }
-      } catch (error) {
-        console.error(
-          "Erreur check archive :",
-          error?.response?.data || error?.message
-        );
-      }
-    };
+  //     if (data?.SiArchive !== undefined) {
+  //       setIsArchived(Boolean(data.SiArchive));
+  //     } else {
+  //       setIsArchived(false);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Erreur check archive :",
+  //       error?.response?.data || error?.message,
+  //     );
+  //   }
+  // };
 
-    checkArchivedStatus();
+  //   checkArchivedStatus();
 
-    return () => {
-      mounted = false;
-    };
-  }, [email]);
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [email]);
 
   const handleClick = () => {
     if (isArchived) {
@@ -97,11 +97,11 @@ function DeleteMembreComponent({
 
     setLoading(true);
     try {
-      await PersonnelService.archiveByEmail(email, formattedDate);
+      await PersonnelService.archive(IDPersonneService, formattedDate);
 
       showToast(
         "success",
-        `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`
+        `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`,
       );
 
       setIsArchived(true);
@@ -117,7 +117,7 @@ function DeleteMembreComponent({
     } catch (error) {
       console.error(
         "Erreur archivage :",
-        error?.response?.data || error?.message
+        error?.response?.data || error?.message,
       );
       showToast("error", "L'archivage a échoué.");
     } finally {
@@ -175,7 +175,11 @@ function DeleteMembreComponent({
           <Button onClick={handleClose} color="inherit">
             Annuler
           </Button>
-          <Button onClick={handleConfirm} variant="contained" disabled={loading}>
+          <Button
+            onClick={handleConfirm}
+            variant="contained"
+            disabled={loading}
+          >
             {loading ? "Archivage..." : "Archiver"}
           </Button>
         </DialogActions>
