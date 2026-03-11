@@ -27,6 +27,7 @@ const isArchived = (v) =>
 function PersonnelStatisticsPage() {
   const [personnes, setPersonnes] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [selectedLabel, setSelectedLabel] = useState(GLOBAL_LABEL);
   const [inputValue, setInputValue] = useState("");
 
@@ -48,6 +49,7 @@ function PersonnelStatisticsPage() {
         setLoading(false);
       }
     };
+
     loadData();
   }, []);
 
@@ -57,6 +59,7 @@ function PersonnelStatisticsPage() {
     personnes.forEach((p) => {
       const dept = clean(p?.NomDepartementFr) || "Sans département";
       const svc = clean(p?.NomServiceFr) || "Sans service";
+
       if (!map.has(dept)) map.set(dept, new Set());
       map.get(dept).add(svc);
     });
@@ -64,8 +67,8 @@ function PersonnelStatisticsPage() {
     const depts = Array.from(map.keys()).sort((a, b) =>
       a.localeCompare(b, "fr")
     );
-    const svcs = {};
 
+    const svcs = {};
     depts.forEach((d) => {
       svcs[d] = Array.from(map.get(d) || []).sort((a, b) =>
         a.localeCompare(b, "fr")
@@ -103,24 +106,31 @@ function PersonnelStatisticsPage() {
 
         const estDejaEntre =
           dEntree && dEntree.isValid()
-            ? dEntree.startOf("day").isBefore(endDate.endOf("day").add(1, "millisecond"))
+            ? dEntree
+                .startOf("day")
+                .isBefore(endDate.endOf("day").add(1, "millisecond"))
             : false;
 
         const estPasPartiAvant =
           !dSortie || !dSortie.isValid()
             ? true
-            : dSortie.endOf("day").isAfter(startDate.startOf("day").subtract(1, "millisecond"));
+            : dSortie
+                .endOf("day")
+                .isAfter(startDate.startOf("day").subtract(1, "millisecond"));
 
         if (!estDejaEntre || !estPasPartiAvant) return false;
       }
 
       if (selectionInfo.type === "global") return true;
+
       if (selectionInfo.type === "dept") {
         return clean(p?.NomDepartementFr) === selectionInfo.dept;
       }
+
       if (selectionInfo.type === "service") {
         return clean(p?.NomServiceFr) === selectionInfo.service;
       }
+
       return true;
     });
   }, [personnes, periodMode, startDate, endDate, selectionInfo]);
@@ -134,14 +144,17 @@ function PersonnelStatisticsPage() {
       if (selectionInfo.type === "global") {
         return clean(p?.NomDepartementFr) || "Inconnu";
       }
+
       if (selectionInfo.type === "dept") {
         return clean(p?.NomServiceFr) || "Sans service";
       }
+
       return clean(p?.NomServiceFr) || selectionInfo.service;
     };
 
     filteredData.forEach((p) => {
       const key = keyOf(p);
+
       if (!map.has(key)) {
         map.set(key, { entries: 0, exits: 0 });
       }
@@ -152,7 +165,11 @@ function PersonnelStatisticsPage() {
           : null;
 
       const archived = isArchived(
-        p?.SiArchive ?? p?.Archive ?? p?.Archived ?? p?.archive ?? p?.IsArchived
+        p?.SiArchive ??
+          p?.Archive ??
+          p?.Archived ??
+          p?.archive ??
+          p?.IsArchived
       );
 
       let isExit = false;
@@ -190,6 +207,7 @@ function PersonnelStatisticsPage() {
 
   const series = useMemo(() => {
     const data = statsComputed?.data ?? [];
+
     return [
       {
         label: "Effectifs Actifs",
@@ -213,7 +231,11 @@ function PersonnelStatisticsPage() {
             value={inputValue}
             onChange={setInputValue}
             loading={loading}
-            onSelect={(opt) => setSelectedLabel(opt?.label || GLOBAL_LABEL)}
+            onSelect={(opt) => {
+              const label = opt?.label || GLOBAL_LABEL;
+              setSelectedLabel(label);
+              setInputValue(label === GLOBAL_LABEL ? "" : label);
+            }}
           />
 
           <Button
@@ -228,7 +250,9 @@ function PersonnelStatisticsPage() {
           >
             {periodMode === "global"
               ? "Période: Global"
-              : `Du ${startDate.format("DD/MM/YY")} au ${endDate.format("DD/MM/YY")}`}
+              : `Du ${startDate.format("DD/MM/YY")} au ${endDate.format(
+                  "DD/MM/YY"
+                )}`}
           </Button>
         </Stack>
       </CardContent>

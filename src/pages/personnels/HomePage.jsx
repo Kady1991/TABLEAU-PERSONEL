@@ -123,7 +123,7 @@ function HomePage() {
   }, []);
 
   return (
-    <Box>
+    <Box >
       <Box
         sx={{
           display: "grid",
@@ -133,7 +133,8 @@ function HomePage() {
             sm: "1fr 1fr",
             lg: "1fr 1fr 1fr",
           },
-          mb: 2,
+          mb: 6,
+          
         }}
       >
         <StatCard
@@ -192,7 +193,7 @@ function HomePage() {
       </Box>
 
       <Card variant="outlined">
-        <CardContent>
+        <CardContent sx={{ height: "60vh" }}>
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -212,7 +213,7 @@ function HomePage() {
 
           {error && <Alert severity="error">{error}</Alert>}
 
-          <Box sx={{ height: "60vh" }}>
+          <Box sx={{ height: "55vh" }}>
             <TableauComponent
               compact={false}
               showHeader={false}

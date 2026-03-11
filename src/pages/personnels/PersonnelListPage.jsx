@@ -5,7 +5,7 @@ function PersonneListPage() {
   return (
     <Box
       sx={{
-        height: "calc(100vh - 64px)",
+        height: "calc(94vh - 64px)",
         display: "flex",
         flexDirection: "column",
       }}

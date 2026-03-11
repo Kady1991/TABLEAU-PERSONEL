@@ -229,7 +229,7 @@ const columns = useMemo(() => [
           minHeight: 0,
           width: "100%",
           bgcolor: "background.paper",
-          height: compact ? height : "calc(90vh - 120px)",
+          height: compact ? height : "calc(100vh - 190px)",
           overflow: "hidden",
         }}
       >

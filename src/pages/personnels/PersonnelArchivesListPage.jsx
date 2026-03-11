@@ -11,7 +11,6 @@ import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
 import { LIEN_API_PERSONNE } from "../../config.js";
 
-
 const CACHE_KEY = "personnels_archives_cache_v2_dates";
 const isArchived = (v) => v === true || v === 1 || String(v).toLowerCase() === "true";
 
@@ -67,12 +66,7 @@ function PersonnelArchivesListPage() {
 
       const res = await PersonnelService.getAll();
       const all = Array.isArray(res.data) ? res.data : [];
-
-      // ✅ filtre corrigé
       const archived = all.filter((p) => isArchived(p?.SiArchive));
-
-      console.log("[ARCHIVES] total =", all.length, "| archived =", archived.length);
-      if (archived[0]) console.log("[ARCHIVES] exemple SiArchive =", archived[0].SiArchive);
 
       const enriched = await Promise.all(
         archived.map(async (p) => {
@@ -98,7 +92,6 @@ function PersonnelArchivesListPage() {
     load();
   }, [load]);
 
-  // ✅ FIX ESLint: refreshData stable + deps correctes
   const refreshData = useCallback(async () => {
     sessionStorage.removeItem(CACHE_KEY);
     await load({ force: true });
@@ -143,7 +136,9 @@ function PersonnelArchivesListPage() {
     [refreshData]
   );
 
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
 
   return (
     <Box>
@@ -187,7 +182,6 @@ function PersonnelArchivesListPage() {
             },
             loadingOverlay: {
               variant: "linear-progress",
-              noRowsVariant: "linear-progress",
             },
           }}
           sx={{
