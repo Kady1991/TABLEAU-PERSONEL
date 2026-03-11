@@ -22,10 +22,14 @@ const PersonnelService = {
 
   //Modifier une personne
   update: (id, payload) => http.put(`/api/personnes/edit?id=${id}`, payload),
-
-  // Restaurer une personne archivée
-  restore: (id) => http.put(`/api/personnes/desarchiver?id=${id}`),
-
+  // Archiver et désarchiver une personne
+  archive: (id, formattedDate) =>
+    http.put(`/api/personnes/archive`, null, {
+      params: {
+        id: id,
+        date: formattedDate,
+      },
+    }),
   // Référentiels
   getGrades: () => http.get("/api/infos/wwgrades"),
   getAdresses: () => http.get("/api/infos/Adresses"),
