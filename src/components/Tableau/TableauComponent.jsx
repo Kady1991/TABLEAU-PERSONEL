@@ -1,22 +1,13 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Alert,
-  Box,
-  Button,
-  Stack,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Alert, Box, Button, Stack, IconButton, Tooltip } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddIcon from "@mui/icons-material/Add";
-
 import FormServiceComponent from "../../components/Forms/FormServiceComponent.jsx";
 import EditFormComponent from "../../components/Forms/EditFormComponent.jsx";
 import DeleteMembreComponent from "../../components/Forms/DeleteMembreComponent.jsx";
 import AjoutFormComponent from "../../components/Forms/AjoutFormComponent.jsx";
-
 import PersonnelService from "../../services/PersonnelService.js";
 import PropTypes from "prop-types";
 
@@ -47,27 +38,105 @@ function TableauComponent({
   const [openAdd, setOpenAdd] = useState(false);
 
   const rows = isControlled ? rowsProp : rowsState;
-  const loading =
-    typeof loadingProp === "boolean" ? loadingProp : loadingState;
+  const loading = typeof loadingProp === "boolean" ? loadingProp : loadingState;
   const error =
-    typeof errorProp === "string" ? errorProp : errorState;
+    typeof errorProp === "string"
+      ? errorProp
+      : typeof errorProp === "object" && errorProp !== null
+        ? JSON.stringify(errorProp)
+        : errorState;
 
   const fetchDataInternal = useCallback(async () => {
     try {
       setErrorState("");
       setLoadingState(true);
 
-      const res = await PersonnelService.getAll();
-      const data = Array.isArray(res?.data) ? res.data : [];
+      const [personnelsRes, gradesRes, fonctionsRes] = await Promise.all([
+        PersonnelService.getAll(),
+        PersonnelService.getGrades(),
+        PersonnelService.getFonctions(),
+      ]);
+
+      const data = Array.isArray(personnelsRes?.data) ? personnelsRes.data : [];
+      const grades = Array.isArray(gradesRes?.data) ? gradesRes.data : [];
+      const fonctions = Array.isArray(fonctionsRes?.data)
+        ? fonctionsRes.data
+        : [];
+
+      const enriched = data.map((p) => {
+        const gradeId =
+          p.WWGradeID ??
+          p.IDWWGrade ??
+          p.GradeID ??
+          p.WWGrade ??
+          p.IdWWGrade ??
+          p.IdGrade ??
+          null;
+
+        const fonctionId =
+          p.FonctionID ??
+          p.IDFonction ??
+          p.IdFonction ??
+          null;
+
+        const gradeTrouve =
+          grades.find((g) => Number(g.IDWWGrade) === Number(gradeId)) ||
+          grades.find((g) => Number(g.WWGradeID) === Number(gradeId)) ||
+          grades.find((g) => Number(g.IdWWGrade) === Number(gradeId)) ||
+          null;
+
+        const fonctionTrouvee =
+          fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
+          fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) ||
+          null;
+
+        return {
+          ...p,
+          NomWWGradeFr:
+            p.NomWWGradeFr ??
+            p.NomGradeFr ??
+            p.LibelleGradeFr ??
+            p.GradeLibelle ??
+            gradeTrouve?.NomWWGradeFr ??
+            gradeTrouve?.NomGradeFr ??
+            gradeTrouve?.LibelleGradeFr ??
+            "-",
+
+          NomWWGradeNl:
+            p.NomWWGradeNl ??
+            p.NomGradeNl ??
+            p.LibelleGradeNl ??
+            gradeTrouve?.NomWWGradeNl ??
+            gradeTrouve?.NomGradeNl ??
+            gradeTrouve?.LibelleGradeNl ??
+            "-",
+
+          NomFonctionFr:
+            p.NomFonctionFr ??
+            p.LibelleFonctionFr ??
+            fonctionTrouvee?.NomFonctionFr ??
+            fonctionTrouvee?.LibelleFonctionFr ??
+            "-",
+
+          NomFonctionNl:
+            p.NomFonctionNl ??
+            p.LibelleFonctionNl ??
+            fonctionTrouvee?.NomFonctionNl ??
+            fonctionTrouvee?.LibelleFonctionNl ??
+            "-",
+        };
+      });
 
       const filtered = nonArchivedOnly
-        ? data.filter((p) => !isArchived(p?.SiArchive))
-        : data;
+        ? enriched.filter((p) => !isArchived(p?.SiArchive))
+        : enriched;
 
       const finalRows =
         typeof rowsPreview === "number"
           ? filtered.slice(0, rowsPreview)
           : filtered;
+
+      console.log("ROWS TABLEAU ENRICHIES =", finalRows);
 
       setRowsState(finalRows);
     } catch (e) {
@@ -99,7 +168,7 @@ function TableauComponent({
         setRowsState((prev) => {
           const newId = addedMember?.IDPersonneService ?? Date.now();
           const exists = prev.some(
-            (r) => String(r?.IDPersonneService) === String(newId)
+            (r) => String(r?.IDPersonneService) === String(newId),
           );
 
           if (exists) return prev;
@@ -117,11 +186,17 @@ function TableauComponent({
       await refreshData();
       setOpenAdd(false);
     },
-    [isControlled, refreshData, rowsPreview]
+    [isControlled, refreshData, rowsPreview],
   );
 
-const columns = useMemo(() => [
-  { field: "IDPersonneService", headerName: "ID", width: 70, disableExport: true },
+  const columns = useMemo(
+    () => [
+      {
+        field: "IDPersonneService",
+        headerName: "ID",
+        width: 70,
+        disableExport: true,
+      },
       {
         field: "actions",
         headerName: "Actions",
@@ -135,7 +210,9 @@ const columns = useMemo(() => [
             <Tooltip title="Voir la fiche">
               <IconButton
                 size="small"
-                onClick={() => navigate(`/Personnels/${params.row.IDPersonneService}`)}
+                onClick={() =>
+                  navigate(`/Personnels/${params.row.IDPersonneService}`)
+                }
               >
                 <VisibilityIcon fontSize="small" />
               </IconButton>
@@ -161,33 +238,75 @@ const columns = useMemo(() => [
           </Stack>
         ),
       },
-  { field: "NomPersonne", headerName: "NOM", width: 180, hideable: false },
-  { field: "PrenomPersonne", headerName: "PRENOM", width: 180, hideable: false },
-  { field: "SiFrancaisString", headerName: "RÔLE", width: 120, hideable: false },
-  { field: "Email", headerName: "E-mail", width: 220, hideable: false },
-  { field: "DateEntree", headerName: "ENTREE SERVICE", width: 150, hideable: false },
-  { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200 },
-  { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
-  { field: "NomServiceNl", headerName: "AFFECTATION(nl)", width: 250 },
-  { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
-  { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 200 },
-  { field: "NomRueFr", headerName: "LOCALISATION", width: 200 },
-  { field: "Numero", headerName: "N°", width: 80 },
-  { field: "NomChefService", headerName: "NOM CHEF DU SERVICE", width: 220 },
-  { field: "PrenomChefService", headerName: "PRENOM CHEF DU SERVICE", width: 220 },
-  { field: "EmailChefService", headerName: "E-MAIL CHEF SERVICE", width: 240 },
-  { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 220 },
-  { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 220 },
-  { field: "NomChefDepartement", headerName: "NOM CHEF DEPARTEMENT", width: 220 },
-  { field: "PrenomChefDepartement", headerName: "PRENOM CHEF DEPARTEMENT", width: 220 },
-  { field: "EmailChefDepartement", headerName: "E-MAIL CHEF DEPARTEMENT", width: 240 },
-  { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
-  { field: "TelPro", headerName: "TEL", width: 130 },
-  { field: "Batiment", headerName: "Batiment", width: 100 },
-  { field: "Etage", headerName: "Etage", width: 80 },
-  { field: "BatimentNl", headerName: "Batiment(nl)", width: 130 }
-
-], [navigate]);
+      { field: "NomPersonne", headerName: "NOM", width: 180, hideable: false },
+      {
+        field: "PrenomPersonne",
+        headerName: "PRENOM",
+        width: 180,
+        hideable: false,
+      },
+      {
+        field: "SiFrancaisString",
+        headerName: "RÔLE",
+        width: 120,
+        hideable: false,
+      },
+      { field: "Email", headerName: "E-mail", width: 220, hideable: false },
+      {
+        field: "DateEntree",
+        headerName: "ENTREE SERVICE",
+        width: 150,
+        hideable: false,
+      },
+      { field: "NomFonctionFr", headerName: "FONCTION", width: 200 },
+      { field: "NomFonctionNl", headerName: "FONCTION(nl)", width: 200 },
+      { field: "NomWWGradeNl", headerName: "GRADE(nl)", width: 200 },
+      { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
+      { field: "NomServiceNl", headerName: "AFFECTATION(nl)", width: 250 },
+      { field: "NomServiceFr", headerName: "AFFECTATION", width: 250 },
+      { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 200 },
+      { field: "NomRueFr", headerName: "LOCALISATION", width: 200 },
+      { field: "Numero", headerName: "N°", width: 80 },
+      {
+        field: "NomChefService",
+        headerName: "NOM CHEF DU SERVICE",
+        width: 220,
+      },
+      {
+        field: "PrenomChefService",
+        headerName: "PRENOM CHEF DU SERVICE",
+        width: 220,
+      },
+      {
+        field: "EmailChefService",
+        headerName: "E-MAIL CHEF SERVICE",
+        width: 240,
+      },
+      { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 220 },
+      { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 220 },
+      {
+        field: "NomChefDepartement",
+        headerName: "NOM CHEF DEPARTEMENT",
+        width: 220,
+      },
+      {
+        field: "PrenomChefDepartement",
+        headerName: "PRENOM CHEF DEPARTEMENT",
+        width: 220,
+      },
+      {
+        field: "EmailChefDepartement",
+        headerName: "E-MAIL CHEF DEPARTEMENT",
+        width: 240,
+      },
+      { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
+      { field: "TelPro", headerName: "TEL", width: 130 },
+      { field: "Batiment", headerName: "Batiment", width: 100 },
+      { field: "Etage", headerName: "Etage", width: 80 },
+      { field: "BatimentNl", headerName: "Batiment(nl)", width: 130 },
+    ],
+    [navigate, refreshData],
+  );
 
   return (
     <Box
@@ -233,48 +352,48 @@ const columns = useMemo(() => [
           overflow: "hidden",
         }}
       >
-       <DataGrid
-  rows={rows}
-  columns={columns}
-  getRowId={(row) =>
-    row?.IDPersonneService ??
-    row?.id ??
-    `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}`
-  }
-  loading={loading}
-  checkboxSelection
-  disableRowSelectionOnClick
-  disableColumnReorder
-  hideFooter={compact}
-  slots={compact ? {} : { toolbar: GridToolbar }}
-  slotProps={
-    compact
-      ? {}
-      : {
-          toolbar: {
-            showQuickFilter: true,
-            csvOptions: {
-              fileName: "export_personnel",
-              delimiter: ";",
-              utf8WithBom: true,
-              allColumns: true,
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          getRowId={(row) =>
+            row?.IDPersonneService ??
+            row?.id ??
+            `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}`
+          }
+          loading={loading}
+          checkboxSelection
+          disableRowSelectionOnClick
+          disableColumnReorder
+          hideFooter={compact}
+          slots={compact ? {} : { toolbar: GridToolbar }}
+          slotProps={
+            compact
+              ? {}
+              : {
+                  toolbar: {
+                    showQuickFilter: true,
+                    csvOptions: {
+                      fileName: "export_personnel",
+                      delimiter: ";",
+                      utf8WithBom: true,
+                      allColumns: true,
+                    },
+                    printOptions: {
+                      disableToolbarButton: true,
+                    },
+                  },
+                }
+          }
+          sx={{ height: "100%", border: "none" }}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
             },
-            printOptions: {
-              disableToolbarButton: true,
+            sorting: {
+              sortModel: [{ field: "IDPersonneService", sort: "desc" }],
             },
-          },
-        }
-  }
-  sx={{ height: "100%", border: "none" }}
-  initialState={{
-    pagination: {
-      paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
-    },
-    sorting: {
-      sortModel: [{ field: "IDPersonneService", sort: "desc" }],
-    },
-  }}
-/>
+          }}
+        />
       </Box>
     </Box>
   );

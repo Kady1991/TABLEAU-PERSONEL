@@ -35,6 +35,22 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import PersonnelService from "../../services/PersonnelService.js";
 
+const INITIAL_FORM = {
+  nom: "",
+  prenom: "",
+  telephone: "",
+  email: "",
+  DateEntreeDate: null,
+  grade: 0,
+  adresse: "",
+  service: "",
+  fonction: "",
+  codeFonction: "",
+  SiTypePersonnel: false,
+  TypePersonnelID: "",
+  siFrancais: true,
+};
+
 const AjoutFormComponent = forwardRef(
   ({ open, onClose, onMemberUpdate, refreshData }, ref) => {
     const [loadingInit, setLoadingInit] = useState(false);
@@ -48,32 +64,17 @@ const AjoutFormComponent = forwardRef(
     const [fonctions, setFonctions] = useState([]);
 
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
-
-    const initialForm = {
-      nom: "",
-      prenom: "",
-      telephone: "",
-      email: "",
-      DateEntreeDate: null,
-      grade: "",
-      adresse: "",
-      service: "",
-      fonction: "",
-      codeFonction: "",
-      SiTypePersonnel: false,
-      TypePersonnelID: "",
-      siFrancais: true,
-    };
-
-    const [form, setForm] = useState(initialForm);
+    const [form, setForm] = useState(INITIAL_FORM);
 
     const isPersonnelSelected = form.SiTypePersonnel === true;
 
-    const setField = (name, value) =>
+    const setField = (name, value) => {
       setForm((prev) => ({ ...prev, [name]: value }));
+    };
 
     const generateEmail = (prenom, nom) => {
       if (!prenom || !nom) return "";
+
       const prenoms = prenom.split(/[\s-]+/);
       const noms = nom.split(/[\s-]+/);
 
@@ -83,12 +84,24 @@ const AjoutFormComponent = forwardRef(
         .join("");
 
       const nomCleaned = noms.join("").toLowerCase();
+
       return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
     };
 
-    const selectedFonction = fonctions.find(
-      (f) => f.IDFonction === form.fonction,
-    );
+    const selectedFonction =
+      fonctions.find(
+        (f) => Number(f.IDFonction) === Number(form.fonction),
+      ) || null;
+
+    const selectedGrade =
+      grades.find((g) => Number(g.IDWWGrade) === Number(form.grade)) || null;
+
+    const selectedService =
+      services.find((s) => Number(s.IDService) === Number(form.service)) || null;
+
+    const selectedAddress =
+      addresses.find((a) => Number(a.IDAdresse) === Number(form.adresse)) ||
+      null;
 
     const codesDisponibles = selectedFonction?.Codes || [];
 
@@ -97,15 +110,14 @@ const AjoutFormComponent = forwardRef(
       setField("email", email);
     };
 
-    // Reset à l'ouverture du Dialog
     useEffect(() => {
       if (!open) return;
+
       setError("");
       setSelectedServiceDetails(null);
-      setForm(initialForm);
+      setForm(INITIAL_FORM);
     }, [open]);
 
-    // Chargement initial des listes (API)
     useEffect(() => {
       if (!open) return;
       let mounted = true;
@@ -113,24 +125,26 @@ const AjoutFormComponent = forwardRef(
       (async () => {
         setLoadingInit(true);
         setError("");
+
         try {
           const [gradesRes, servicesRes, addrRes, typeRes, fonRes] =
             await Promise.all([
-              await PersonnelService.getGrades(),
-              await PersonnelService.getServices(),
-              await PersonnelService.getAdresses(),
-              await PersonnelService.getTypesPersonnel(),
-              await PersonnelService.getFonctions(),
+              PersonnelService.getGrades(),
+              PersonnelService.getServices(),
+              PersonnelService.getAdresses(),
+              PersonnelService.getTypesPersonnel(),
+              PersonnelService.getFonctions(),
             ]);
 
           if (!mounted) return;
 
-          setGrades(Array.isArray(gradesRes.data) ? gradesRes.data : []);
-          setServices(Array.isArray(servicesRes.data) ? servicesRes.data : []);
-          setAddresses(Array.isArray(addrRes.data) ? addrRes.data : []);
-          setTypePersonnelList(Array.isArray(typeRes.data) ? typeRes.data : []);
-          setFonctions(Array.isArray(fonRes.data) ? fonRes.data : []);
+          setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
+          setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
+          setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
+          setTypePersonnelList(Array.isArray(typeRes?.data) ? typeRes.data : []);
+          setFonctions(Array.isArray(fonRes?.data) ? fonRes.data : []);
         } catch (e) {
+          console.error(e);
           setError("Erreur lors du chargement des listes.");
         } finally {
           if (mounted) setLoadingInit(false);
@@ -142,18 +156,17 @@ const AjoutFormComponent = forwardRef(
       };
     }, [open]);
 
-    // Récupération automatique des détails du chef de service
     useEffect(() => {
       if (!form.service) {
         setSelectedServiceDetails(null);
         return;
       }
 
-      const service = services.find(
-        (s) => Number(s.IDService) === Number(form.service),
-      );
+      const service =
+        services.find((s) => Number(s.IDService) === Number(form.service)) ||
+        null;
 
-      setSelectedServiceDetails(service || null);
+      setSelectedServiceDetails(service);
     }, [form.service, services]);
 
     const clearCaches = () => {
@@ -167,14 +180,13 @@ const AjoutFormComponent = forwardRef(
     };
 
     const handleClose = () => {
-      setForm(initialForm);
+      setForm(INITIAL_FORM);
       setSelectedServiceDetails(null);
       setError("");
       onClose?.();
     };
 
     const handleSubmit = async () => {
-      // Validation simple
       if (
         !form.nom ||
         !form.prenom ||
@@ -187,7 +199,6 @@ const AjoutFormComponent = forwardRef(
         return;
       }
 
-      // Si personnel = Oui => TypePersonnel obligatoire
       if (form.SiTypePersonnel === true && !form.TypePersonnelID) {
         alert("Veuillez sélectionner un type de personnel.");
         return;
@@ -207,20 +218,18 @@ const AjoutFormComponent = forwardRef(
             ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
             : null,
 
-          // ✅ IDs en nombre
           ServiceID: form.service ? Number(form.service) : null,
           AdresseID: form.adresse ? Number(form.adresse) : null,
 
-          // ✅ d'après ton XML : 0 si vide
-          WWGradeID: form.grade ? Number(form.grade) : 0,
+          WWGradeID: Number(form.grade) || 0,
+          IDWWGrade: Number(form.grade) || 0,
+
           FonctionID: form.fonction ? Number(form.fonction) : 0,
           CodeID: form.codeFonction ? Number(form.codeFonction) : 0,
 
-          // ✅ bool
           SiFrancais: !!form.siFrancais,
           SiTypePersonnel: !!form.SiTypePersonnel,
 
-          // ✅ d'après ton XML : 0 si vide
           TypePersonnelID: form.SiTypePersonnel
             ? Number(form.TypePersonnelID)
             : 0,
@@ -228,19 +237,17 @@ const AjoutFormComponent = forwardRef(
           SiArchive: false,
         };
 
-        console.log("payload", payload);
+        console.log("GRADE DANS FORM =", form.grade);
+        console.log("FONCTION DANS FORM =", form.fonction);
+        console.log("SERVICE DANS FORM =", form.service);
+        console.log("GRADE ENVOYÉ =", payload.WWGradeID);
+        console.log("FONCTION ENVOYÉE =", payload.FonctionID);
+        console.log("SERVICE ENVOYÉ =", payload.ServiceID);
+        console.log("PAYLOAD =", payload);
         console.log("[AJOUT] payload JSON =", JSON.stringify(payload, null, 2));
-        console.log("[AJOUT] types payload:", {
-          ServiceID: typeof payload.ServiceID,
-          AdresseID: typeof payload.AdresseID,
-          WWGradeID: typeof payload.WWGradeID,
-          TypePersonnelID: typeof payload.TypePersonnelID,
-          SiFrancais: typeof payload.SiFrancais,
-          SiTypePersonnel: typeof payload.SiTypePersonnel,
-          SiArchive: typeof payload.SiArchive,
-        });
 
         const response = await PersonnelService.create(payload);
+
         console.log("[AJOUT] response.data :", response.data);
         console.log("[AJOUT] status :", response.status);
 
@@ -256,35 +263,90 @@ const AjoutFormComponent = forwardRef(
           alert(msg);
           return;
         }
+
         if (response.data === "OK-create") {
           alert("Ajout réussi !");
         }
+
         clearCaches();
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        const nomServiceFr = selectedService?.NomServiceFr || "";
+        const nomServiceNl = selectedService?.NomServiceNl || "";
 
-        if (typeof refreshData === "function") await refreshData();
+        const nomFonctionFr =
+          selectedFonction?.NomFonctionFr ||
+          selectedFonction?.LibelleFonctionFr ||
+          "";
+
+        const nomFonctionNl =
+          selectedFonction?.NomFonctionNl ||
+          selectedFonction?.LibelleFonctionNl ||
+          "";
+
+        const nomGradeFr =
+          selectedGrade?.NomWWGradeFr ||
+          selectedGrade?.NomGradeFr ||
+          selectedGrade?.LibelleGradeFr ||
+          "";
+
+        const nomGradeNl =
+          selectedGrade?.NomWWGradeNl ||
+          selectedGrade?.NomGradeNl ||
+          selectedGrade?.LibelleGradeNl ||
+          "";
+
+        const addedMember = {
+          ...payload,
+          IDPersonneService:
+            response?.data?.IDPersonneService ||
+            response?.data?.id ||
+            Date.now(),
+
+          NomServiceFr: nomServiceFr,
+          NomServiceNl: nomServiceNl,
+
+          NomFonctionFr: nomFonctionFr,
+          NomFonctionNl: nomFonctionNl,
+
+          NomWWGradeFr: nomGradeFr,
+          NomWWGradeNl: nomGradeNl,
+
+          NomRueFr:
+            selectedAddress?.NomRueFr ||
+            selectedAddress?.NomRue ||
+            selectedAddress?.RueFr ||
+            "",
+
+          NomRueNl:
+            selectedAddress?.NomRueNl ||
+            selectedAddress?.RueNl ||
+            "",
+
+          Numero: selectedAddress?.Numero || "",
+          Batiment: selectedAddress?.Batiment || "",
+          BatimentNl: selectedAddress?.BatimentNl || "",
+          Etage: selectedAddress?.Etage || "",
+        };
+
+        console.log("[AJOUT] addedMember enrichi =", addedMember);
 
         if (typeof onMemberUpdate === "function") {
-          const serviceIdNum = payload.ServiceID; // déjà number
-          const nomService =
-            services.find((s) => Number(s.IDService) === Number(serviceIdNum))
-              ?.NomServiceFr || "";
-
-          const addedMember = {
-            ...payload,
-            IDPersonneService: response.data?.IDPersonneService || Date.now(),
-            NomServiceFr: nomService,
-          };
-
           onMemberUpdate(addedMember);
         }
 
-        handleClose();
-      } catch (error) {
-        console.log("Validation errors:", error.response.data.errors);
+        if (typeof refreshData === "function") {
+          await refreshData();
+        }
 
-        const msg = error?.response?.data || "Erreur lors de l'envoi.";
+        handleClose();
+      } catch (err) {
+        console.log("Validation errors:", err?.response?.data?.errors);
+
+        const msg =
+          typeof err?.response?.data === "string"
+            ? err.response.data
+            : err?.message || "Erreur lors de l'envoi.";
+
         setError(msg);
         alert(msg);
       } finally {
@@ -314,6 +376,7 @@ const AjoutFormComponent = forwardRef(
               Ajouter un membre
             </Typography>
           </Stack>
+
           <IconButton onClick={handleClose} size="small">
             <CloseIcon />
           </IconButton>
@@ -344,6 +407,7 @@ const AjoutFormComponent = forwardRef(
                       }}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       label="Prénom"
@@ -357,6 +421,7 @@ const AjoutFormComponent = forwardRef(
                       }}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       label="Téléphone"
@@ -366,6 +431,7 @@ const AjoutFormComponent = forwardRef(
                       onChange={(e) => setField("telephone", e.target.value)}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       label="Email"
@@ -376,6 +442,7 @@ const AjoutFormComponent = forwardRef(
                       onChange={(e) => setField("email", e.target.value)}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
@@ -392,45 +459,45 @@ const AjoutFormComponent = forwardRef(
                       />
                     </LocalizationProvider>
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
-                      options={[
-                        { IDWWGrade: "", NomWWGradeFr: "Aucun" },
-                        ...grades,
-                      ]}
+                      options={grades}
                       getOptionLabel={(option) => option?.NomWWGradeFr || ""}
                       value={
-                        grades.find((g) => g.IDWWGrade === form.grade) || {
-                          IDWWGrade: "",
-                          NomWWGradeFr: "Aucun",
-                        }
+                        grades.find(
+                          (g) => Number(g.IDWWGrade) === Number(form.grade),
+                        ) || null
                       }
                       isOptionEqualToValue={(option, value) =>
-                        option.IDWWGrade === value.IDWWGrade
+                        Number(option.IDWWGrade) === Number(value.IDWWGrade)
                       }
-                      onChange={(e, nv) =>
-                        setField("grade", nv ? nv.IDWWGrade : "")
-                      }
+                      onChange={(e, nv) => {
+                        console.log("GRADE CHOISI =", nv);
+                        setField("grade", nv ? Number(nv.IDWWGrade) : 0);
+                      }}
                       renderInput={(params) => (
                         <TextField {...params} label="Grade" />
                       )}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
                       options={addresses}
                       getOptionLabel={(option) => option?.AdresseComplete || ""}
                       value={
-                        addresses.find((a) => a.IDAdresse === form.adresse) ||
-                        null
+                        addresses.find(
+                          (a) => Number(a.IDAdresse) === Number(form.adresse),
+                        ) || null
                       }
                       isOptionEqualToValue={(option, value) =>
-                        option.IDAdresse === value.IDAdresse
+                        Number(option.IDAdresse) === Number(value.IDAdresse)
                       }
                       onChange={(e, nv) =>
-                        setField("adresse", nv ? nv.IDAdresse : "")
+                        setField("adresse", nv ? Number(nv.IDAdresse) : "")
                       }
                       renderInput={(params) => (
                         <TextField
@@ -441,43 +508,52 @@ const AjoutFormComponent = forwardRef(
                       )}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth size="small" required>
-                      <InputLabel>Service</InputLabel>
-                      <Select
-                        label="Service"
-                        value={form.service}
-                        onChange={(e) => setField("service", e.target.value)}
-                      >
-                        {services.map((s) => (
-                          <MenuItem key={s.IDService} value={s.IDService}>
-                            {s.NomServiceFr}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>{" "}
+                    <Autocomplete
+                      size="small"
+                      options={services}
+                      getOptionLabel={(option) => option?.NomServiceFr || ""}
+                      value={
+                        services.find(
+                          (s) => Number(s.IDService) === Number(form.service),
+                        ) || null
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        Number(option.IDService) === Number(value.IDService)
+                      }
+                      onChange={(e, nv) =>
+                        setField("service", nv ? Number(nv.IDService) : "")
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Service" required />
+                      )}
+                    />
+                  </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
                       options={fonctions}
                       getOptionLabel={(option) => option?.NomFonctionFr || ""}
                       value={
-                        fonctions.find((a) => a.IDFonction === form.fonction) ||
-                        null
+                        fonctions.find(
+                          (f) => Number(f.IDFonction) === Number(form.fonction),
+                        ) || null
                       }
                       isOptionEqualToValue={(option, value) =>
-                        option.IDFonction === value.IDFonction
+                        Number(option.IDFonction) === Number(value.IDFonction)
                       }
                       onChange={(e, nv) => {
-                        setField("fonction", nv ? nv.IDFonction : "");
+                        setField("fonction", nv ? Number(nv.IDFonction) : 0);
                         setField("codeFonction", "");
                       }}
                       renderInput={(params) => (
-                        <TextField {...params} label="Fonctions" required />
+                        <TextField {...params} label="Fonction" required />
                       )}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Autocomplete
                       size="small"
@@ -485,20 +561,21 @@ const AjoutFormComponent = forwardRef(
                       getOptionLabel={(option) => option?.NomCode || ""}
                       value={
                         codesDisponibles.find(
-                          (c) => c.Idcode === form.codeFonction,
+                          (c) => Number(c.Idcode) === Number(form.codeFonction),
                         ) || null
                       }
                       isOptionEqualToValue={(option, value) =>
-                        option.Idcode === value.Idcode
+                        Number(option.Idcode) === Number(value.Idcode)
                       }
                       onChange={(e, nv) =>
-                        setField("codeFonction", nv ? nv.Idcode : "")
+                        setField("codeFonction", nv ? Number(nv.Idcode) : 0)
                       }
                       renderInput={(params) => (
                         <TextField {...params} label="Code fonction" required />
                       )}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
                       <span style={{ color: "#d32f2f" }}>*</span> Personnel
@@ -550,6 +627,7 @@ const AjoutFormComponent = forwardRef(
                       </FormControl>
                     )}
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
                       <span style={{ color: "#d32f2f" }}>*</span> Langue
@@ -591,11 +669,13 @@ const AjoutFormComponent = forwardRef(
                   <Typography fontWeight={700} variant="subtitle2" mb={1}>
                     Détails du service
                   </Typography>
+
                   <Typography variant="caption" display="block">
                     <strong>Chef Service :</strong>{" "}
                     {selectedServiceDetails.NomChefService}{" "}
                     {selectedServiceDetails.PrenomChefService}
                   </Typography>
+
                   <Typography variant="caption" display="block">
                     <strong>Chef Département :</strong>{" "}
                     {selectedServiceDetails.NomChefDepartement}{" "}
@@ -615,6 +695,7 @@ const AjoutFormComponent = forwardRef(
           >
             Annuler
           </Button>
+
           <Button
             onClick={handleSubmit}
             variant="contained"

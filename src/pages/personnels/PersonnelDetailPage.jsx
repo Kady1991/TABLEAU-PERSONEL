@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { XMLParser } from "fast-xml-parser";
 import dayjs from "dayjs";
 import {
   Alert,
@@ -18,42 +16,109 @@ import {
 import PersonnelService from "../../services/PersonnelService.js";
 
 export default function PersonnelDetail() {
-  const { id } = useParams(); // id = IDPersonneService
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [personData, setPersonData] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
+useEffect(() => {
+  let mounted = true;
 
-    (async () => {
-      try {
-        setLoading(true);
-        setError("");
+  (async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const response = await PersonnelService.getById(id);
-        console.log("type", typeof response.data);
-        console.log("res", response.data);
-       
+      const [personRes, gradesRes, fonctionsRes] = await Promise.all([
+        PersonnelService.getById(id),
+        PersonnelService.getGrades(),
+        PersonnelService.getFonctions(),
+      ]);
 
-        if (mounted) setPersonData(response.data);
-      } catch (e) {
-        if (mounted) setError(e?.message || "Erreur chargement détail");
-      } finally {
-        if (mounted) setLoading(false);
+      if (!mounted) return;
+
+const person = personRes.data || {};
+const grades = Array.isArray(gradesRes.data) ? gradesRes.data : [];
+const fonctions = Array.isArray(fonctionsRes.data) ? fonctionsRes.data : [];
+
+console.log("DETAIL PERSONNE =", person);
+console.log("DETAIL PERSONNE KEYS =", Object.keys(person));
+console.log("GRADES =", grades);
+console.log("1er grade exemple =", grades[0]);
+
+const gradeId =
+  person.WWGradeID ??
+  person.IDWWGrade ??
+  person.GradeID ??
+  person.WWGrade ??
+  person.IdWWGrade ??
+  person.IdGrade ??
+  null;
+
+const fonctionId =
+  person.FonctionID ??
+  person.IDFonction ??
+  person.IdFonction ??
+  null;
+
+const gradeTrouve =
+  grades.find((g) => Number(g.IDWWGrade) === Number(gradeId)) ||
+  grades.find((g) => Number(g.WWGradeID) === Number(gradeId)) ||
+  grades.find((g) => Number(g.IdWWGrade) === Number(gradeId)) ||
+  null;
+
+const fonctionTrouvee =
+  fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
+  fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) ||
+  null;
+
+const nomGrade =
+  person.NomWWGradeFr ??
+  person.NomGradeFr ??
+  person.LibelleGradeFr ??
+  person.GradeLibelle ??
+  gradeTrouve?.NomWWGradeFr ??
+  gradeTrouve?.NomGradeFr ??
+  gradeTrouve?.LibelleGradeFr ??
+  "-";
+
+const nomFonction =
+  person.NomFonctionFr ??
+  person.LibelleFonctionFr ??
+  fonctionTrouvee?.NomFonctionFr ??
+  fonctionTrouvee?.LibelleFonctionFr ??
+  "-";
+
+const enrichedPerson = {
+  ...person,
+  NomWWGradeFr: nomGrade,
+  NomFonctionFr: nomFonction,
+};
+
+console.log("GRADE ID =", gradeId);
+console.log("GRADE TROUVE =", gradeTrouve);
+console.log("NOM GRADE FINAL =", nomGrade);
+console.log("PERSON ENRICHI =", enrichedPerson);
+
+setPersonData(enrichedPerson);
+    } catch (e) {
+      if (mounted) {
+        setError(e?.message || "Erreur chargement détail");
       }
-    })();
+    } finally {
+      if (mounted) setLoading(false);
+    }
+  })();
 
-    return () => {
-      mounted = false;
-    };
-  }, [id]);
+  return () => {
+    mounted = false;
+  };
+}, [id]);
 
   return (
     <Box>
-      {/* Header style template */}
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -83,7 +148,6 @@ export default function PersonnelDetail() {
         </Stack>
       </Stack>
 
-      {/* Content */}
       <Card variant="outlined">
         <CardContent>
           {loading && <CircularProgress />}
@@ -108,22 +172,25 @@ export default function PersonnelDetail() {
 
               <Stack spacing={1.2}>
                 <Typography>
-                  <strong>Nom :</strong> {personData.NomPersonne}
+                  <strong>Nom :</strong> {personData.NomPersonne || "-"}
                 </Typography>
                 <Typography>
-                  <strong>Prénom :</strong> {personData.PrenomPersonne}
+                  <strong>Prénom :</strong> {personData.PrenomPersonne || "-"}
                 </Typography>
                 <Typography>
-                  <strong>Email :</strong> {personData.Email}
+                  <strong>Email :</strong> {personData.Email || "-"}
                 </Typography>
                 <Typography>
-                  <strong>Téléphone :</strong> {personData.TelPro}
+                  <strong>Téléphone :</strong> {personData.TelPro || "-"}
                 </Typography>
                 <Typography>
-                  <strong>Service :</strong> {personData.NomServiceFr}
+                  <strong>Service :</strong> {personData.NomServiceFr || "-"}
                 </Typography>
                 <Typography>
-                  <strong>Grade :</strong> {personData.NomWWGradeFr}
+                  <strong>Grade :</strong> {personData.NomWWGradeFr || "-"}
+                </Typography>
+                <Typography>
+                  <strong>Fonction :</strong> {personData.NomFonctionFr || "-"}
                 </Typography>
 
                 <Typography>
@@ -143,25 +210,27 @@ export default function PersonnelDetail() {
                 )}
 
                 <Typography>
-                  <strong>Adresse :</strong> {personData.NomRueFr}{" "}
-                  {personData.Numero} — <strong>Bâtiment :</strong>{" "}
-                  {personData.Batiment} — <strong>Étage :</strong>{" "}
-                  {personData.Etage}
+                  <strong>Adresse :</strong> {personData.NomRueFr || "-"}{" "}
+                  {personData.Numero || ""} — <strong>Bâtiment :</strong>{" "}
+                  {personData.Batiment || "-"} — <strong>Étage :</strong>{" "}
+                  {personData.Etage || "-"}
                 </Typography>
 
                 <Typography>
-                  <strong>Chef de service :</strong> {personData.NomChefService}{" "}
-                  {personData.PrenomChefService}
+                  <strong>Chef de service :</strong>{" "}
+                  {personData.NomChefService || "-"}{" "}
+                  {personData.PrenomChefService || ""}
                 </Typography>
 
                 <Typography>
-                  <strong>Département :</strong> {personData.NomDepartementFr}
+                  <strong>Département :</strong>{" "}
+                  {personData.NomDepartementFr || "-"}
                 </Typography>
 
                 <Typography>
                   <strong>Chef de département :</strong>{" "}
-                  {personData.NomChefDepartement}{" "}
-                  {personData.PrenomChefDepartement}
+                  {personData.NomChefDepartement || "-"}{" "}
+                  {personData.PrenomChefDepartement || ""}
                 </Typography>
               </Stack>
             </>
