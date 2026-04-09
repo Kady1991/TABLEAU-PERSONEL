@@ -13,48 +13,10 @@ const PersonnelService = {
 
   create: (payload) => http.post("/api/personnes", payload),
 
-  update: async (id, payload) => {
-    console.log("[SERVICE UPDATE] id =", id);
-    console.log("[SERVICE UPDATE] payload =", payload);
-
-    const attempts = [
-      {
-        name: "PUT /api/personnes/edit?id=ID",
-        run: () => http.put(`/api/personnes/edit?id=${id}`, payload),
-      },
-      {
-        name: "POST /api/personnes/ID",
-        run: () => http.post(`/api/personnes/${id}`, payload),
-      },
-      {
-        name: "POST /api/personnes/edit (id dans body)",
-        run: () =>
-          http.post("/api/personnes/edit", {
-            id,
-            ...payload,
-          }),
-      },
-    ];
-
-    let lastError = null;
-
-    for (const attempt of attempts) {
-      try {
-        console.log(`[SERVICE UPDATE TEST] tentative: ${attempt.name}`);
-        const res = await attempt.run();
-        console.log(`[SERVICE UPDATE TEST] succès: ${attempt.name}`);
-        return res;
-      } catch (error) {
-        lastError = error;
-        console.log(
-          `[SERVICE UPDATE TEST] échec: ${attempt.name}`,
-          error?.response?.status,
-          error?.response?.data || error?.message,
-        );
-      }
-    }
-
-    throw lastError;
+  update: (id, payload) => {
+    console.log("ID:", id);
+    console.log("Payload:", payload);
+    return http.put(`/api/personnes/edit/${id}`, payload);
   },
 
   archive: (id, formattedDate) =>

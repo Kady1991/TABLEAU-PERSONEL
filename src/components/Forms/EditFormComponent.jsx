@@ -368,7 +368,7 @@ const handleSubmit = async () => {
         ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
         : null,
       WWGradeID: form.WWGradeID || null,
-      IDWWGrade: form.WWGradeID || null,
+      //IDWWGrade: form.WWGradeID || null,
       AdresseID: form.AdresseID,
       ServiceID: form.ServiceID,
       FonctionID: form.FonctionID || null,
