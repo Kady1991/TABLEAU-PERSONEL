@@ -1,17 +1,25 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Alert, Box, Button, Stack, IconButton, Tooltip } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Stack,
+  IconButton,
+  Tooltip,
+  Snackbar,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddIcon from "@mui/icons-material/Add";
 import FormServiceComponent from "../../components/Forms/FormServiceComponent.jsx";
 import EditFormComponent from "../../components/Forms/EditFormComponent.jsx";
 import DeleteMembreComponent from "../../components/Forms/DeleteMembreComponent.jsx";
+import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
 import AjoutFormComponent from "../../components/Forms/AjoutFormComponent.jsx";
 import PersonnelService from "../../services/PersonnelService.js";
 import PropTypes from "prop-types";
 
-// helper robuste : true / 1 / "1" / "true"
 const isArchived = (v) =>
   v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
 
@@ -21,35 +29,53 @@ function TableauComponent({
   rowsPreview,
   showHeader = true,
   showAddButton = true,
-  nonArchivedOnly = true,
-
-  rows: rowsProp,
-  loading: loadingProp,
-  error: errorProp,
-  refreshData: refreshDataProp,
 }) {
   const navigate = useNavigate();
 
-  const isControlled = Array.isArray(rowsProp);
-
-  const [rowsState, setRowsState] = useState([]);
-  const [loadingState, setLoadingState] = useState(true);
-  const [errorState, setErrorState] = useState("");
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
+  const [toast, setToast] = useState({
+    open: false,
+    type: "info",
+    text: "",
+  });
 
-  const rows = isControlled ? rowsProp : rowsState;
-  const loading = typeof loadingProp === "boolean" ? loadingProp : loadingState;
-  const error =
-    typeof errorProp === "string"
-      ? errorProp
-      : typeof errorProp === "object" && errorProp !== null
-        ? JSON.stringify(errorProp)
-        : errorState;
+  const sortRows = useCallback((list) => {
+    return [...list].sort((a, b) => {
+      const aArchived = isArchived(a?.SiArchive) ? 1 : 0;
+      const bArchived = isArchived(b?.SiArchive) ? 1 : 0;
 
-  const fetchDataInternal = useCallback(async () => {
+      if (aArchived !== bArchived) {
+        return aArchived - bArchived;
+      }
+
+      if (aArchived === 0) {
+        return Number(b?.IDPersonneService ?? 0) - Number(a?.IDPersonneService ?? 0);
+      }
+
+      return Number(a?.IDPersonneService ?? 0) - Number(b?.IDPersonneService ?? 0);
+    });
+  }, []);
+
+  const showToast = useCallback((payload) => {
+    setToast({
+      open: true,
+      type: payload?.type || "info",
+      text: payload?.text || "",
+    });
+  }, []);
+
+  const closeToast = (_, reason) => {
+    if (reason === "clickaway") return;
+    setToast((prev) => ({ ...prev, open: false }));
+  };
+
+  const fetchData = useCallback(async () => {
     try {
-      setErrorState("");
-      setLoadingState(true);
+      setError("");
+      setLoading(true);
 
       const [personnelsRes, gradesRes, fonctionsRes] = await Promise.all([
         PersonnelService.getAll(),
@@ -127,67 +153,53 @@ function TableauComponent({
         };
       });
 
-      const filtered = nonArchivedOnly
-        ? enriched.filter((p) => !isArchived(p?.SiArchive))
-        : enriched;
-
       const finalRows =
         typeof rowsPreview === "number"
-          ? filtered.slice(0, rowsPreview)
-          : filtered;
+          ? sortRows(enriched).slice(0, rowsPreview)
+          : sortRows(enriched);
 
-      console.log("ROWS TABLEAU ENRICHIES =", finalRows);
-
-      setRowsState(finalRows);
+      setRows(finalRows);
     } catch (e) {
       console.error(e);
-      setErrorState("Erreur de chargement");
-      setRowsState([]);
+      setError("Erreur de chargement");
+      setRows([]);
     } finally {
-      setLoadingState(false);
+      setLoading(false);
     }
-  }, [nonArchivedOnly, rowsPreview]);
-
-  const refreshData = useCallback(async () => {
-    if (typeof refreshDataProp === "function") {
-      await refreshDataProp();
-      return;
-    }
-    await fetchDataInternal();
-  }, [refreshDataProp, fetchDataInternal]);
+  }, [rowsPreview, sortRows]);
 
   useEffect(() => {
-    if (!isControlled) {
-      fetchDataInternal();
-    }
-  }, [isControlled, fetchDataInternal]);
+    fetchData();
+  }, [fetchData]);
 
-  const handleMemberUpdate = useCallback(
-    async (addedMember) => {
-      if (!isControlled && addedMember) {
-        setRowsState((prev) => {
-          const newId = addedMember?.IDPersonneService ?? Date.now();
-          const exists = prev.some(
-            (r) => String(r?.IDPersonneService) === String(newId),
-          );
+  const markRowArchived = useCallback((id) => {
+    setRows((prev) =>
+      sortRows(
+        prev.map((row) =>
+          String(row?.IDPersonneService) === String(id)
+            ? { ...row, SiArchive: true }
+            : row
+        )
+      )
+    );
+  }, [sortRows]);
 
-          if (exists) return prev;
+  const markRowRestored = useCallback((id) => {
+    setRows((prev) =>
+      sortRows(
+        prev.map((row) =>
+          String(row?.IDPersonneService) === String(id)
+            ? { ...row, SiArchive: false }
+            : row
+        )
+      )
+    );
+  }, [sortRows]);
 
-          const next = [{ ...addedMember, IDPersonneService: newId }, ...prev];
-
-          if (typeof rowsPreview === "number") {
-            return next.slice(0, rowsPreview);
-          }
-
-          return next;
-        });
-      }
-
-      await refreshData();
-      setOpenAdd(false);
-    },
-    [isControlled, refreshData, rowsPreview],
-  );
+  const handleMemberUpdate = useCallback(async () => {
+    await fetchData();
+    setOpenAdd(false);
+  }, [fetchData]);
 
   const columns = useMemo(
     () => [
@@ -200,7 +212,7 @@ function TableauComponent({
       {
         field: "actions",
         headerName: "Actions",
-        width: 220,
+        width: 230,
         sortable: false,
         filterable: false,
         disableExport: true,
@@ -210,9 +222,11 @@ function TableauComponent({
             <Tooltip title="Voir la fiche">
               <IconButton
                 size="small"
-                onClick={() =>
-                  navigate(`/Personnels/${params.row.IDPersonneService}`)
-                }
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  navigate(`/Personnels/${params.row.IDPersonneService}`);
+                }}
               >
                 <VisibilityIcon fontSize="small" />
               </IconButton>
@@ -220,21 +234,35 @@ function TableauComponent({
 
             <FormServiceComponent
               IDPersonneService={params.row.IDPersonneService}
-              refreshData={refreshData}
+              refreshData={fetchData}
             />
 
             <EditFormComponent
               IDPersonneService={params.row.IDPersonneService}
-              refreshData={refreshData}
+              refreshData={fetchData}
             />
 
-            <DeleteMembreComponent
-              IDPersonneService={params.row.IDPersonneService}
-              nomPersonne={params.row.NomPersonne}
-              prenomPersonne={params.row.PrenomPersonne}
-              email={params.row.Email}
-              refreshData={refreshData}
-            />
+            {isArchived(params.row?.SiArchive) ? (
+              <RestoreActionComponent
+                IDPersonneService={params.row.IDPersonneService}
+                nomPersonne={params.row.NomPersonne}
+                prenomPersonne={params.row.PrenomPersonne}
+                email={params.row.Email}
+                refreshData={fetchData}
+                onRestoreSuccess={showToast}
+                onRestoreLocal={markRowRestored}
+              />
+            ) : (
+              <DeleteMembreComponent
+                IDPersonneService={params.row.IDPersonneService}
+                nomPersonne={params.row.NomPersonne}
+                prenomPersonne={params.row.PrenomPersonne}
+                email={params.row.Email}
+                refreshData={fetchData}
+                onArchiveSuccess={showToast}
+                onArchiveLocal={markRowArchived}
+              />
+            )}
           </Stack>
         ),
       },
@@ -305,97 +333,120 @@ function TableauComponent({
       { field: "Etage", headerName: "Etage", width: 80 },
       { field: "BatimentNl", headerName: "Batiment(nl)", width: 130 },
     ],
-    [navigate, refreshData],
+    [navigate, fetchData, showToast, markRowArchived, markRowRestored]
   );
 
   return (
-    <Box
-      sx={{
-        height: "90%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <AjoutFormComponent
-        open={openAdd}
-        onClose={() => setOpenAdd(false)}
-        onMemberUpdate={handleMemberUpdate}
-        refreshData={refreshData}
-      />
-
-      {showHeader && (
-        <Stack direction="row" justifyContent="space-between" mb={2}>
-          <Stack direction="row" spacing={1}>
-            {showAddButton && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => setOpenAdd(true)}
-              >
-                Nouveau Membre
-              </Button>
-            )}
-          </Stack>
-        </Stack>
-      )}
-
-      {error && <Alert severity="error">{error}</Alert>}
-
+    <>
       <Box
         sx={{
-          flex: 1,
-          minHeight: 0,
-          width: "100%",
-          bgcolor: "background.paper",
-          height: compact ? height : "calc(100vh - 190px)",
+          height: "90%",
+          display: "flex",
+          flexDirection: "column",
           overflow: "hidden",
         }}
       >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          getRowId={(row) =>
-            row?.IDPersonneService ??
-            row?.id ??
-            `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}`
-          }
-          loading={loading}
-          checkboxSelection
-          disableRowSelectionOnClick
-          disableColumnReorder
-          hideFooter={compact}
-          slots={compact ? {} : { toolbar: GridToolbar }}
-          slotProps={
-            compact
-              ? {}
-              : {
-                  toolbar: {
-                    showQuickFilter: true,
-                    csvOptions: {
-                      fileName: "export_personnel",
-                      delimiter: ";",
-                      utf8WithBom: true,
-                      allColumns: true,
-                    },
-                    printOptions: {
-                      disableToolbarButton: true,
-                    },
-                  },
-                }
-          }
-          sx={{ height: "100%", border: "none" }}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
-            },
-            sorting: {
-              sortModel: [{ field: "IDPersonneService", sort: "desc" }],
-            },
-          }}
+        <AjoutFormComponent
+          open={openAdd}
+          onClose={() => setOpenAdd(false)}
+          onMemberUpdate={handleMemberUpdate}
+          refreshData={fetchData}
         />
+
+        {showHeader && (
+          <Stack direction="row" justifyContent="space-between" mb={2}>
+            <Stack direction="row" spacing={1}>
+              {showAddButton && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenAdd(true)}
+                >
+                  Nouveau Membre
+                </Button>
+              )}
+            </Stack>
+          </Stack>
+        )}
+
+        {error && <Alert severity="error">{error}</Alert>}
+
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            width: "100%",
+            bgcolor: "background.paper",
+            height: compact ? height : "calc(100vh - 190px)",
+            overflow: "hidden",
+          }}
+        >
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) =>
+              row?.IDPersonneService ??
+              row?.id ??
+              `${row?.NomPersonne ?? "x"}_${row?.PrenomPersonne ?? "y"}`
+            }
+            getRowClassName={(params) =>
+              isArchived(params.row?.SiArchive) ? "row-archived" : ""
+            }
+            loading={loading}
+            checkboxSelection
+            disableRowSelectionOnClick
+            disableColumnReorder
+            hideFooter={compact}
+            slots={compact ? {} : { toolbar: GridToolbar }}
+            slotProps={
+              compact
+                ? {}
+                : {
+                    toolbar: {
+                      showQuickFilter: true,
+                      csvOptions: {
+                        fileName: "export_personnel",
+                        delimiter: ";",
+                        utf8WithBom: true,
+                        allColumns: true,
+                      },
+                      printOptions: {
+                        disableToolbarButton: true,
+                      },
+                    },
+                  }
+            }
+            sx={{
+              height: "100%",
+              border: "none",
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+              },
+              "& .row-archived": {
+                opacity: 0.6,
+              },
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
+              },
+            }}
+          />
+        </Box>
       </Box>
-    </Box>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3500}
+        onClose={closeToast}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={closeToast} severity={toast.type} variant="filled">
+          {toast.text}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
@@ -405,11 +456,6 @@ TableauComponent.propTypes = {
   rowsPreview: PropTypes.number,
   showHeader: PropTypes.bool,
   showAddButton: PropTypes.bool,
-  nonArchivedOnly: PropTypes.bool,
-  rows: PropTypes.array,
-  loading: PropTypes.bool,
-  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  refreshData: PropTypes.func,
 };
 
 export default TableauComponent;

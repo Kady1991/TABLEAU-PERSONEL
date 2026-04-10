@@ -9,16 +9,13 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
-
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import PropTypes from "prop-types";
-
 import PersonnelService from "../../services/PersonnelService";
 
 function DeleteMembreComponent({
@@ -27,99 +24,79 @@ function DeleteMembreComponent({
   prenomPersonne,
   email,
   refreshData,
+  onArchiveSuccess,
+  onArchiveLocal,
 }) {
-  const [isArchived, setIsArchived] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null); // dayjs
+  const [selectedDate, setSelectedDate] = useState(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [toast, setToast] = useState({ open: false, type: "info", text: "" });
-
-  const showToast = (type, text) => setToast({ open: true, type, text });
-  const closeToast = () => setToast((t) => ({ ...t, open: false }));
-
-  // ✅ Vérifie si la personne est déjà archivée
-  // useEffect(() => {
-  // let mounted = true;
-
-  // const checkArchivedStatus = async () => {
-  //   try {
-  //     if (!email) return;
-
-  //     const data = await PersonnelService.getByEmail(email);
-
-  //     if (!mounted) return;
-
-  //     if (data?.SiArchive !== undefined) {
-  //       setIsArchived(Boolean(data.SiArchive));
-  //     } else {
-  //       setIsArchived(false);
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Erreur check archive :",
-  //       error?.response?.data || error?.message,
-  //     );
-  //   }
-  // };
-
-  //   checkArchivedStatus();
-
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, [email]);
-
-  const handleClick = () => {
-    if (isArchived) {
-      showToast("warning", "Cette personne est déjà archivée.");
-      return;
-    }
+  const handleClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    if (loading) return;
     setOpen(false);
     setSelectedDate(null);
   };
 
-  const handleConfirm = async () => {
-    if (!selectedDate) {
-      showToast("error", "Veuillez sélectionner une date de sortie.");
-      return;
-    }
-    if (!email) {
-      showToast("error", "Email manquant, impossible d’archiver.");
+  const handleConfirm = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!selectedDate || !dayjs(selectedDate).isValid()) {
+      onArchiveSuccess?.({
+        type: "error",
+        text: "Veuillez sélectionner une date de sortie.",
+      });
       return;
     }
 
     const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
-
     setLoading(true);
+
     try {
+      // 1. Exécution de l'archivage côté serveur
       await PersonnelService.archive(IDPersonneService, formattedDate);
 
-      showToast(
-        "success",
-        `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`,
-      );
+      // 2. Mise à jour LOCALE immédiate du tableau
+      onArchiveLocal?.(IDPersonneService);
 
-      setIsArchived(true);
+      // 3. Fermeture de la modale et reset
       setOpen(false);
       setSelectedDate(null);
 
-      // ✅ vider caches + refresh
-      PersonnelService.clearCaches?.();
+      // 4. Notification de succès
+      onArchiveSuccess?.({
+        type: "success",
+        text: `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`,
+      });
 
-      if (typeof refreshData === "function") {
-        await refreshData();
+      // 5. Nettoyage des caches et rafraîchissement global
+      if (PersonnelService.clearCaches) {
+          PersonnelService.clearCaches();
       }
+      
+      // On déclenche le refreshData après un très court délai pour laisser l'état local se stabiliser
+      setTimeout(() => {
+        refreshData?.();
+      }, 100);
+
     } catch (error) {
       console.error(
         "Erreur archivage :",
-        error?.response?.data || error?.message,
+        error?.response?.data || error?.message
       );
-      showToast("error", "L'archivage a échoué.");
+
+      onArchiveSuccess?.({
+        type: "error",
+        text: "L'archivage a échoué.",
+      });
     } finally {
       setLoading(false);
     }
@@ -129,18 +106,23 @@ function DeleteMembreComponent({
     <>
       <IconButton
         size="small"
-        title={isArchived ? "Déjà archivé" : "Archiver"}
+        title={loading ? "Archivage..." : "Archiver"}
+        onMouseDown={(event) => event.stopPropagation()}
         onClick={handleClick}
-        disabled={isArchived}
-        sx={{
-          ml: 0.5,
-          color: isArchived ? "grey.400" : "error.main",
-        }}
+        disabled={loading}
+        sx={{ ml: 0.5, color: "error.main" }}
       >
         <MdDeleteForever style={{ fontSize: 20 }} />
       </IconButton>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="xs"
+        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <DialogTitle>Archiver la personne</DialogTitle>
 
         <DialogContent dividers>
@@ -165,17 +147,25 @@ function DeleteMembreComponent({
                 label="Date de sortie"
                 value={selectedDate}
                 onChange={(val) => setSelectedDate(val)}
-                slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                    onClick: (event) => event.stopPropagation(),
+                    onMouseDown: (event) => event.stopPropagation(),
+                  },
+                }}
               />
             </LocalizationProvider>
           </Stack>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="inherit">
+          <Button onClick={handleClose} color="inherit" disabled={loading}>
             Annuler
           </Button>
           <Button
+            type="button"
             onClick={handleConfirm}
             variant="contained"
             disabled={loading}
@@ -184,17 +174,6 @@ function DeleteMembreComponent({
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={toast.open}
-        autoHideDuration={3500}
-        onClose={closeToast}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={closeToast} severity={toast.type} variant="filled">
-          {toast.text}
-        </Alert>
-      </Snackbar>
     </>
   );
 }
@@ -206,6 +185,8 @@ DeleteMembreComponent.propTypes = {
   prenomPersonne: PropTypes.string,
   email: PropTypes.string,
   refreshData: PropTypes.func,
+  onArchiveSuccess: PropTypes.func,
+  onArchiveLocal: PropTypes.func,
 };
 
 export default DeleteMembreComponent;
