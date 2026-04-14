@@ -27,10 +27,7 @@ const PersonnelService = {
       },
     }),
 
-restore: (id) =>
-  http.get("/api/personnes/desarchiver", {
-    params: { id: id },
-  }),
+  
 
   getGrades: () => http.get("/api/infos/wwgrades"),
   getAdresses: () => http.get("/api/infos/adresses"),

@@ -67,7 +67,7 @@ function RestoreActionComponent({
 
     try {
       // Appel API pour restaurer la personne
-      await PersonnelService.restore(IDPersonneService);
+      await PersonnelService.archive(IDPersonneService);
 
       // Mise à jour locale (optionnel)
       onRestoreLocal?.(IDPersonneService);
@@ -102,10 +102,7 @@ function RestoreActionComponent({
       console.error("Data brut :", error?.response?.data);
 
       // Affichage clair des erreurs de validation
-      console.error(
-        "Errors JSON :",
-        JSON.stringify(errors, null, 2)
-      );
+      console.error("Errors JSON :", JSON.stringify(errors, null, 2));
 
       // Parcours des champs en erreur pour plus de lisibilité
       if (errors) {
@@ -189,10 +186,8 @@ function RestoreActionComponent({
 
 // Définition des types de props
 RestoreActionComponent.propTypes = {
-  IDPersonneService: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
   nomPersonne: PropTypes.string,
   prenomPersonne: PropTypes.string,
   email: PropTypes.string,
