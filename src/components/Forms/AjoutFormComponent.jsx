@@ -12,15 +12,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
+ // FormControl,
   FormControlLabel,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
+ // InputLabel,
+ // MenuItem,
   Radio,
   RadioGroup,
-  Select,
+ //Select,
   Stack,
   TextField,
   Typography,
@@ -60,13 +60,13 @@ const AjoutFormComponent = forwardRef(
     const [grades, setGrades] = useState([]);
     const [services, setServices] = useState([]);
     const [addresses, setAddresses] = useState([]);
-    const [typePersonnelList, setTypePersonnelList] = useState([]);
+    // const [typePersonnelList, setTypePersonnelList] = useState([]);
     const [fonctions, setFonctions] = useState([]);
 
     const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
     const [form, setForm] = useState(INITIAL_FORM);
 
-    const isPersonnelSelected = form.SiTypePersonnel === true;
+    // const isPersonnelSelected = form.SiTypePersonnel === true;
 
     const setField = (name, value) => {
       setForm((prev) => ({ ...prev, [name]: value }));
@@ -89,15 +89,15 @@ const AjoutFormComponent = forwardRef(
     };
 
     const selectedFonction =
-      fonctions.find(
-        (f) => Number(f.IDFonction) === Number(form.fonction),
-      ) || null;
+      fonctions.find((f) => Number(f.IDFonction) === Number(form.fonction)) ||
+      null;
 
     const selectedGrade =
       grades.find((g) => Number(g.IDWWGrade) === Number(form.grade)) || null;
 
     const selectedService =
-      services.find((s) => Number(s.IDService) === Number(form.service)) || null;
+      services.find((s) => Number(s.IDService) === Number(form.service)) ||
+      null;
 
     const selectedAddress =
       addresses.find((a) => Number(a.IDAdresse) === Number(form.adresse)) ||
@@ -127,21 +127,22 @@ const AjoutFormComponent = forwardRef(
         setError("");
 
         try {
-          const [gradesRes, servicesRes, addrRes, typeRes, fonRes] =
-            await Promise.all([
-              PersonnelService.getGrades(),
-              PersonnelService.getServices(),
-              PersonnelService.getAdresses(),
-              PersonnelService.getTypesPersonnel(),
-              PersonnelService.getFonctions(),
-            ]);
+          const [gradesRes, servicesRes, addrRes, fonRes] = await Promise.all([
+            PersonnelService.getGrades(),
+            PersonnelService.getServices(),
+            PersonnelService.getAdresses(),
+            // PersonnelService.getTypesPersonnel(),
+            PersonnelService.getFonctions(),
+          ]);
 
           if (!mounted) return;
 
           setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
           setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
           setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
-          setTypePersonnelList(Array.isArray(typeRes?.data) ? typeRes.data : []);
+          // setTypePersonnelList(
+          //   Array.isArray(typeRes?.data) ? typeRes.data : [],
+          // );
           setFonctions(Array.isArray(fonRes?.data) ? fonRes.data : []);
         } catch (e) {
           console.error(e);
@@ -317,10 +318,7 @@ const AjoutFormComponent = forwardRef(
             selectedAddress?.RueFr ||
             "",
 
-          NomRueNl:
-            selectedAddress?.NomRueNl ||
-            selectedAddress?.RueNl ||
-            "",
+          NomRueNl: selectedAddress?.NomRueNl || selectedAddress?.RueNl || "",
 
           Numero: selectedAddress?.Numero || "",
           Batiment: selectedAddress?.Batiment || "",
@@ -599,7 +597,7 @@ const AjoutFormComponent = forwardRef(
                         label="Non"
                       />
                     </RadioGroup>
-
+                    {/* 
                     {isPersonnelSelected && (
                       <FormControl
                         fullWidth
@@ -625,7 +623,7 @@ const AjoutFormComponent = forwardRef(
                           ))}
                         </Select>
                       </FormControl>
-                    )}
+                    )} */}
                   </Grid>
 
                   <Grid item xs={12} sm={6}>

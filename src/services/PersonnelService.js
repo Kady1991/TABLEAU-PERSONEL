@@ -34,7 +34,7 @@ restore: (id) =>
 
   getGrades: () => http.get("/api/infos/wwgrades"),
   getAdresses: () => http.get("/api/infos/adresses"),
-  getTypesPersonnel: () => http.get("/api/infos/typepersonnel"),
+  // getTypesPersonnel: () => http.get("/api/infos/typepersonnel"),
   getServices: () => http.get("/api/infos/services"),
   getCodes: () => http.get("/api/infos/codes"),
   getFonctions: () => http.get("/api/infos/fonctions"),

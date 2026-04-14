@@ -61,7 +61,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   const [grades, setGrades] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [services, setServices] = useState([]);
-  const [typePersonnelList, setTypePersonnelList] = useState([]);
+  // const [typePersonnelList, setTypePersonnelList] = useState([]);
   const [fonctions, setFonctions] = useState([]);
 
   const [serviceDetails, setServiceDetails] = useState(null);
@@ -89,8 +89,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   const selectedFonction = useMemo(() => {
     return (
       fonctions.find(
-        (f) =>
-          String(f.IDFonction ?? f.IdFonction) === String(form.FonctionID),
+        (f) => String(f.IDFonction ?? f.IdFonction) === String(form.FonctionID),
       ) || null
     );
   }, [fonctions, form.FonctionID]);
@@ -112,14 +111,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           personRes,
           gradesRes,
           addrRes,
-          typeRes,
+          //typeRes,
           servicesRes,
           fonctionsRes,
         ] = await Promise.all([
           PersonnelService.getById(IDPersonneService),
           PersonnelService.getGrades(),
           PersonnelService.getAdresses(),
-          PersonnelService.getTypesPersonnel(),
+          //PersonnelService.getTypesPersonnel(),
           PersonnelService.getServices(),
           PersonnelService.getFonctions(),
         ]);
@@ -128,9 +127,9 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
 
         const gradesData = Array.isArray(gradesRes?.data) ? gradesRes.data : [];
         const addressesData = Array.isArray(addrRes?.data) ? addrRes.data : [];
-        const typePersonnelData = Array.isArray(typeRes?.data)
-          ? typeRes.data
-          : [];
+        // const typePersonnelData = Array.isArray(typeRes?.data)
+        //   ? typeRes.data
+        //   : [];
         const servicesData = Array.isArray(servicesRes?.data)
           ? servicesRes.data
           : [];
@@ -140,7 +139,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
 
         setGrades(gradesData);
         setAddresses(addressesData);
-        setTypePersonnelList(typePersonnelData);
+        //setTypePersonnelList(typePersonnelData);
         setServices(servicesData);
         setFonctions(fonctionsData);
 
@@ -172,8 +171,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           gradeFound?.IdWWGrade ??
           "";
 
-        const serviceIdDirect =
-          p.ServiceID ?? p.IDService ?? p.IdService ?? "";
+        const serviceIdDirect = p.ServiceID ?? p.IDService ?? p.IdService ?? "";
 
         const serviceFound =
           servicesData.find(
@@ -188,8 +186,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
 
         const finalServiceId = serviceFound?.IDService ?? "";
 
-        const adresseIdDirect =
-          p.AdresseID ?? p.IDAdresse ?? p.IdAdresse ?? "";
+        const adresseIdDirect = p.AdresseID ?? p.IDAdresse ?? p.IdAdresse ?? "";
 
         const personNomRueFr = clean(p.NomRueFr);
         const personNomRueNl = clean(p.NomRueNl);
@@ -291,7 +288,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           CodeID: finalCodeId,
           SiFrancais: p.SiFrancais ?? true,
           SiTypePersonnel: p.SiTypePersonnel ?? false,
-          TypePersonnelID: typePersonnelIdDirect,
+          //TypePersonnelID: typePersonnelIdDirect,
         });
       } catch (e) {
         console.error(
@@ -337,69 +334,69 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
     if (!form.Email) return "E-mail obligatoire";
     if (!form.AdresseID) return "Adresse obligatoire";
     if (!form.ServiceID) return "Service obligatoire";
-    if (form.SiTypePersonnel && !form.TypePersonnelID) {
-      return "Type de personnel obligatoire";
-    }
-    return "";
+    // if (form.SiTypePersonnel && !form.TypePersonnelID) {
+    //   return "Type de personnel obligatoire";
+    // }
+    // return "";
   };
 
-const handleSubmit = async () => {
-  const err = validate();
-  if (err) {
-    alert(err);
-    return;
-  }
-
-  if (!form.PersonneID) {
-    alert("PersonneID manquant (impossible de sauvegarder).");
-    return;
-  }
-
-  setSaving(true);
-  try {
-    const payload = {
-      IDPersonneService: form.IDPersonneService,
-      PersonneID: form.PersonneID,
-      NomPersonne: form.NomPersonne,
-      PrenomPersonne: form.PrenomPersonne,
-      Email: form.Email,
-      TelPro: form.TelPro || null,
-      DateEntree: form.DateEntreeDate
-        ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
-        : null,
-      WWGradeID: form.WWGradeID || null,
-      //IDWWGrade: form.WWGradeID || null,
-      AdresseID: form.AdresseID,
-      ServiceID: form.ServiceID,
-      FonctionID: form.FonctionID || null,
-      CodeID: form.CodeID || null,
-      SiFrancais: form.SiFrancais,
-      SiTypePersonnel: form.SiTypePersonnel,
-      TypePersonnelID: form.SiTypePersonnel ? form.TypePersonnelID : null,
-    };
-
-    console.log("[EDIT] payload =", payload);
-
-    await PersonnelService.update(form.IDPersonneService, payload);
-
-    PersonnelService.clearCaches?.();
-
-    alert("Modifications enregistrées !");
-    handleClose();
-
-    if (typeof refreshData === "function") {
-      await refreshData();
+  const handleSubmit = async () => {
+    const err = validate();
+    if (err) {
+      alert(err);
+      return;
     }
-  } catch (e) {
-    console.error(
-      "Erreur sauvegarde Edit :",
-      e?.response?.data || e?.message,
-    );
-    alert("Une erreur est survenue lors de l’enregistrement.");
-  } finally {
-    setSaving(false);
-  }
-};
+
+    if (!form.PersonneID) {
+      alert("PersonneID manquant (impossible de sauvegarder).");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        IDPersonneService: form.IDPersonneService,
+        PersonneID: form.PersonneID,
+        NomPersonne: form.NomPersonne,
+        PrenomPersonne: form.PrenomPersonne,
+        Email: form.Email,
+        TelPro: form.TelPro || null,
+        DateEntree: form.DateEntreeDate
+          ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
+          : null,
+        WWGradeID: form.WWGradeID || null,
+        //IDWWGrade: form.WWGradeID || null,
+        AdresseID: form.AdresseID,
+        ServiceID: form.ServiceID,
+        FonctionID: form.FonctionID || null,
+        CodeID: form.CodeID || null,
+        SiFrancais: form.SiFrancais,
+        SiTypePersonnel: form.SiTypePersonnel,
+        TypePersonnelID: form.SiTypePersonnel ? form.TypePersonnelID : null,
+      };
+
+      console.log("[EDIT] payload =", payload);
+
+      await PersonnelService.update(form.IDPersonneService, payload);
+
+      PersonnelService.clearCaches?.();
+
+      alert("Modifications enregistrées !");
+      handleClose();
+
+      if (typeof refreshData === "function") {
+        await refreshData();
+      }
+    } catch (e) {
+      console.error(
+        "Erreur sauvegarde Edit :",
+        e?.response?.data || e?.message,
+      );
+      alert("Une erreur est survenue lors de l’enregistrement.");
+    } finally {
+      setSaving(false);
+    }
+  };
   return (
     <>
       <IconButton
@@ -486,9 +483,8 @@ const handleSubmit = async () => {
                     value={
                       grades.find(
                         (g) =>
-                          String(
-                            g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade,
-                          ) === String(form.WWGradeID),
+                          String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) ===
+                          String(form.WWGradeID),
                       ) || null
                     }
                     isOptionEqualToValue={(option, value) =>
@@ -505,7 +501,7 @@ const handleSubmit = async () => {
                       setField(
                         "WWGradeID",
                         nv
-                          ? nv.IDWWGrade ?? nv.WWGradeID ?? nv.IdWWGrade
+                          ? (nv.IDWWGrade ?? nv.WWGradeID ?? nv.IdWWGrade)
                           : "",
                       )
                     }
@@ -623,7 +619,7 @@ const handleSubmit = async () => {
                     onChange={(e, nv) => {
                       setField(
                         "FonctionID",
-                        nv ? nv.IDFonction ?? nv.IdFonction : "",
+                        nv ? (nv.IDFonction ?? nv.IdFonction) : "",
                       );
                       setField("CodeID", "");
                     }}
@@ -662,7 +658,7 @@ const handleSubmit = async () => {
                       String(value.Idcode ?? value.IDCode)
                     }
                     onChange={(e, nv) =>
-                      setField("CodeID", nv ? nv.Idcode ?? nv.IDCode : "")
+                      setField("CodeID", nv ? (nv.Idcode ?? nv.IDCode) : "")
                     }
                     renderOption={(props, option) => {
                       const { key, ...restProps } = props;
@@ -706,7 +702,7 @@ const handleSubmit = async () => {
                     </RadioGroup>
                   </FormControl>
 
-                  {form.SiTypePersonnel && (
+                  {/* {form.SiTypePersonnel && (
                     <FormControl fullWidth size="small" sx={{ mt: 2 }}>
                       <InputLabel id="typep-label">
                         Type de personnel
@@ -729,7 +725,7 @@ const handleSubmit = async () => {
                         ))}
                       </Select>
                     </FormControl>
-                  )}
+                  )} */}
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
