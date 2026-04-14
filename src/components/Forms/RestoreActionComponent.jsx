@@ -183,7 +183,6 @@ function RestoreActionComponent({
     </>
   );
 }
-
 // Définition des types de props
 RestoreActionComponent.propTypes = {
   IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
