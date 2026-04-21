@@ -20,6 +20,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import ApartmentIcon from "@mui/icons-material/Apartment.js";
 import AddIcon from "@mui/icons-material/Add";
 import logo from "../assets/logo_white.png";
 import AjoutFormComponent from "../components/Forms/AjoutFormComponent.jsx";
@@ -52,6 +53,11 @@ export default function DashboardLayout() {
       path: "/personnels/statistics",
       icon: <AssessmentIcon fontSize="small" />,
     },
+    {
+      label: "Affectations",
+      path: "/affectations",
+      icon: <ApartmentIcon fontSize="small" />,
+    },
   ];
 
   const drawer = (
@@ -64,72 +70,72 @@ export default function DashboardLayout() {
 
       <Divider />
 
-     <List sx={{ px: 1 }}>
-  {/* ✅ 1) ACCUEIL tout en haut */}
-  <ListItemButton
-    component={NavLink}
-    to="/"
-    end
-    onClick={() => setMobileOpen(false)}
-    sx={{
-      borderRadius: 1,
-      my: 0.5,
-      "&.active": {
-        bgcolor: "action.selected",
-        fontWeight: 700,
-      },
-    }}
-  >
-    <ListItemIcon sx={{ minWidth: 34 }}>
-      <DashboardIcon fontSize="small" />
-    </ListItemIcon>
-    <ListItemText primary="Accueil" />
-  </ListItemButton>
+      <List sx={{ px: 1 }}>
+        {/* ✅ 1) ACCUEIL tout en haut */}
+        <ListItemButton
+          component={NavLink}
+          to="/"
+          end
+          onClick={() => setMobileOpen(false)}
+          sx={{
+            borderRadius: 1,
+            my: 0.5,
+            "&.active": {
+              bgcolor: "action.selected",
+              fontWeight: 700,
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 34 }}>
+            <DashboardIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Accueil" />
+        </ListItemButton>
 
-  {/* ✅ Trait */}
-  <Divider sx={{ my: 1 }} />
+        {/* ✅ Trait */}
+        <Divider sx={{ my: 1 }} />
 
-  {/* ✅ 2) BOUTON AJOUT juste après le trait */}
-  <ListItemButton
-    onClick={() => {
-      setMobileOpen(false);
-      setOpenAdd(true);
-    }}
-    sx={{
-      borderRadius: 1,
-      my: 0.5,
-    }}
-  >
-    <ListItemIcon sx={{ minWidth: 34 }}>
-      <AddIcon fontSize="small" />
-    </ListItemIcon>
-    <ListItemText primary="Nouveau membre" />
-  </ListItemButton>
+        {/* ✅ 2) BOUTON AJOUT juste après le trait */}
+        <ListItemButton
+          onClick={() => {
+            setMobileOpen(false);
+            setOpenAdd(true);
+          }}
+          sx={{
+            borderRadius: 1,
+            my: 0.5,
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 34 }}>
+            <AddIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Nouveau membre" />
+        </ListItemButton>
 
-  {/* ✅ 3) AUTRES ITEMS (sans Accueil) */}
-  {navItems
-    .filter((item) => item.path !== "/")
-    .map((item) => (
-      <ListItemButton
-        key={item.path}
-        component={NavLink}
-        to={item.path}
-        end={item.path === "/personnels"}
-        onClick={() => setMobileOpen(false)}
-        sx={{
-          borderRadius: 1,
-          my: 0.5,
-          "&.active": {
-            bgcolor: "action.selected",
-            fontWeight: 700,
-          },
-        }}
-      >
-        <ListItemIcon sx={{ minWidth: 34 }}>{item.icon}</ListItemIcon>
-        <ListItemText primary={item.label} />
-      </ListItemButton>
-    ))}
-</List>
+        {/* ✅ 3) AUTRES ITEMS (sans Accueil) */}
+        {navItems
+          .filter((item) => item.path !== "/")
+          .map((item) => (
+            <ListItemButton
+              key={item.path}
+              component={NavLink}
+              to={item.path}
+              end={item.path === "/personnels"}
+              onClick={() => setMobileOpen(false)}
+              sx={{
+                borderRadius: 1,
+                my: 0.5,
+                "&.active": {
+                  bgcolor: "action.selected",
+                  fontWeight: 700,
+                },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 34 }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          ))}
+      </List>
     </Box>
   );
 
