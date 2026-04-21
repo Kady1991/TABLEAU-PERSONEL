@@ -1,18 +1,17 @@
-// src/pages/Personnels/PersonnelArchivesListPage.jsx
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Alert, Box, Button, Stack, Typography, Tooltip } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import dayjs from "dayjs";
-import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
 import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
-import { LIEN_API_PERSONNE } from "../../config.js";
 
 const CACHE_KEY = "personnels_archives_cache_v2_dates";
-const isArchived = (v) => v === true || v === 1 || String(v).toLowerCase() === "true";
+
+const isArchived = (v) =>
+  v === true || v === 1 || String(v).toLowerCase() === "true";
 
 function PersonnelArchivesListPage() {
   const navigate = useNavigate();
@@ -28,10 +27,7 @@ function PersonnelArchivesListPage() {
 
   const fetchPersonDatesXml = async (idPersonneService) => {
     try {
-      const response = await axios.get(
-        `${LIEN_API_PERSONNE}/api/Personne/${idPersonneService}`,
-        { headers: { Accept: "application/xml" } }
-      );
+      const response = await PersonnelService.getPersonXmlById(idPersonneService);
 
       if (typeof response.data !== "string") {
         return { DateEntree: "", DateSortie: "" };
@@ -89,7 +85,7 @@ function PersonnelArchivesListPage() {
   }, []);
 
   useEffect(() => {
-    load();
+    load({ force: true });
   }, [load]);
 
   const refreshData = useCallback(async () => {
@@ -123,7 +119,7 @@ function PersonnelArchivesListPage() {
         renderCell: (params) => (
           <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
             <RestoreActionComponent
-              PersonneID={params.row.PersonneID}
+              IDPersonneService={params.row.IDPersonneService}
               nomPersonne={params.row.NomPersonne}
               prenomPersonne={params.row.PrenomPersonne}
               email={params.row.Email}

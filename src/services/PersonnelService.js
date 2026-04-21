@@ -27,6 +27,16 @@ const PersonnelService = {
       },
     }),
 
+  restore: (id) =>
+    http.get("/api/personnes/desarchiver", {
+      params: { id },
+    }),
+
+  // Récupère les données XML d'une personne (avec credentials)
+ getPersonXmlById: (id) =>
+  http.get(`/api/personnes/${id}`, {
+    headers: { Accept: "application/xml" },
+  }),
   
 
   getGrades: () => http.get("/api/infos/wwgrades"),
