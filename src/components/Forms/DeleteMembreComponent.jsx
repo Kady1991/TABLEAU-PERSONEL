@@ -81,6 +81,9 @@ function DeleteMembreComponent({
       if (PersonnelService.clearCaches) {
           PersonnelService.clearCaches();
       }
+
+      //  Vide aussi le cache de la page archives
+    sessionStorage.removeItem("personnels_archives_cache_v2_dates");
       
       // On déclenche le refreshData après un très court délai pour laisser l'état local se stabiliser
       setTimeout(() => {

@@ -1,8 +1,7 @@
-import { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState, forwardRef, useCallback } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import { IoPersonAddSharp } from "react-icons/io5";
-
 import {
   Alert,
   Box,
@@ -12,28 +11,34 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
- // FormControl,
+  Divider,
   FormControlLabel,
   Grid,
   IconButton,
- // InputLabel,
- // MenuItem,
+  LinearProgress,
   Radio,
   RadioGroup,
- //Select,
+  Snackbar,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-
 import Autocomplete from "@mui/material/Autocomplete";
 import CloseIcon from "@mui/icons-material/Close";
-
+import PersonIcon from "@mui/icons-material/Person";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import WorkIcon from "@mui/icons-material/Work";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
-import PersonnelService from "../../services/PersonnelService.js";
+import { serviceService } from "../../services/AffectationsService";
+import PersonnelService from "../../services/PersonnelService";
+import ServiceTreeSelect from "./ServiceTreeSelect";
+import { useTheme } from "@mui/material/styles";
 
 const INITIAL_FORM = {
   nom: "",
@@ -51,334 +56,323 @@ const INITIAL_FORM = {
   siFrancais: true,
 };
 
-const AjoutFormComponent = forwardRef(
-  ({ open, onClose, onMemberUpdate, refreshData }, ref) => {
-    const [loadingInit, setLoadingInit] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
+const INITIAL_TOUCHED = {
+  nom: false,
+  prenom: false,
+  email: false,
+  adresse: false,
+  service: false,
+  DateEntreeDate: false,
+};
 
-    const [grades, setGrades] = useState([]);
-    const [services, setServices] = useState([]);
-    const [addresses, setAddresses] = useState([]);
-    // const [typePersonnelList, setTypePersonnelList] = useState([]);
-    const [fonctions, setFonctions] = useState([]);
+const buildFlatOptions = (servicesList) => {
+  const result = [];
+  servicesList.forEach((s) => {
+    const svcId = s.idService ?? s.IDService;
+    const hasSousServices = s.sousServices && s.sousServices.length > 0;
+    result.push({
+      id: `service-${svcId}`, value: `service-${svcId}`,
+      realServiceId: svcId, parentServiceId: null,
+      hasChildren: hasSousServices,
+      label: s.nomServiceFr ?? s.NomServiceFr ?? "",
+      type: "service",
+      nomChefDepartement: "", prenomChefDepartement: "",
+      nomChefService: s.nomChefService ?? s.NomChefService ?? "",
+      prenomChefService: s.prenomChefService ?? s.PrenomChefService ?? "",
+      nomSousChef: "", prenomSousChef: "",
+    });
+    s.sousServices?.forEach((ss) => {
+      const sousId = ss.idSousService ?? ss.IDSousService;
+      const hasChildren = ss.children && ss.children.length > 0;
+      result.push({
+        id: `sous-${sousId}`, value: `sous-${sousId}`,
+        realServiceId: sousId, parentServiceId: svcId, hasChildren,
+        label: "— " + (ss.nomSousServiceFr ?? ss.NomSousServiceFr ?? ""),
+        type: "sousService",
+        nomChefDepartement: ss.nomChefDepartement ?? "",
+        prenomChefDepartement: ss.prenomChefDepartement ?? "",
+        nomChefService: ss.nomChefService ?? s.nomChefService ?? "",
+        prenomChefService: ss.prenomChefService ?? s.prenomChefService ?? "",
+        nomSousChef: ss.nomSousChef ?? "", prenomSousChef: ss.prenomSousChef ?? "",
+      });
+      ss.children?.forEach((child) => {
+        const childId = child.idSousService ?? child.IDSousService;
+        result.push({
+          id: `child-${childId}`, value: `child-${childId}`,
+          realServiceId: childId, parentServiceId: svcId, hasChildren: false,
+          label: "—— " + (child.nomSousServiceFr ?? child.NomSousServiceFr ?? ""),
+          type: "child",
+          nomChefDepartement: child.nomChefDepartement ?? ss.nomChefDepartement ?? "",
+          prenomChefDepartement: child.prenomChefDepartement ?? ss.prenomChefDepartement ?? "",
+          nomChefService: child.nomChefService ?? ss.nomChefService ?? s.nomChefService ?? "",
+          prenomChefService: child.prenomChefService ?? ss.prenomChefService ?? s.prenomChefService ?? "",
+          nomSousChef: child.nomSousChef ?? ss.nomSousChef ?? "",
+          prenomSousChef: child.prenomSousChef ?? ss.prenomSousChef ?? "",
+        });
+      });
+    });
+  });
+  return result;
+};
 
-    const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
-    const [form, setForm] = useState(INITIAL_FORM);
+const enrichWithChefDepartement = (flatOptions, infosFlat) => {
+  const chefMap = new Map();
+  infosFlat.forEach((row) => {
+    const sousId = row.IDSousService ?? 0;
+    const childId = row.IDSousSousService ?? 0;
+    const svcId = row.IDService ?? 0;
+    let key;
+    if (childId && childId !== 0) key = childId;
+    else if (sousId && sousId !== 0) key = sousId;
+    else key = svcId;
+    if (!chefMap.has(key) && (row.NomChefDepartement || row.PrenomChefDepartement)) {
+      chefMap.set(key, { nomChefDepartement: row.NomChefDepartement ?? "", prenomChefDepartement: row.PrenomChefDepartement ?? "" });
+    }
+  });
+  return flatOptions.map((opt) => {
+    const chefInfo = chefMap.get(opt.realServiceId);
+    if (chefInfo && !opt.nomChefDepartement) return { ...opt, ...chefInfo };
+    return opt;
+  });
+};
 
-    // const isPersonnelSelected = form.SiTypePersonnel === true;
+// ── Section title ─────────────────────────────────────────────────────────────
+function SectionTitle({ icon, label }) {
+  const theme = useTheme();
+  return (
+    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5, mt: 1 }}>
+      <Box sx={{ color: theme.palette.secondary.main, display: "flex", alignItems: "center" }}>{icon}</Box>
+      <Typography sx={{ fontSize: 11, fontWeight: 600, color: theme.palette.secondary.main, textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
+        {label}
+      </Typography>
+      <Divider sx={{ flex: 1 }} />
+    </Stack>
+  );
+}
+SectionTitle.propTypes = { icon: PropTypes.node.isRequired, label: PropTypes.string.isRequired };
 
-    const setField = (name, value) => {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    };
+// ── Main ──────────────────────────────────────────────────────────────────────
+const AjoutFormComponent = forwardRef(({ open, onClose, onMemberUpdate, refreshData }, ref) => {
+  const theme = useTheme();
+  const PRIMARY = theme.palette.primary.main;
+  const TEAL = theme.palette.secondary.main;
 
-    const generateEmail = (prenom, nom) => {
-      if (!prenom || !nom) return "";
+  const [loadingInit, setLoadingInit] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [grades, setGrades] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [fonctions, setFonctions] = useState([]);
+  const [selectedServiceDetails, setSelectedServiceDetails] = useState(null);
+  const [servicesFlat, setServicesFlat] = useState([]);
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [touched, setTouched] = useState(INITIAL_TOUCHED);
 
-      const prenoms = prenom.split(/[\s-]+/);
-      const noms = nom.split(/[\s-]+/);
+  const showSnackbar = (message, severity = "success") => setSnackbar({ open: true, message, severity });
+  const closeSnackbar = () => setSnackbar((prev) => ({ ...prev, open: false }));
 
-      const firstLettersPrenom = prenoms
-        .filter((p) => p.trim() !== "")
-        .map((p) => p.charAt(0).toLowerCase())
-        .join("");
+  const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }));
+  const touch = (name) => setTouched((prev) => ({ ...prev, [name]: true }));
 
-      const nomCleaned = noms.join("").toLowerCase();
+  // ── Validation inline ───────────────────────────────────────────────────────
+  const fieldErrors = {
+    nom: touched.nom && !form.nom ? "Nom obligatoire" : "",
+    prenom: touched.prenom && !form.prenom ? "Prénom obligatoire" : "",
+    email: touched.email && !form.email ? "Email obligatoire" : "",
+    adresse: touched.adresse && !form.adresse ? "Adresse obligatoire" : "",
+    service: touched.service && !form.service ? "Service obligatoire" : "",
+    DateEntreeDate: touched.DateEntreeDate && !form.DateEntreeDate ? "Date obligatoire" : "",
+  };
 
-      return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
-    };
+  // ── Progression ─────────────────────────────────────────────────────────────
+  const requiredFields = ["nom", "prenom", "email", "DateEntreeDate", "adresse", "service"];
+  const filledCount = requiredFields.filter((f) => {
+    if (f === "DateEntreeDate") return !!form.DateEntreeDate;
+    return !!form[f];
+  }).length;
+  const progressPct = Math.round((filledCount / requiredFields.length) * 100);
 
-    const selectedFonction =
-      fonctions.find((f) => Number(f.IDFonction) === Number(form.fonction)) ||
-      null;
+  const generateEmail = (prenom, nom) => {
+    if (!prenom || !nom) return "";
+    const prenoms = prenom.split(/[\s-]+/);
+    const noms = nom.split(/[\s-]+/);
+    const firstLettersPrenom = prenoms.filter((p) => p.trim() !== "").map((p) => p.charAt(0).toLowerCase()).join("");
+    const nomCleaned = noms.join("").toLowerCase();
+    return `${firstLettersPrenom}${nomCleaned}@uccle.brussels`;
+  };
 
-    const selectedGrade =
-      grades.find((g) => Number(g.IDWWGrade) === Number(form.grade)) || null;
+  const selectedFonction = fonctions.find((f) => Number(f.IDFonction) === Number(form.fonction)) || null;
+  const selectedGrade = grades.find((g) => Number(g.IDWWGrade) === Number(form.grade)) || null;
+  const selectedAddress = addresses.find((a) => Number(a.IDAdresse) === Number(form.adresse)) || null;
+  const codesDisponibles = selectedFonction?.Codes || [];
 
-    const selectedService =
-      services.find((s) => Number(s.IDService) === Number(form.service)) ||
-      null;
+  const handleNameChange = useCallback((nextNom, nextPrenom) => {
+    setField("email", generateEmail(nextPrenom, nextNom));
+  }, []);
 
-    const selectedAddress =
-      addresses.find((a) => Number(a.IDAdresse) === Number(form.adresse)) ||
-      null;
-
-    const codesDisponibles = selectedFonction?.Codes || [];
-
-    const handleNameChange = (nextNom, nextPrenom) => {
-      const email = generateEmail(nextPrenom, nextNom);
-      setField("email", email);
-    };
-
-    useEffect(() => {
-      if (!open) return;
-
+  useEffect(() => {
+    if (!open) return;
+    let mounted = true;
+    (async () => {
+      setLoadingInit(true);
       setError("");
-      setSelectedServiceDetails(null);
-      setForm(INITIAL_FORM);
-    }, [open]);
-
-    useEffect(() => {
-      if (!open) return;
-      let mounted = true;
-
-      (async () => {
-        setLoadingInit(true);
-        setError("");
-
-        try {
-          const [gradesRes, servicesRes, addrRes, fonRes] = await Promise.all([
-            PersonnelService.getGrades(),
-            PersonnelService.getServices(),
-            PersonnelService.getAdresses(),
-            // PersonnelService.getTypesPersonnel(),
-            PersonnelService.getFonctions(),
-          ]);
-
-          if (!mounted) return;
-
-          setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
-          setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
-          setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
-          // setTypePersonnelList(
-          //   Array.isArray(typeRes?.data) ? typeRes.data : [],
-          // );
-          setFonctions(Array.isArray(fonRes?.data) ? fonRes.data : []);
-        } catch (e) {
-          console.error(e);
-          setError("Erreur lors du chargement des listes.");
-        } finally {
-          if (mounted) setLoadingInit(false);
-        }
-      })();
-
-      return () => {
-        mounted = false;
-      };
-    }, [open]);
-
-    useEffect(() => {
-      if (!form.service) {
-        setSelectedServiceDetails(null);
-        return;
-      }
-
-      const service =
-        services.find((s) => Number(s.IDService) === Number(form.service)) ||
-        null;
-
-      setSelectedServiceDetails(service);
-    }, [form.service, services]);
-
-    const clearCaches = () => {
       try {
-        sessionStorage.removeItem("personnels_actifs_cache_v1");
-        sessionStorage.removeItem("Personnels_actifs_cache_v1");
-        sessionStorage.removeItem("home_personnels_actifs_cache_v1");
+        const [gradesRes, affectServicesRes, infosServicesRes, addrRes, fonRes] = await Promise.all([
+          PersonnelService.getGrades(),
+          serviceService.getAll(),
+          PersonnelService.getServices(),
+          PersonnelService.getAdresses(),
+          PersonnelService.getFonctions(),
+        ]);
+        if (!mounted) return;
+        const flat = buildFlatOptions(affectServicesRes?.data || []);
+        const enriched = enrichWithChefDepartement(flat, infosServicesRes?.data || []);
+        setServicesFlat(enriched);
+        setGrades(Array.isArray(gradesRes?.data) ? gradesRes.data : []);
+        setAddresses(Array.isArray(addrRes?.data) ? addrRes.data : []);
+        setFonctions(Array.isArray(fonRes?.data) ? fonRes.data : []);
       } catch (e) {
-        console.error("Erreur vidage cache:", e);
-      }
-    };
-
-    const handleClose = () => {
-      setForm(INITIAL_FORM);
-      setSelectedServiceDetails(null);
-      setError("");
-      onClose?.();
-    };
-
-    const handleSubmit = async () => {
-      if (
-        !form.nom ||
-        !form.prenom ||
-        !form.email ||
-        !form.DateEntreeDate ||
-        !form.service ||
-        !form.adresse
-      ) {
-        alert("Veuillez remplir les champs obligatoires.");
-        return;
-      }
-
-      if (form.SiTypePersonnel === true && !form.TypePersonnelID) {
-        alert("Veuillez sélectionner un type de personnel.");
-        return;
-      }
-
-      setSaving(true);
-      setError("");
-
-      try {
-        const payload = {
-          NomPersonne: form.nom.toUpperCase(),
-          PrenomPersonne: form.prenom,
-          Email: form.email?.trim(),
-          TelPro: form.telephone ? String(form.telephone).trim() : null,
-
-          DateEntree: form.DateEntreeDate
-            ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD")
-            : null,
-
-          ServiceID: form.service ? Number(form.service) : null,
-          AdresseID: form.adresse ? Number(form.adresse) : null,
-
-          WWGradeID: Number(form.grade) || 0,
-          IDWWGrade: Number(form.grade) || 0,
-
-          FonctionID: form.fonction ? Number(form.fonction) : 0,
-          CodeID: form.codeFonction ? Number(form.codeFonction) : 0,
-
-          SiFrancais: !!form.siFrancais,
-          SiTypePersonnel: !!form.SiTypePersonnel,
-
-          TypePersonnelID: form.SiTypePersonnel
-            ? Number(form.TypePersonnelID)
-            : 0,
-
-          SiArchive: false,
-        };
-
-        console.log("GRADE DANS FORM =", form.grade);
-        console.log("FONCTION DANS FORM =", form.fonction);
-        console.log("SERVICE DANS FORM =", form.service);
-        console.log("GRADE ENVOYÉ =", payload.WWGradeID);
-        console.log("FONCTION ENVOYÉE =", payload.FonctionID);
-        console.log("SERVICE ENVOYÉ =", payload.ServiceID);
-        console.log("PAYLOAD =", payload);
-        console.log("[AJOUT] payload JSON =", JSON.stringify(payload, null, 2));
-
-        const response = await PersonnelService.create(payload);
-
-        console.log("[AJOUT] response.data :", response.data);
-        console.log("[AJOUT] status :", response.status);
-
-        if (response.data === "Personne Exists") {
-          alert("Cet email est déjà attribué.");
-          return;
-        }
-
-        if (response.data === "NOK") {
-          const msg =
-            "L'API a refusé l'ajout (NOK). Vérifie les champs / règles serveur.";
-          setError(msg);
-          alert(msg);
-          return;
-        }
-
-        if (response.data === "OK-create") {
-          alert("Ajout réussi !");
-        }
-
-        clearCaches();
-
-        const nomServiceFr = selectedService?.NomServiceFr || "";
-        const nomServiceNl = selectedService?.NomServiceNl || "";
-
-        const nomFonctionFr =
-          selectedFonction?.NomFonctionFr ||
-          selectedFonction?.LibelleFonctionFr ||
-          "";
-
-        const nomFonctionNl =
-          selectedFonction?.NomFonctionNl ||
-          selectedFonction?.LibelleFonctionNl ||
-          "";
-
-        const nomGradeFr =
-          selectedGrade?.NomWWGradeFr ||
-          selectedGrade?.NomGradeFr ||
-          selectedGrade?.LibelleGradeFr ||
-          "";
-
-        const nomGradeNl =
-          selectedGrade?.NomWWGradeNl ||
-          selectedGrade?.NomGradeNl ||
-          selectedGrade?.LibelleGradeNl ||
-          "";
-
-        const addedMember = {
-          ...payload,
-          IDPersonneService:
-            response?.data?.IDPersonneService ||
-            response?.data?.id ||
-            Date.now(),
-
-          NomServiceFr: nomServiceFr,
-          NomServiceNl: nomServiceNl,
-
-          NomFonctionFr: nomFonctionFr,
-          NomFonctionNl: nomFonctionNl,
-
-          NomWWGradeFr: nomGradeFr,
-          NomWWGradeNl: nomGradeNl,
-
-          NomRueFr:
-            selectedAddress?.NomRueFr ||
-            selectedAddress?.NomRue ||
-            selectedAddress?.RueFr ||
-            "",
-
-          NomRueNl: selectedAddress?.NomRueNl || selectedAddress?.RueNl || "",
-
-          Numero: selectedAddress?.Numero || "",
-          Batiment: selectedAddress?.Batiment || "",
-          BatimentNl: selectedAddress?.BatimentNl || "",
-          Etage: selectedAddress?.Etage || "",
-        };
-
-        console.log("[AJOUT] addedMember enrichi =", addedMember);
-
-        if (typeof onMemberUpdate === "function") {
-          onMemberUpdate(addedMember);
-        }
-
-        if (typeof refreshData === "function") {
-          await refreshData();
-        }
-
-        handleClose();
-      } catch (err) {
-        console.log("Validation errors:", err?.response?.data?.errors);
-
-        const msg =
-          typeof err?.response?.data === "string"
-            ? err.response.data
-            : err?.message || "Erreur lors de l'envoi.";
-
-        setError(msg);
-        alert(msg);
+        console.error(e);
+        setError("Erreur lors du chargement des listes.");
       } finally {
-        setSaving(false);
+        if (mounted) setLoadingInit(false);
       }
-    };
+    })();
+    return () => { mounted = false; };
+  }, [open]);
 
-    return (
-      <Dialog
-        open={!!open}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="md"
-        ref={ref}
-      >
-        <DialogTitle
-          sx={{
-            pb: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Stack direction="row" spacing={1.2} alignItems="center">
-            <IoPersonAddSharp style={{ fontSize: 22 }} />
-            <Typography variant="h6" fontWeight={700}>
-              Ajouter un membre
-            </Typography>
+  useEffect(() => {
+    if (!form.service) { setSelectedServiceDetails(null); return; }
+    setSelectedServiceDetails(servicesFlat.find((s) => s.value === form.service) || null);
+  }, [form.service, servicesFlat]);
+
+  const clearCaches = () => {
+    try {
+      sessionStorage.removeItem("personnels_actifs_cache_v1");
+      sessionStorage.removeItem("Personnels_actifs_cache_v1");
+      sessionStorage.removeItem("home_personnels_actifs_cache_v1");
+    } catch (e) { console.error(e); }
+  };
+
+  const handleClose = () => {
+    setForm(INITIAL_FORM);
+    setTouched(INITIAL_TOUCHED);
+    setSelectedServiceDetails(null);
+    setError("");
+    onClose?.();
+  };
+
+  const handleSubmit = async () => {
+    // Touch tous les champs obligatoires
+    setTouched({ nom: true, prenom: true, email: true, adresse: true, service: true, DateEntreeDate: true });
+
+    if (!form.nom || !form.prenom || !form.email || !form.DateEntreeDate || !form.service || !form.adresse) {
+      showSnackbar("Veuillez remplir tous les champs obligatoires.", "error");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const realServiceId = selectedServiceDetails?.realServiceId ?? null;
+      const payload = {
+        NomPersonne: form.nom.toUpperCase(),
+        PrenomPersonne: form.prenom,
+        Email: form.email?.trim(),
+        TelPro: form.telephone ? String(form.telephone).trim() : null,
+        DateEntree: form.DateEntreeDate ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD") : null,
+        ServiceID: realServiceId,
+        AdresseID: form.adresse ? Number(form.adresse) : null,
+        WWGradeID: Number(form.grade) || 0,
+        IDWWGrade: Number(form.grade) || 0,
+        FonctionID: form.fonction ? Number(form.fonction) : 0,
+        CodeID: form.codeFonction ? Number(form.codeFonction) : 0,
+        SiFrancais: !!form.siFrancais,
+        SiTypePersonnel: !!form.SiTypePersonnel,
+        TypePersonnelID: form.SiTypePersonnel ? Number(form.TypePersonnelID) : 0,
+        SiArchive: false,
+      };
+
+      const response = await PersonnelService.create(payload);
+
+      if (response.data === "Personne Exists") { showSnackbar("Cet email est déjà attribué.", "warning"); return; }
+      if (response.data === "NOK") { showSnackbar("L'API a refusé l'ajout.", "error"); return; }
+      if (response.data === "OK-create") showSnackbar("Membre ajouté avec succès !", "success");
+
+      clearCaches();
+
+      const nomFonctionFr = selectedFonction?.NomFonctionFr || selectedFonction?.LibelleFonctionFr || "";
+      const nomFonctionNl = selectedFonction?.NomFonctionNl || selectedFonction?.LibelleFonctionNl || "";
+      const nomGradeFr = selectedGrade?.NomWWGradeFr || selectedGrade?.NomGradeFr || selectedGrade?.LibelleGradeFr || "";
+      const nomGradeNl = selectedGrade?.NomWWGradeNl || selectedGrade?.NomGradeNl || selectedGrade?.LibelleGradeNl || "";
+
+      const addedMember = {
+        ...payload,
+        IDPersonneService: response?.data?.IDPersonneService || response?.data?.id || Date.now(),
+        NomServiceFr: selectedServiceDetails?.label?.replace(/^[-— ]+/, "") || "",
+        NomFonctionFr: nomFonctionFr, NomFonctionNl: nomFonctionNl,
+        NomWWGradeFr: nomGradeFr, NomWWGradeNl: nomGradeNl,
+        NomRueFr: selectedAddress?.NomRueFr || selectedAddress?.NomRue || selectedAddress?.RueFr || "",
+        NomRueNl: selectedAddress?.NomRueNl || selectedAddress?.RueNl || "",
+        Numero: selectedAddress?.Numero || "",
+        Batiment: selectedAddress?.Batiment || "",
+        BatimentNl: selectedAddress?.BatimentNl || "",
+        Etage: selectedAddress?.Etage || "",
+      };
+
+      if (typeof onMemberUpdate === "function") onMemberUpdate(addedMember);
+      if (typeof refreshData === "function") await refreshData();
+      handleClose();
+    } catch (err) {
+      const msg = typeof err?.response?.data === "string" ? err.response.data : err?.message || "Erreur lors de l'envoi.";
+      setError(msg);
+      showSnackbar(msg, "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ── Preview membre ──────────────────────────────────────────────────────────
+  const showPreview = form.nom && form.prenom && form.email;
+  const previewService = selectedServiceDetails?.label?.replace(/^[-— ]+/, "") || "";
+
+  return (
+    <>
+      <Dialog open={!!open} onClose={handleClose} fullWidth maxWidth="md" ref={ref}>
+
+        {/* ── Header ── */}
+        <DialogTitle sx={{ pb: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box sx={{ width: 36, height: 36, borderRadius: 2, background: "#e0f7f7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <IoPersonAddSharp style={{ fontSize: 18, color: TEAL }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" fontWeight={600}>Ajouter un membre</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {filledCount} / {requiredFields.length} champs obligatoires remplis
+              </Typography>
+            </Box>
           </Stack>
-
-          <IconButton onClick={handleClose} size="small">
-            <CloseIcon />
-          </IconButton>
+          <IconButton onClick={handleClose} size="small"><CloseIcon fontSize="small" /></IconButton>
         </DialogTitle>
+
+        {/* ── Barre de progression ── */}
+        <Box sx={{ px: 3, pb: 1 }}>
+          <LinearProgress
+            variant="determinate"
+            value={progressPct}
+            sx={{
+              height: 4,
+              borderRadius: 99,
+              bgcolor: "rgba(0,0,0,0.06)",
+              "& .MuiLinearProgress-bar": {
+                bgcolor: progressPct === 100 ? TEAL : PRIMARY,
+                borderRadius: 99,
+              },
+            }}
+          />
+        </Box>
 
         <DialogContent dividers sx={{ bgcolor: "background.paper" }}>
           {loadingInit ? (
@@ -387,325 +381,241 @@ const AjoutFormComponent = forwardRef(
               <Typography>Chargement des listes...</Typography>
             </Stack>
           ) : (
-            <Stack spacing={2}>
-              {error && <Alert severity="error">{error}</Alert>}
+            <Stack spacing={0} sx={{ p: 1 }}>
+              {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-              <Box sx={{ p: 1 }}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Nom"
-                      required
-                      fullWidth
-                      size="small"
-                      value={form.nom}
-                      onChange={(e) => {
-                        setField("nom", e.target.value);
-                        handleNameChange(e.target.value, form.prenom);
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Prénom"
-                      required
-                      fullWidth
-                      size="small"
-                      value={form.prenom}
-                      onChange={(e) => {
-                        setField("prenom", e.target.value);
-                        handleNameChange(form.nom, e.target.value);
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Téléphone"
-                      fullWidth
-                      size="small"
-                      value={form.telephone}
-                      onChange={(e) => setField("telephone", e.target.value)}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Email"
-                      required
-                      fullWidth
-                      size="small"
-                      value={form.email}
-                      onChange={(e) => setField("email", e.target.value)}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        label="Date d'entrée"
-                        value={form.DateEntreeDate}
-                        onChange={(val) => setField("DateEntreeDate", val)}
-                        slotProps={{
-                          textField: {
-                            required: true,
-                            fullWidth: true,
-                            size: "small",
-                          },
-                        }}
-                      />
-                    </LocalizationProvider>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      size="small"
-                      options={grades}
-                      getOptionLabel={(option) => option?.NomWWGradeFr || ""}
-                      value={
-                        grades.find(
-                          (g) => Number(g.IDWWGrade) === Number(form.grade),
-                        ) || null
-                      }
-                      isOptionEqualToValue={(option, value) =>
-                        Number(option.IDWWGrade) === Number(value.IDWWGrade)
-                      }
-                      onChange={(e, nv) => {
-                        console.log("GRADE CHOISI =", nv);
-                        setField("grade", nv ? Number(nv.IDWWGrade) : 0);
-                      }}
-                      renderInput={(params) => (
-                        <TextField {...params} label="Grade" />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      size="small"
-                      options={addresses}
-                      getOptionLabel={(option) => option?.AdresseComplete || ""}
-                      value={
-                        addresses.find(
-                          (a) => Number(a.IDAdresse) === Number(form.adresse),
-                        ) || null
-                      }
-                      isOptionEqualToValue={(option, value) =>
-                        Number(option.IDAdresse) === Number(value.IDAdresse)
-                      }
-                      onChange={(e, nv) =>
-                        setField("adresse", nv ? Number(nv.IDAdresse) : "")
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Adresse d'affectation"
-                          required
-                        />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      size="small"
-                      options={services}
-                      getOptionLabel={(option) => option?.NomServiceFr || ""}
-                      value={
-                        services.find(
-                          (s) => Number(s.IDService) === Number(form.service),
-                        ) || null
-                      }
-                      isOptionEqualToValue={(option, value) =>
-                        Number(option.IDService) === Number(value.IDService)
-                      }
-                      onChange={(e, nv) =>
-                        setField("service", nv ? Number(nv.IDService) : "")
-                      }
-                      renderInput={(params) => (
-                        <TextField {...params} label="Service" required />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      size="small"
-                      options={fonctions}
-                      getOptionLabel={(option) => option?.NomFonctionFr || ""}
-                      value={
-                        fonctions.find(
-                          (f) => Number(f.IDFonction) === Number(form.fonction),
-                        ) || null
-                      }
-                      isOptionEqualToValue={(option, value) =>
-                        Number(option.IDFonction) === Number(value.IDFonction)
-                      }
-                      onChange={(e, nv) => {
-                        setField("fonction", nv ? Number(nv.IDFonction) : 0);
-                        setField("codeFonction", "");
-                      }}
-                      renderInput={(params) => (
-                        <TextField {...params} label="Fonction" required />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Autocomplete
-                      size="small"
-                      options={codesDisponibles}
-                      getOptionLabel={(option) => option?.NomCode || ""}
-                      value={
-                        codesDisponibles.find(
-                          (c) => Number(c.Idcode) === Number(form.codeFonction),
-                        ) || null
-                      }
-                      isOptionEqualToValue={(option, value) =>
-                        Number(option.Idcode) === Number(value.Idcode)
-                      }
-                      onChange={(e, nv) =>
-                        setField("codeFonction", nv ? Number(nv.Idcode) : 0)
-                      }
-                      renderInput={(params) => (
-                        <TextField {...params} label="Code fonction" required />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                      <span style={{ color: "#d32f2f" }}>*</span> Personnel
-                    </Typography>
-
-                    <RadioGroup
-                      row
-                      value={form.SiTypePersonnel ? "true" : "false"}
-                      onChange={(e) =>
-                        setField("SiTypePersonnel", e.target.value === "true")
-                      }
-                    >
-                      <FormControlLabel
-                        value="true"
-                        control={<Radio size="small" />}
-                        label="Oui"
-                      />
-                      <FormControlLabel
-                        value="false"
-                        control={<Radio size="small" />}
-                        label="Non"
-                      />
-                    </RadioGroup>
-                    {/* 
-                    {isPersonnelSelected && (
-                      <FormControl
-                        fullWidth
-                        size="small"
-                        sx={{ mt: 1.5 }}
-                        required
-                      >
-                        <InputLabel>Type de personnel</InputLabel>
-                        <Select
-                          label="Type de personnel"
-                          value={form.TypePersonnelID}
-                          onChange={(e) =>
-                            setField("TypePersonnelID", e.target.value)
-                          }
-                        >
-                          {typePersonnelList.map((tp) => (
-                            <MenuItem
-                              key={tp.IDTypePersonnel}
-                              value={tp.IDTypePersonnel}
-                            >
-                              {tp.NomTypePersonnelFr}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )} */}
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                      <span style={{ color: "#d32f2f" }}>*</span> Langue
-                    </Typography>
-
-                    <RadioGroup
-                      row
-                      value={form.siFrancais ? "true" : "false"}
-                      onChange={(e) =>
-                        setField("siFrancais", e.target.value === "true")
-                      }
-                    >
-                      <FormControlLabel
-                        value="true"
-                        control={<Radio size="small" />}
-                        label="FR"
-                      />
-                      <FormControlLabel
-                        value="false"
-                        control={<Radio size="small" />}
-                        label="NL"
-                      />
-                    </RadioGroup>
-                  </Grid>
+              {/* ── Identité ── */}
+              <SectionTitle icon={<PersonIcon sx={{ fontSize: 14 }} />} label="Identité" />
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Nom" required fullWidth size="small" value={form.nom}
+                    error={!!fieldErrors.nom} helperText={fieldErrors.nom}
+                    onChange={(e) => { setField("nom", e.target.value); handleNameChange(e.target.value, form.prenom); }}
+                    onBlur={() => touch("nom")}
+                    InputProps={{
+                      endAdornment: form.nom ? <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} /> : null,
+                    }}
+                  />
                 </Grid>
-              </Box>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Prénom" required fullWidth size="small" value={form.prenom}
+                    error={!!fieldErrors.prenom} helperText={fieldErrors.prenom}
+                    onChange={(e) => { setField("prenom", e.target.value); handleNameChange(form.nom, e.target.value); }}
+                    onBlur={() => touch("prenom")}
+                    InputProps={{
+                      endAdornment: form.prenom ? <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} /> : null,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Téléphone" fullWidth size="small" value={form.telephone}
+                    onChange={(e) => setField("telephone", e.target.value)} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Tooltip title="Généré automatiquement depuis le nom et prénom" placement="top">
+                    <TextField
+                      label="Email" required fullWidth size="small" value={form.email}
+                      error={!!fieldErrors.email} helperText={fieldErrors.email}
+                      onChange={(e) => setField("email", e.target.value)}
+                      onBlur={() => touch("email")}
+                      sx={{ "& .MuiInputBase-root": { bgcolor: form.email ? "rgba(2,178,175,0.05)" : "action.hover" } }}
+                      InputProps={{
+                        endAdornment: (
+                          <Stack direction="row" alignItems="center" spacing={0.5}>
+                            <AutoFixHighIcon sx={{ fontSize: 14, color: TEAL, opacity: 0.7 }} />
+                            {form.email && <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} />}
+                          </Stack>
+                        ),
+                      }}
+                    />
+                  </Tooltip>
+                </Grid>
+              </Grid>
 
-              {selectedServiceDetails && (
-                <Box
-                  sx={{
-                    mt: 1,
-                    p: 2,
-                    borderRadius: 2,
-                    bgcolor: "action.hover",
-                    border: "1px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  <Typography fontWeight={700} variant="subtitle2" mb={1}>
-                    Détails du service
-                  </Typography>
+              {/* ── Affectation ── */}
+              <SectionTitle icon={<CalendarTodayIcon sx={{ fontSize: 14 }} />} label="Affectation" />
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={12} sm={6}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Date d'entrée" value={form.DateEntreeDate}
+                      onChange={(val) => { setField("DateEntreeDate", val); touch("DateEntreeDate"); }}
+                      slotProps={{
+                        textField: {
+                          required: true, fullWidth: true, size: "small",
+                          error: !!fieldErrors.DateEntreeDate,
+                          helperText: fieldErrors.DateEntreeDate,
+                          onBlur: () => touch("DateEntreeDate"),
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Autocomplete size="small" options={grades}
+                    getOptionLabel={(option) => option?.NomWWGradeFr || ""}
+                    value={grades.find((g) => Number(g.IDWWGrade) === Number(form.grade)) || null}
+                    isOptionEqualToValue={(option, value) => Number(option.IDWWGrade) === Number(value.IDWWGrade)}
+                    onChange={(e, nv) => setField("grade", nv ? Number(nv.IDWWGrade) : 0)}
+                    renderInput={(params) => <TextField {...params} label="Grade" />} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Autocomplete size="small" options={addresses || []}
+                    getOptionLabel={(option) => option?.AdresseComplete ?? ""}
+                    value={addresses.find((a) => a.IDAdresse === form.adresse) || null}
+                    onChange={(e, nv) => { setField("adresse", nv ? nv.IDAdresse : null); touch("adresse"); }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Adresse d'affectation" required
+                        error={!!fieldErrors.adresse} helperText={fieldErrors.adresse}
+                        onBlur={() => touch("adresse")} />
+                    )} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box onBlur={() => touch("service")}>
+                    <ServiceTreeSelect
+                      servicesFlat={servicesFlat}
+                      value={servicesFlat.find((s) => s.value === form.service) || null}
+                      onChange={(nv) => {
+                        if (!nv) { setField("service", ""); setSelectedServiceDetails(null); return; }
+                        setField("service", nv.value);
+                        setSelectedServiceDetails(nv);
+                        touch("service");
+                      }}
+                      required
+                    />
+                    {fieldErrors.service && (
+                      <Typography sx={{ fontSize: 11, color: "error.main", mt: 0.5, ml: 1.5 }}>
+                        {fieldErrors.service}
+                      </Typography>
+                    )}
+                  </Box>
+                </Grid>
 
-                  <Typography variant="caption" display="block">
-                    <strong>Chef Service :</strong>{" "}
-                    {selectedServiceDetails.NomChefService}{" "}
-                    {selectedServiceDetails.PrenomChefService}
-                  </Typography>
+                {selectedServiceDetails && (
+                  <Grid item xs={12}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "action.hover", border: "1px solid", borderColor: "divider", display: "flex", gap: 3, flexWrap: "wrap" }}>
+                      <Typography variant="body2"><strong>Chef Département :</strong> {selectedServiceDetails.nomChefDepartement || "-"} {selectedServiceDetails.prenomChefDepartement || ""}</Typography>
+                      <Typography variant="body2"><strong>Chef Service :</strong> {selectedServiceDetails.nomChefService || "-"} {selectedServiceDetails.prenomChefService || ""}</Typography>
+                      {selectedServiceDetails.nomSousChef && (
+                        <Typography variant="body2"><strong>Sous-chef :</strong> {selectedServiceDetails.nomSousChef} {selectedServiceDetails.prenomSousChef || ""}</Typography>
+                      )}
+                    </Box>
+                  </Grid>
+                )}
+              </Grid>
 
-                  <Typography variant="caption" display="block">
-                    <strong>Chef Département :</strong>{" "}
-                    {selectedServiceDetails.NomChefDepartement}{" "}
-                    {selectedServiceDetails.PrenomChefDepartement}
+              {/* ── Fonction ── */}
+              <SectionTitle icon={<WorkIcon sx={{ fontSize: 14 }} />} label="Fonction" />
+              <Grid container spacing={2} mb={2}>
+                <Grid item xs={12} sm={6}>
+                  <Autocomplete size="small" options={fonctions}
+                    getOptionLabel={(option) => typeof option === "string" ? option : option?.NomFonctionFr || ""}
+                    isOptionEqualToValue={(option, value) => Number(option.IDFonction) === Number(value.IDFonction)}
+                    value={fonctions.find((f) => Number(f.IDFonction) === Number(form.fonction)) || null}
+                    onChange={(e, nv) => { setField("fonction", nv ? Number(nv.IDFonction) : 0); setField("codeFonction", ""); }}
+                    renderOption={(props, option) => <li key={option.IDFonction} {...props}>{option.NomFonctionFr}</li>}
+                    renderInput={(params) => <TextField {...params} label="Fonction" required />} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Tooltip
+                    title={!selectedFonction ? "Sélectionnez d'abord une fonction" : ""}
+                    placement="top"
+                  >
+                    <span>
+                      <Autocomplete size="small" options={codesDisponibles}
+                        disabled={!selectedFonction}
+                        getOptionLabel={(option) => option?.NomCode || ""}
+                        value={codesDisponibles.find((c) => Number(c.Idcode) === Number(form.codeFonction)) || null}
+                        isOptionEqualToValue={(option, value) => Number(option.Idcode) === Number(value.Idcode)}
+                        onChange={(e, nv) => setField("codeFonction", nv ? Number(nv.Idcode) : 0)}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Code fonction" required
+                            sx={{ "& .MuiInputBase-root": { bgcolor: !selectedFonction ? "action.disabledBackground" : "transparent" } }} />
+                        )} />
+                    </span>
+                  </Tooltip>
+                </Grid>
+              </Grid>
+
+              {/* ── Paramètres ── */}
+              <SectionTitle icon={<SettingsIcon sx={{ fontSize: 14 }} />} label="Paramètres" />
+              <Grid container spacing={2} mb={1}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}>
+                    <span style={{ color: "#d32f2f" }}>*</span> Personnel
                   </Typography>
+                  <RadioGroup row value={form.SiTypePersonnel ? "true" : "false"}
+                    onChange={(e) => setField("SiTypePersonnel", e.target.value === "true")}>
+                    <FormControlLabel value="true" control={<Radio size="small" />} label="Oui" />
+                    <FormControlLabel value="false" control={<Radio size="small" />} label="Non" />
+                  </RadioGroup>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}>
+                    <span style={{ color: "#d32f2f" }}>*</span> Langue
+                  </Typography>
+                  <RadioGroup row value={form.siFrancais ? "true" : "false"}
+                    onChange={(e) => setField("siFrancais", e.target.value === "true")}>
+                    <FormControlLabel value="true" control={<Radio size="small" />} label="FR" />
+                    <FormControlLabel value="false" control={<Radio size="small" />} label="NL" />
+                  </RadioGroup>
+                </Grid>
+              </Grid>
+
+              {/* ── Preview membre ── */}
+              {showPreview && (
+                <Box sx={{ mt: 1, p: 1.5, borderRadius: 2, border: "1px solid", borderColor: TEAL, bgcolor: "rgba(2,178,175,0.04)" }}>
+                  <Typography sx={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.8 }}>
+                    Apercu du membre
+                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: "50%", bgcolor: "#E6F1FB", color: PRIMARY, fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {`${form.nom.charAt(0)}${form.prenom.charAt(0)}`.toUpperCase()}
+                    </Box>
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: PRIMARY }}>
+                        {form.nom.toUpperCase()} {form.prenom}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {form.email}{previewService ? ` · ${previewService}` : ""}
+                      </Typography>
+                    </Box>
+                  </Stack>
                 </Box>
               )}
             </Stack>
           )}
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button
-            onClick={handleClose}
-            color="inherit"
-            disabled={saving || loadingInit}
-          >
-            Annuler
-          </Button>
-
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            disabled={saving || loadingInit}
-          >
-            {saving ? "Enregistrement..." : "Valider"}
-          </Button>
+        <DialogActions sx={{ px: 3, py: 1.5, justifyContent: "space-between" }}>
+          <Typography variant="body2" color="text.secondary">
+            <span style={{ color: "#d32f2f" }}>*</span> Champs obligatoires
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            <Button onClick={handleClose} color="inherit" disabled={saving || loadingInit}>Annuler</Button>
+            <Button onClick={handleSubmit} variant="contained" disabled={saving || loadingInit}>
+              {saving ? "Enregistrement..." : "Valider"}
+            </Button>
+          </Stack>
         </DialogActions>
       </Dialog>
-    );
-  },
-);
+
+      {/* ── Snackbar ── */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={closeSnackbar} severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+});
 
 AjoutFormComponent.propTypes = {
   open: PropTypes.any,

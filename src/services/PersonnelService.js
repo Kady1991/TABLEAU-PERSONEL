@@ -37,6 +37,13 @@ const PersonnelService = {
   http.get(`/api/personnes/${id}`, {
     headers: { Accept: "application/xml" },
   }),
+
+  // Récupère les données XML via l'API de production (qui contient DateSortie)
+// getPersonXmlByIdProd: (id) =>
+//   axios.get(`https://server-iis.uccle.intra/APIPersonnelUccle/api/Personne/${id}`, {
+//     withCredentials: true,
+//     headers: { Accept: "application/xml" },
+//   }),
   
 
   getGrades: () => http.get("/api/infos/wwgrades"),

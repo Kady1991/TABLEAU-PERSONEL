@@ -225,7 +225,7 @@ function TableauComponent({
                 onMouseDown={(event) => event.stopPropagation()}
                 onClick={(event) => {
                   event.stopPropagation();
-                  navigate(`/Personnels/${params.row.IDPersonneService}`);
+                  navigate(`/personnels/${params.row.IDPersonneService}`);
                 }}
               >
                 <VisibilityIcon fontSize="small" />
@@ -295,38 +295,14 @@ function TableauComponent({
       { field: "NomRueNl", headerName: "LOCALISATION(nl)", width: 200 },
       { field: "NomRueFr", headerName: "LOCALISATION", width: 200 },
       { field: "Numero", headerName: "N°", width: 80 },
-      {
-        field: "NomChefService",
-        headerName: "NOM CHEF DU SERVICE",
-        width: 220,
-      },
-      {
-        field: "PrenomChefService",
-        headerName: "PRENOM CHEF DU SERVICE",
-        width: 220,
-      },
-      {
-        field: "EmailChefService",
-        headerName: "E-MAIL CHEF SERVICE",
-        width: 240,
-      },
+      { field: "NomChefService", headerName: "NOM CHEF DU SERVICE", width: 220 },
+      { field: "PrenomChefService", headerName: "PRENOM CHEF DU SERVICE", width: 220 },
+      { field: "EmailChefService", headerName: "E-MAIL CHEF SERVICE", width: 240 },
       { field: "NomDepartementNl", headerName: "DEPARTEMENT(nl)", width: 220 },
       { field: "NomDepartementFr", headerName: "DEPARTEMENTS", width: 220 },
-      {
-        field: "NomChefDepartement",
-        headerName: "NOM CHEF DEPARTEMENT",
-        width: 220,
-      },
-      {
-        field: "PrenomChefDepartement",
-        headerName: "PRENOM CHEF DEPARTEMENT",
-        width: 220,
-      },
-      {
-        field: "EmailChefDepartement",
-        headerName: "E-MAIL CHEF DEPARTEMENT",
-        width: 240,
-      },
+      { field: "NomChefDepartement", headerName: "NOM CHEF DEPARTEMENT", width: 220 },
+      { field: "PrenomChefDepartement", headerName: "PRENOM CHEF DEPARTEMENT", width: 220 },
+      { field: "EmailChefDepartement", headerName: "E-MAIL CHEF DEPARTEMENT", width: 240 },
       { field: "P+C:UENSION", headerName: "P+C:UENSION", width: 150 },
       { field: "TelPro", headerName: "TEL", width: 130 },
       { field: "Batiment", headerName: "Batiment", width: 100 },
@@ -372,15 +348,17 @@ function TableauComponent({
         {error && <Alert severity="error">{error}</Alert>}
 
         <Box
-          sx={{
-            flex: 1,
-            minHeight: 0,
-            width: "100%",
-            bgcolor: "background.paper",
-            height: compact ? height : "calc(100vh - 190px)",
-            overflow: "hidden",
-          }}
-        >
+  sx={{
+    flex: 1,
+    minHeight: 0,
+    width: "100%",
+    bgcolor: "background.paper",
+    height: compact ? height : "calc(100vh - 190px)",
+    overflow: "hidden",
+    borderRadius: "12px",
+    border: "1px solid rgba(0,0,0,0.08)",
+  }}
+>
           <DataGrid
             rows={rows}
             columns={columns}
@@ -424,12 +402,35 @@ function TableauComponent({
                 alignItems: "center",
               },
               "& .row-archived": {
-                opacity: 0.6,
+                opacity: 0.55,
+                background: "#fff8f8",
+              },
+              "& .row-archived:hover": {
+                background: "#fdecea !important",
               },
             }}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
+              },
+              columns: {
+                columnVisibilityModel: {
+                  NomFonctionNl: false,
+                  NomWWGradeNl: false,
+                  NomServiceNl: false,
+                  NomDepartementNl: false,
+                  NomRueFr: false,
+                  NomRueNl: false,
+                  Numero: false,
+                  Batiment: false,
+                  BatimentNl: false,
+                  Etage: false,
+                  PrenomChefService: false,
+                  EmailChefService: false,
+                  PrenomChefDepartement: false,
+                  EmailChefDepartement: false,
+                  "P+C:UENSION": false,
+                },
               },
             }}
           />
