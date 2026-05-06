@@ -56,7 +56,8 @@ export const buildBreadcrumb = ({ type, id, departements }) => {
       d?.services?.some((s) => s?.idService === id),
     );
     const svc = dept?.services?.find((s) => s?.idService === id);
-    if (!svc?.sousServices?.length) return null; // feuille
+    if (!svc) return null;
+    // if (!svc?.sousServices?.length) return null; // feuille
     return {
       label: svc?.nomServiceFr ?? svc?.nomServiceNl,
       breadcrumb: [
@@ -84,7 +85,8 @@ export const buildBreadcrumb = ({ type, id, departements }) => {
       s?.sousServices?.some((ss) => findSS([ss], id)),
     );
     const ssPath = buildSSPath(svc?.sousServices ?? [], id);
-
+    console.log("found", found)
+    
     return {
       label: found?.nomSousServiceFr ?? found?.nomSousServiceNl,
       breadcrumb: [
