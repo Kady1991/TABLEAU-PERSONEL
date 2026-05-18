@@ -8,7 +8,7 @@ function PersonneListPage() {
 
   return (
     <Box sx={{ height: "calc(94vh - 64px)", display: "flex", flexDirection: "column" }}>
-      <Typography variant="h1" fontSize={25} fontWeight={500} color={PRIMARY} mb={2}>
+      <Typography variant="h1">
         Liste du personnel
       </Typography>
       <TableauComponent compact={false} showHeader showAddButton nonArchivedOnly />

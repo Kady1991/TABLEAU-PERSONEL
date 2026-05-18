@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
-import ApartmentIcon from "@mui/icons-material/Apartment.js";
+//import React from "react";
+import { Box, Typography } from "@mui/material";
+//import ApartmentIcon from "@mui/icons-material/Apartment.js";
 import AffectationsComponent from "../../components/Affectations/AffectationsComponent";
 
 function AffectationsPage() {
@@ -26,16 +26,8 @@ function AffectationsPage() {
           <Box
             sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 0.5 }}
           >
-            <Typography variant="h1" fontWeight={700}>
-              Affectations
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{
-                fontWeight: 500,
-                color: "text.secondary",
-              }}
-            >
+            <Typography variant="h1">Affectations</Typography>
+            <Typography variant="h2">
               Structure Administration communale Uccle
             </Typography>
           </Box>

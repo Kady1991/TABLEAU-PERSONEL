@@ -5,7 +5,6 @@ import {
   Box,
   Card,
   CardContent,
-  CircularProgress,
   Grid,
   Stack,
   Tooltip,
@@ -20,7 +19,9 @@ import "dayjs/locale/fr";
 import { XMLParser } from "fast-xml-parser";
 import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
+import PersonnelLoader from "../../components/Loading/PersonnelLoaderComponent.jsx";
 import PropTypes from "prop-types";
+
 dayjs.extend(relativeTime);
 dayjs.locale("fr");
 
@@ -116,7 +117,6 @@ export default function PersonnelArchivesListPage() {
         }
       }
 
-      // Étape 1 : affiche les archivés immédiatement
       const res = await PersonnelService.getAll();
       const all = Array.isArray(res.data) ? res.data : [];
       const archived = all
@@ -126,7 +126,6 @@ export default function PersonnelArchivesListPage() {
       setRows(archived);
       setLoading(false);
 
-      // Étape 2 : enrichit avec les dates XML
       setLoadingDates(true);
       const enriched = await Promise.all(
         archived.map(async (p) => {
@@ -139,7 +138,6 @@ export default function PersonnelArchivesListPage() {
         })
       );
 
-      // Re-trie après enrichissement
       const sorted = [...enriched].sort(
         (a, b) => Number(b.IDPersonneService) - Number(a.IDPersonneService)
       );
@@ -187,11 +185,7 @@ export default function PersonnelArchivesListPage() {
   // ── Colonnes DataGrid ───────────────────────────────────────────────────────
   const columns = useMemo(
     () => [
-      {
-        field: "IDPersonneService",
-        headerName: "ID",
-        width: 80,
-      },
+      { field: "IDPersonneService", headerName: "ID", width: 80 },
       {
         field: "actions",
         headerName: "Actions",
@@ -212,11 +206,11 @@ export default function PersonnelArchivesListPage() {
           </Stack>
         ),
       },
-      { field: "NomPersonne", headerName: "NOM", width: 180, hideable: false },
-      { field: "PrenomPersonne", headerName: "PRÉNOM", width: 180, hideable: false },
-      { field: "Email", headerName: "E-MAIL", width: 260, hideable: false },
-      { field: "NomDepartementFr", headerName: "DÉPARTEMENT", width: 220 },
-      { field: "NomServiceFr", headerName: "SERVICE", width: 220 },
+      { field: "NomPersonne",      headerName: "NOM",            width: 180, hideable: false },
+      { field: "PrenomPersonne",   headerName: "PRÉNOM",         width: 180, hideable: false },
+      { field: "Email",            headerName: "E-MAIL",         width: 260, hideable: false },
+      { field: "NomDepartementFr", headerName: "DÉPARTEMENT",    width: 220 },
+      { field: "NomServiceFr",     headerName: "SERVICE",        width: 220 },
       {
         field: "DateEntree",
         headerName: "DATE D'ENTRÉE",
@@ -229,22 +223,25 @@ export default function PersonnelArchivesListPage() {
         width: 160,
         renderCell: (params) => safeFormat(params.value) || "-",
       },
-      { field: "NomFonctionFr", headerName: "FONCTION", width: 220 },
-      { field: "NomWWGradeFr", headerName: "GRADE", width: 200 },
-      { field: "NomRueFr", headerName: "LOCALISATION", width: 200 },
-      { field: "TelPro", headerName: "TÉL", width: 130 },
+      { field: "NomFonctionFr", headerName: "FONCTION",    width: 220 },
+      { field: "NomWWGradeFr",  headerName: "GRADE",       width: 200 },
+      { field: "NomRueFr",      headerName: "LOCALISATION", width: 200 },
+      { field: "TelPro",        headerName: "TÉL",         width: 130 },
     ],
     [refreshData]
   );
 
   if (error) return <Alert severity="error">{error}</Alert>;
 
+  // ── Loader principal ─────────────────────────────────────────────────────────
+  if (loading) return <PersonnelLoader />;
+
   return (
     <Box sx={{ fontFamily: "Roboto, Arial, sans-serif" }}>
 
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography sx={{ fontSize: 25, fontWeight: 700, color: PRIMARY ,}}>
+        <Typography variant="h1">
           Personnels archivés
         </Typography>
         <Tooltip title="Retour à la liste" arrow>
@@ -271,7 +268,7 @@ export default function PersonnelArchivesListPage() {
         <Grid item xs={12} sm={4}>
           <KpiCard
             label="Total archivés"
-            value={loading ? "…" : rows.length}
+            value={rows.length}
             sub="membres archivés"
             color={PRIMARY}
           />
@@ -279,7 +276,7 @@ export default function PersonnelArchivesListPage() {
         <Grid item xs={12} sm={4}>
           <KpiCard
             label="Cette année"
-            value={loading ? "…" : departsThisYear}
+            value={departsThisYear}
             sub={`départs en ${thisYear}`}
             color={RED}
           />
@@ -288,7 +285,7 @@ export default function PersonnelArchivesListPage() {
           <KpiCard
             label="Dernière archive"
             value={
-              loading || loadingDates
+              loadingDates
                 ? "…"
                 : lastArchived
                 ? `${lastArchived.NomPersonne ?? ""} ${lastArchived.PrenomPersonne ?? ""}`.trim()
@@ -319,7 +316,26 @@ export default function PersonnelArchivesListPage() {
             border: "1px solid rgba(2,178,175,0.2)",
           }}
         >
-          <CircularProgress size={12} sx={{ color: TEAL }} />
+          {/* Petits points pulsants à la place du CircularProgress */}
+          <Stack direction="row" spacing="4px" alignItems="center">
+            {[0, 1, 2].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: "50%",
+                  bgcolor: TEAL,
+                  "@keyframes blink": {
+                    "0%,100%": { opacity: 0.3 },
+                    "50%":     { opacity: 1 },
+                  },
+                  animation: "blink 1.2s ease-in-out infinite",
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              />
+            ))}
+          </Stack>
           <Typography sx={{ fontSize: 12, color: "#007a78" }}>
             Chargement des dates en cours…
           </Typography>
@@ -327,18 +343,19 @@ export default function PersonnelArchivesListPage() {
       )}
 
       {/* DataGrid */}
-      <Box sx={{
-  height: "calc(100vh - 320px)",
-  bgcolor: "background.paper",
-  borderRadius: "12px",
-  border: "1px solid rgba(0,0,0,0.08)",
-  overflow: "hidden",
-}}>
+      <Box
+        sx={{
+          height: "calc(100vh - 320px)",
+          bgcolor: "background.paper",
+          borderRadius: "12px",
+          border: "1px solid rgba(0,0,0,0.08)",
+          overflow: "hidden",
+        }}
+      >
         <DataGrid
           rows={rows}
           columns={columns}
           getRowId={(row) => row?.IDPersonneService ?? row?.id}
-          loading={loading}
           checkboxSelection
           disableRowSelectionOnClick
           disableColumnReorder
@@ -352,29 +369,18 @@ export default function PersonnelArchivesListPage() {
                 utf8WithBom: true,
                 allColumns: true,
               },
-              printOptions: {
-                disableToolbarButton: true,
-              },
+              printOptions: { disableToolbarButton: true },
             },
           }}
           initialState={{
-            pagination: {
-              paginationModel: { pageSize: 25 },
-            },
+            pagination: { paginationModel: { pageSize: 25 } },
           }}
           pageSizeOptions={[10, 25, 50, 100]}
           sx={{
             border: "none",
-            "& .MuiDataGrid-cell": {
-              display: "flex",
-              alignItems: "center",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              borderBottom: "1px solid #d7e1ef",
-            },
-            "& .MuiDataGrid-row": {
-              borderBottom: "1px solid #d7e1ef",
-            },
+            "& .MuiDataGrid-cell": { display: "flex", alignItems: "center" },
+            "& .MuiDataGrid-columnHeaders": { borderBottom: "1px solid #d7e1ef" },
+            "& .MuiDataGrid-row": { borderBottom: "1px solid #d7e1ef" },
           }}
         />
       </Box>

@@ -23,37 +23,29 @@ function DeleteMembreComponent({
   nomPersonne,
   prenomPersonne,
   email,
-  refreshData,
   onArchiveSuccess,
   onArchiveLocal,
 }) {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [open,         setOpen]         = useState(false);
+  const [loading,      setLoading]      = useState(false);
 
-  const handleClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setOpen(true);
-  };
+  const handleClick = (e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); };
 
-  const handleClose = (event) => {
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
+  const handleClose = (e) => {
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
     if (loading) return;
     setOpen(false);
     setSelectedDate(null);
   };
 
-  const handleConfirm = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
     if (!selectedDate || !dayjs(selectedDate).isValid()) {
-      onArchiveSuccess?.({
-        type: "error",
-        text: "Veuillez sélectionner une date de sortie.",
-      });
+      onArchiveSuccess?.({ type: "error", text: "Veuillez sélectionner une date de sortie." });
       return;
     }
 
@@ -61,45 +53,30 @@ function DeleteMembreComponent({
     setLoading(true);
 
     try {
-      // 1. Exécution de l'archivage côté serveur
       await PersonnelService.archive(IDPersonneService, formattedDate);
 
-      // 2. Mise à jour LOCALE immédiate du tableau
-      onArchiveLocal?.(IDPersonneService);
-
-      // 3. Fermeture de la modale et reset
+      // 1. Ferme la modale en premier
       setOpen(false);
       setSelectedDate(null);
 
-      // 4. Notification de succès
+      // 2. Notification
       onArchiveSuccess?.({
         type: "success",
-        text: `La personne ${prenomPersonne || ""} ${nomPersonne || ""} a été archivée avec succès.`,
+        text: `${prenomPersonne || ""} ${nomPersonne || ""} a été archivé(e) avec succès.`,
       });
 
-      // 5. Nettoyage des caches et rafraîchissement global
-      if (PersonnelService.clearCaches) {
-          PersonnelService.clearCaches();
-      }
+      // 3. Nettoyage caches
+      PersonnelService.clearCaches?.();
+      sessionStorage.removeItem("personnels_archives_cache_v2_dates");
 
-      //  Vide aussi le cache de la page archives
-    sessionStorage.removeItem("personnels_archives_cache_v2_dates");
-      
-      // On déclenche le refreshData après un très court délai pour laisser l'état local se stabiliser
+      // 4. Mise à jour locale après que le dialog soit complètement fermé
       setTimeout(() => {
-        refreshData?.();
-      }, 100);
+        onArchiveLocal?.(IDPersonneService);
+      }, 150);
 
     } catch (error) {
-      console.error(
-        "Erreur archivage :",
-        error?.response?.data || error?.message
-      );
-
-      onArchiveSuccess?.({
-        type: "error",
-        text: "L'archivage a échoué.",
-      });
+      console.error("Erreur archivage :", error?.response?.data || error?.message);
+      onArchiveSuccess?.({ type: "error", text: "L'archivage a échoué." });
     } finally {
       setLoading(false);
     }
@@ -110,7 +87,7 @@ function DeleteMembreComponent({
       <IconButton
         size="small"
         title={loading ? "Archivage..." : "Archiver"}
-        onMouseDown={(event) => event.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         onClick={handleClick}
         disabled={loading}
         sx={{ ml: 0.5, color: "error.main" }}
@@ -123,8 +100,8 @@ function DeleteMembreComponent({
         onClose={handleClose}
         fullWidth
         maxWidth="xs"
-        onClick={(event) => event.stopPropagation()}
-        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <DialogTitle>Archiver la personne</DialogTitle>
 
@@ -132,9 +109,7 @@ function DeleteMembreComponent({
           <Stack spacing={1.2}>
             <Typography>
               Vous allez archiver :{" "}
-              <strong>
-                {prenomPersonne} {nomPersonne}
-              </strong>
+              <strong>{prenomPersonne} {nomPersonne}</strong>
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
@@ -142,7 +117,7 @@ function DeleteMembreComponent({
             </Typography>
 
             <Alert severity="info">
-              Sélectionnez une <strong>date de sortie</strong> avant d’archiver.
+              Sélectionnez une <strong>date de sortie</strong> avant d&apos;archiver.
             </Alert>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -154,8 +129,8 @@ function DeleteMembreComponent({
                   textField: {
                     fullWidth: true,
                     size: "small",
-                    onClick: (event) => event.stopPropagation(),
-                    onMouseDown: (event) => event.stopPropagation(),
+                    onClick: (e) => e.stopPropagation(),
+                    onMouseDown: (e) => e.stopPropagation(),
                   },
                 }}
               />
@@ -164,15 +139,8 @@ function DeleteMembreComponent({
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="inherit" disabled={loading}>
-            Annuler
-          </Button>
-          <Button
-            type="button"
-            onClick={handleConfirm}
-            variant="contained"
-            disabled={loading}
-          >
+          <Button onClick={handleClose} color="inherit" disabled={loading}>Annuler</Button>
+          <Button type="button" onClick={handleConfirm} variant="contained" disabled={loading}>
             {loading ? "Archivage..." : "Archiver"}
           </Button>
         </DialogActions>
@@ -182,14 +150,13 @@ function DeleteMembreComponent({
 }
 
 DeleteMembreComponent.propTypes = {
-  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
-  nomPersonne: PropTypes.string,
-  prenomPersonne: PropTypes.string,
-  email: PropTypes.string,
-  refreshData: PropTypes.func,
-  onArchiveSuccess: PropTypes.func,
-  onArchiveLocal: PropTypes.func,
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  nomPersonne:       PropTypes.string,
+  prenomPersonne:    PropTypes.string,
+  email:             PropTypes.string,
+  refreshData:       PropTypes.func,
+  onArchiveSuccess:  PropTypes.func,
+  onArchiveLocal:    PropTypes.func,
 };
 
 export default DeleteMembreComponent;
