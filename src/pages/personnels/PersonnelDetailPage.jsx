@@ -89,40 +89,82 @@ export default function PersonnelDetail() {
   const [error,      setError]      = useState("");
   const [personData, setPersonData] = useState(null);
 
-  const loadData = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const [personRes, gradesRes, fonctionsRes] = await Promise.all([
-        PersonnelService.getById(id),
-        PersonnelService.getGrades(),
-        PersonnelService.getFonctions(),
-      ]);
-      const person    = personRes.data || {};
-      const grades    = Array.isArray(gradesRes.data)    ? gradesRes.data    : [];
-      const fonctions = Array.isArray(fonctionsRes.data) ? fonctionsRes.data : [];
+ const loadData = async () => {
+  setLoading(true);
+  setError("");
+  try {
+    const [personRes, gradesRes, fonctionsRes] = await Promise.all([
+      PersonnelService.getById(id),
+      PersonnelService.getGrades(),
+      PersonnelService.getFonctions(),
+    ]);
 
-      const gradeId    = person.WWGradeID ?? person.IDWWGrade ?? person.GradeID ?? person.WWGrade ?? person.IdWWGrade ?? person.IdGrade ?? null;
-      const fonctionId = person.FonctionID ?? person.IDFonction ?? person.IdFonction ?? null;
+    const person    = personRes.data || {};
+    const grades    = Array.isArray(gradesRes.data)    ? gradesRes.data    : [];
+    const fonctions = Array.isArray(fonctionsRes.data) ? fonctionsRes.data : [];
 
-      const gradeTrouve =
-        grades.find((g) => Number(g.IDWWGrade)  === Number(gradeId)) ||
-        grades.find((g) => Number(g.WWGradeID)  === Number(gradeId)) ||
-        grades.find((g) => Number(g.IdWWGrade)  === Number(gradeId)) || null;
-      const fonctionTrouvee =
-        fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
-        fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) || null;
+    // ── Logs de diagnostic ──────────────────────────────────────────────
+console.log("📋 getById :", JSON.stringify({
+  NomServiceFr:       person.NomServiceFr,
+  NomSousServiceFr:   person.NomSousServiceFr,
 
-      const nomGrade    = person.NomWWGradeFr ?? person.NomGradeFr ?? person.LibelleGradeFr ?? gradeTrouve?.NomWWGradeFr ?? gradeTrouve?.NomGradeFr ?? null;
-      const nomFonction = person.NomFonctionFr ?? person.LibelleFonctionFr ?? fonctionTrouvee?.NomFonctionFr ?? fonctionTrouvee?.LibelleFonctionFr ?? null;
+  NomSousChef:        person.NomSousChef,
+  PrenomSousChef:     person.PrenomSousChef,
 
-      setPersonData({ ...person, NomWWGradeFr: nomGrade, NomFonctionFr: nomFonction });
-    } catch (e) {
-      setError(e?.message || "Erreur lors du chargement");
-    } finally {
-      setLoading(false);
-    }
-  };
+  NomChefService:     person.NomChefService,
+  NomChefDepartement: person.NomChefDepartement,
+
+  NomDepartementFr:   person.NomDepartementFr,
+  ServiceID:          person.ServiceID,
+  SousServiceID:      person.SousServiceID,
+}, null, 2));
+
+    const { sousServiceService } = await import("../../services/AffectationsService.js");
+    const sousServRes  = await sousServiceService.getAll();
+    const sousServData = Array.isArray(sousServRes?.data) ? sousServRes.data : [];
+    const sousServTrouve = sousServData.find(
+      ss => ss.nomSousServiceFr === person.NomSousServiceFr
+    );
+    console.log(" sousservice trouvé :", JSON.stringify(sousServTrouve, null, 2));
+    // ────────────────────────────────────────────────────────────────────
+
+    const gradeId    = person.WWGradeID ?? person.IDWWGrade ?? person.GradeID ?? person.WWGrade ?? person.IdWWGrade ?? person.IdGrade ?? null;
+    const fonctionId = person.FonctionID ?? person.IDFonction ?? person.IdFonction ?? null;
+
+    const gradeTrouve =
+      grades.find((g) => Number(g.IDWWGrade)  === Number(gradeId)) ||
+      grades.find((g) => Number(g.WWGradeID)  === Number(gradeId)) ||
+      grades.find((g) => Number(g.IdWWGrade)  === Number(gradeId)) || null;
+    const fonctionTrouvee =
+      fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
+      fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) || null;
+
+    const nomGrade    = person.NomWWGradeFr ?? person.NomGradeFr ?? person.LibelleGradeFr ?? gradeTrouve?.NomWWGradeFr ?? gradeTrouve?.NomGradeFr ?? null;
+    const nomFonction = person.NomFonctionFr ?? person.LibelleFonctionFr ?? fonctionTrouvee?.NomFonctionFr ?? fonctionTrouvee?.LibelleFonctionFr ?? null;
+
+    // setPersonData({ ...person, NomWWGradeFr: nomGrade, NomFonctionFr: nomFonction });
+    setPersonData({
+  ...person,
+
+  NomWWGradeFr: nomGrade,
+  NomFonctionFr: nomFonction,
+
+  NomSousChef:
+    person.NomSousChef ||
+    sousServTrouve?.nomSousChef ||
+    null,
+
+  PrenomSousChef:
+    person.PrenomSousChef ||
+    sousServTrouve?.prenomSousChef ||
+    null,
+});
+  } catch (e) {
+    setError(e?.message || "Erreur lors du chargement");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => { loadData(); }, [id]); // eslint-disable-line
 
@@ -225,15 +267,43 @@ export default function PersonnelDetail() {
           </Box>
 
           {/* Hiérarchie */}
-          {hasHierarchie && (
-            <Box sx={t.sectionLast}>
-              <SectionLabel>Hiérarchie</SectionLabel>
-              <Stack direction="row" spacing={1.25}>
-                <HierarchyCard role="Chef de service"     nom={p.NomChefService}     prenom={p.PrenomChefService} />
-                <HierarchyCard role="Chef de département" nom={p.NomChefDepartement} prenom={p.PrenomChefDepartement} />
-              </Stack>
-            </Box>
-          )}
+{/* Hiérarchie */}
+{hasHierarchie && (
+  <Box sx={t.sectionLast}>
+    <SectionLabel>Hiérarchie</SectionLabel>
+
+    <Stack direction="row" spacing={1.25} flexWrap="wrap">
+
+      {/* N+1 */}
+      {p.NomSousChef && (
+        <HierarchyCard
+          role="Sous-chef"
+          nom={p.NomSousChef}
+          prenom={p.PrenomSousChef}
+        />
+      )}
+
+      {/* N+2 */}
+      {p.NomChefService && (
+        <HierarchyCard
+          role={p.NomSousChef ? "Chef de service" : "Chef de service"}
+          nom={p.NomChefService}
+          prenom={p.PrenomChefService}
+        />
+      )}
+
+      {/* N+3 */}
+      {p.NomChefDepartement && (
+        <HierarchyCard
+          role="Chef de département"
+          nom={p.NomChefDepartement}
+          prenom={p.PrenomChefDepartement}
+        />
+      )}
+
+    </Stack>
+  </Box>
+)}
 
         </Box>
       )}

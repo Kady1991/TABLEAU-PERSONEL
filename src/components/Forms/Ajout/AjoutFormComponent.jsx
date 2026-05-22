@@ -123,6 +123,7 @@ const buildFlatOptions = (departementsList, servicesList) => {
             value:          `child-${childId}`,
             realServiceId:  childId,
             parentServiceId: svcId,
+            parentSousServiceId: sousId,
             hasChildren:    false,
             label:          "—— " + (child.nomSousServiceFr ?? ""),
             type:           "child",
@@ -297,7 +298,17 @@ const AjoutFormComponent = forwardRef(({ open, onClose, onMemberUpdate, refreshD
         Email:           form.email?.trim(),
         TelPro:          form.telephone ? String(form.telephone).trim() : null,
         DateEntree:      form.DateEntreeDate ? dayjs(form.DateEntreeDate).format("YYYY-MM-DD") : null,
-        ServiceID:       selectedServiceDetails?.realServiceId ?? null,
+        ServiceID:
+  selectedServiceDetails?.type === "service"
+    ? selectedServiceDetails.realServiceId
+    : selectedServiceDetails.parentServiceId,
+SousServiceID:
+  selectedServiceDetails?.type === "child"
+    ? selectedServiceDetails.parentSousServiceId
+    : selectedServiceDetails?.type === "sousService"
+      ? selectedServiceDetails.realServiceId
+      : null,
+
         AdresseID:       form.adresse  ? Number(form.adresse)  : null,
         WWGradeID:       Number(form.grade)       || 0,
         IDWWGrade:       Number(form.grade)       || 0,
@@ -308,6 +319,17 @@ const AjoutFormComponent = forwardRef(({ open, onClose, onMemberUpdate, refreshD
         TypePersonnelID: form.SiTypePersonnel ? Number(form.TypePersonnelID) : 0,
         SiArchive:       false,
       };
+
+      console.log("════════════════════");
+console.log("selectedServiceDetails :", selectedServiceDetails);
+
+console.log("TYPE :", selectedServiceDetails?.type);
+console.log("realServiceId :", selectedServiceDetails?.realServiceId);
+console.log("parentServiceId :", selectedServiceDetails?.parentServiceId);
+
+console.log("PAYLOAD :", payload);
+console.log("════════════════════");
+
 
       const response = await PersonnelService.create(payload);
 
