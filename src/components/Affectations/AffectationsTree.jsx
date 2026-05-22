@@ -136,6 +136,12 @@ function AffectationsTree({ onSelect, onAdd, selectedId, refreshKey }) {
   const theme = useTheme();
 
   useEffect(() => {
+    departementService.getAll().then((res) => {
+      console.log("RAW departements:", JSON.stringify(res.data?.[0], null, 2));
+    });
+  }, []);
+
+  useEffect(() => {
     if (selectedId === "" || selectedId === null) {
       setExpanded([]);
     }
