@@ -338,10 +338,13 @@ console.log("════════════════════");
 
       clearCaches();
 
-      const newId        = response?.data?.IDPersonneService || response?.data?.id || null;
+      const refreshRes = await PersonnelService.getAll();
+      const allPersonnels = Array.isArray(refreshRes?.data)  ? refreshRes.data  : [];
+      const createdPerson = allPersonnels.sort(  (a, b) =>
+      Number(b.IDPersonneService) - Number(a.IDPersonneService)  ).find(   (p) =>  String(p.Email).toLowerCase() ===  String(form.email).toLowerCase()  );
+      const newId = createdPerson?.IDPersonneService || null;
       const serviceLabel = selectedServiceDetails?.label?.replace(/^[-— ]+/, "") || "";
       const deptLabel    = selectedServiceDetails?.nomDepartementFr || "";
-
       const addedMember = {
         ...payload,
         IDPersonneService: newId,
@@ -358,7 +361,6 @@ console.log("════════════════════");
         BatimentNl:        selectedAddress?.BatimentNl || "",
         Etage:             selectedAddress?.Etage     || "",
       };
-
       if (typeof onMemberUpdate === "function") onMemberUpdate(addedMember);
       if (typeof refreshData    === "function") await refreshData();
 

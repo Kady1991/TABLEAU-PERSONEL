@@ -70,9 +70,8 @@ function DeleteMembreComponent({
       sessionStorage.removeItem("personnels_archives_cache_v2_dates");
 
       // 4. Mise à jour locale après que le dialog soit complètement fermé
-      setTimeout(() => {
-        onArchiveLocal?.(IDPersonneService);
-      }, 150);
+     // 4. Mise à jour locale immédiate
+onArchiveLocal?.(IDPersonneService);
 
     } catch (error) {
       console.error("Erreur archivage :", error?.response?.data || error?.message);

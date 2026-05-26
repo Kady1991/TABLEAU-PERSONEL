@@ -54,21 +54,32 @@ const buildFlatOptions = (servicesList) => {
   servicesList.forEach((s) => {
     const svcId = s.idService ?? s.IDService;
     const hasSousServices = s.sousServices && s.sousServices.length > 0;
-    result.push({
-      id: `service-${svcId}`,
-      value: `service-${svcId}`,
-      realServiceId: svcId,
-      parentServiceId: null,
-      hasChildren: hasSousServices,
-      label: s.nomServiceFr ?? s.NomServiceFr ?? "",
-      type: "service",
-      nomChefDepartement: "",
-      prenomChefDepartement: "",
-      nomChefService: s.nomChefService ?? s.NomChefService ?? "",
-      prenomChefService: s.prenomChefService ?? s.PrenomChefService ?? "",
-      nomSousChef: "",
-      prenomSousChef: "",
-    });
+result.push({
+  id: `service-${svcId}`,
+  value: `service-${svcId}`,
+
+  realServiceId: svcId,
+
+  parentServiceId: null,
+  parentSousServiceId: null,
+
+  hasChildren: hasSousServices,
+
+  label: s.nomServiceFr ?? s.NomServiceFr ?? "",
+  type: "service",
+
+  nomChefDepartement: "",
+  prenomChefDepartement: "",
+
+  nomChefService:
+    s.nomChefService ?? s.NomChefService ?? "",
+
+  prenomChefService:
+    s.prenomChefService ?? s.PrenomChefService ?? "",
+
+  nomSousChef: "",
+  prenomSousChef: "",
+});
     s.sousServices?.forEach((ss) => {
       const sousId = ss.idSousService ?? ss.IDSousService;
       const hasChildren = ss.children && ss.children.length > 0;
@@ -183,6 +194,7 @@ const initialForm = {
   AdresseID: "",
   serviceValue: "",   // valeur interne ServiceTreeSelect (ex: "sous-42")
   ServiceID: "",      // realServiceId envoyé à l'API
+  SousServiceID: "",
   FonctionID: "",
   CodeID: "",
   SiFrancais: true,
@@ -460,6 +472,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         WWGradeID: form.WWGradeID || null,
         AdresseID: form.AdresseID,
         ServiceID: form.ServiceID,       // realServiceId
+        SousServiceID: form.SousServiceID || null,
         FonctionID: form.FonctionID || null,
         CodeID: form.CodeID || null,
         SiFrancais: form.SiFrancais,
@@ -678,17 +691,36 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                     value={
                       servicesFlat.find((s) => s.value === form.serviceValue) || null
                     }
-                    onChange={(nv) => {
-                      if (!nv) {
-                        setField("serviceValue", "");
-                        setField("ServiceID", "");
-                        setSelectedServiceDetails(null);
-                        return;
-                      }
-                      setField("serviceValue", nv.value);
-                      setField("ServiceID", nv.realServiceId);
-                      setSelectedServiceDetails(nv);
-                    }}
+                 onChange={(nv) => {
+  if (!nv) {
+    setField("serviceValue", "");
+    setField("ServiceID", "");
+    setField("SousServiceID", "");
+    setSelectedServiceDetails(null);
+    return;
+  }
+
+  setField("serviceValue", nv.value);
+
+  // Service racine
+  const finalServiceId =
+    nv.type === "service"
+      ? nv.realServiceId
+      : nv.parentServiceId;
+
+  // Sous-service
+  const finalSousServiceId =
+    nv.type === "child"
+      ? nv.parentSousServiceId
+      : nv.type === "sousService"
+        ? nv.realServiceId
+        : null;
+
+  setField("ServiceID", finalServiceId);
+  setField("SousServiceID", finalSousServiceId);
+
+  setSelectedServiceDetails(nv);
+}}
                     required
                   />
                 </Grid>

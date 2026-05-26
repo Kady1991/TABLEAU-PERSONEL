@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import "dayjs/locale/fr";
 import {
@@ -14,161 +15,266 @@ import {
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import ArrowBackIcon     from "@mui/icons-material/ArrowBack";
-import RefreshIcon       from "@mui/icons-material/Refresh";
-import EmailIcon         from "@mui/icons-material/Email";
-import PhoneIcon         from "@mui/icons-material/Phone";
-import BusinessIcon      from "@mui/icons-material/Business";
-import AccountTreeIcon   from "@mui/icons-material/AccountTree";
-import EmojiEventsIcon   from "@mui/icons-material/EmojiEvents";
-import WorkIcon          from "@mui/icons-material/Work";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import LocationOnIcon    from "@mui/icons-material/LocationOn";
-import PersonnelService  from "../../services/PersonnelService.js";
+import ArrowBackIcon        from "@mui/icons-material/ArrowBack";
+import RefreshIcon          from "@mui/icons-material/Refresh";
+import EmailIcon            from "@mui/icons-material/Email";
+import PhoneIcon            from "@mui/icons-material/Phone";
+import BusinessIcon         from "@mui/icons-material/Business";
+import AccountTreeIcon      from "@mui/icons-material/AccountTree";
+import EmojiEventsIcon      from "@mui/icons-material/EmojiEvents";
+import WorkIcon             from "@mui/icons-material/Work";
+import CalendarMonthIcon    from "@mui/icons-material/CalendarMonth";
+import EventBusyIcon        from "@mui/icons-material/EventBusy";
+import LocationOnIcon       from "@mui/icons-material/LocationOn";
+import PersonnelService     from "../../services/PersonnelService.js";
 
 dayjs.locale("fr");
 
-// ── SectionLabel ──────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// SectionLabel
+// ─────────────────────────────────────────────────────────────
 function SectionLabel({ children }) {
-  const { custom: { detail: t } } = useTheme();
-  return <Typography sx={t.sectionLabel}>{children}</Typography>;
+  return (
+    <Typography sx={{
+      fontSize: 10,
+      fontWeight: 600,
+      color: "secondary.main",
+      textTransform: "uppercase",
+      letterSpacing: "0.1em",
+      pt: 1.75,
+      pb: 1.25,
+      borderTop: "0.5px solid",
+      borderColor: "divider",
+    }}>
+      {children}
+    </Typography>
+  );
 }
+SectionLabel.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
-// ── InfoRow ───────────────────────────────────────────────────
-function InfoRow({ icon, label, value, accent, muted }) {
-  const theme = useTheme();
-  const t     = theme.custom.detail;
-  if (value === undefined) return null;
+// ─────────────────────────────────────────────────────────────
+// InfoRow
+// ─────────────────────────────────────────────────────────────
+function InfoRow({ icon, label, value, accent, muted, danger, last }) {
+  if (value === undefined || value === null) return null;
 
   return (
-    <Stack direction="row" alignItems="center" spacing={1.5} sx={t.infoRow}>
-      {/* iconSm gère le fontSize de toutes les icônes InfoRow */}
-      <Box sx={{ ...t.infoIconBox, bgcolor: `${theme.palette.secondary.main}18`, color: theme.palette.secondary.main }}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1.5}
+      sx={{
+        py: 1.25,
+        borderBottom: last ? "none" : "0.5px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Box sx={{
+        width: 28,
+        height: 28,
+        borderRadius: 1.75,
+        background: "rgba(2,178,175,0.1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        "& svg": { fontSize: 14, color: "secondary.main" },
+      }}>
         {icon}
       </Box>
-      <Typography sx={t.infoLabel}>{label}</Typography>
+
+      <Typography sx={{ fontSize: 13, color: "text.secondary", width: 130, flexShrink: 0 }}>
+        {label}
+      </Typography>
+
       <Typography sx={{
-        ...t.infoValue,
-        color:      accent ? "primary.main" : muted ? "text.disabled" : "text.primary",
-        fontWeight: accent ? 500 : 400,
-        fontStyle:  muted  ? "italic" : "normal",
+        fontSize: 14,
+        flex: 1,
+        color: accent  ? "secondary.main"
+            : danger  ? "error.main"
+            : muted   ? "text.disabled"
+            : "text.primary",
+        fontStyle:  muted ? "italic" : "normal",
+        fontWeight: muted ? 400 : 500,
       }}>
         {value}
       </Typography>
     </Stack>
   );
 }
+InfoRow.propTypes = {
+  icon:   PropTypes.node.isRequired,
+  label:  PropTypes.string.isRequired,
+  value:  PropTypes.string,
+  accent: PropTypes.bool,
+  muted:  PropTypes.bool,
+  danger: PropTypes.bool,
+  last:   PropTypes.bool,
+};
+InfoRow.defaultProps = {
+  value:  undefined,
+  accent: false,
+  muted:  false,
+  danger: false,
+  last:   false,
+};
 
-// ── HierarchyCard ─────────────────────────────────────────────
-function HierarchyCard({ role, nom, prenom }) {
-  const { custom: { detail: t } } = useTheme();
+// ─────────────────────────────────────────────────────────────
+// HierarchyCard
+// ─────────────────────────────────────────────────────────────
+const hierColors = {
+  souschef: { bg: "#f0edfb", color: "#5a3fb5" },
+  chef:     { bg: "#e0f4f4", color: "#027b79" },
+  dept:     { bg: "#e0ecf6", color: "#003B68" },
+};
+
+function HierarchyCard({ role, nom, prenom, variant }) {
   const fullName = [nom, prenom].filter(Boolean).join(" ");
   if (!fullName.trim()) return null;
-  const initials = [nom, prenom].filter(Boolean).map((s) => s.charAt(0).toUpperCase()).join("");
+
+  const initials = [nom, prenom]
+    .filter(Boolean)
+    .map(s => s.charAt(0).toUpperCase())
+    .join("");
+
+  const c = hierColors[variant] || hierColors.chef;
 
   return (
-    <Stack direction="row" alignItems="center" spacing={1.25} sx={t.hierCard}>
-      <Box sx={t.hierAvatar}>{initials}</Box>
-      <Box>
-        <Typography sx={t.hierRole}>{role}</Typography>
-        <Typography sx={t.hierName}>{fullName}</Typography>
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1.25}
+      sx={{
+        flex: 1,
+        border: "0.5px solid",
+        borderColor: "divider",
+        borderRadius: 2.5,
+        px: 1.75,
+        py: 1.5,
+        minWidth: 0,
+      }}
+    >
+      <Box sx={{
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        bgcolor: c.bg,
+        color: c.color,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12,
+        fontWeight: 500,
+        flexShrink: 0,
+      }}>
+        {initials}
+      </Box>
+      <Box minWidth={0}>
+        <Typography sx={{
+          fontSize: 10,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          color: "text.disabled",
+          mb: 0.4,
+        }}>
+          {role}
+        </Typography>
+        <Typography sx={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: "text.primary",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}>
+          {fullName}
+        </Typography>
       </Box>
     </Stack>
   );
 }
+HierarchyCard.propTypes = {
+  role:    PropTypes.string.isRequired,
+  nom:     PropTypes.string,
+  prenom:  PropTypes.string,
+  variant: PropTypes.oneOf(["souschef", "chef", "dept"]),
+};
+HierarchyCard.defaultProps = {
+  nom:     "",
+  prenom:  "",
+  variant: "chef",
+};
 
-// ── Page ──────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// Page principale
+// ─────────────────────────────────────────────────────────────
 export default function PersonnelDetail() {
   const { id }   = useParams();
   const navigate = useNavigate();
   const theme    = useTheme();
-  const t        = theme.custom.detail;
 
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState("");
   const [personData, setPersonData] = useState(null);
 
- const loadData = async () => {
-  setLoading(true);
-  setError("");
-  try {
-    const [personRes, gradesRes, fonctionsRes] = await Promise.all([
-      PersonnelService.getById(id),
-      PersonnelService.getGrades(),
-      PersonnelService.getFonctions(),
-    ]);
+  const loadData = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const [personRes, gradesRes, fonctionsRes] = await Promise.all([
+        PersonnelService.getById(id),
+        PersonnelService.getGrades(),
+        PersonnelService.getFonctions(),
+      ]);
 
-    const person    = personRes.data || {};
-    const grades    = Array.isArray(gradesRes.data)    ? gradesRes.data    : [];
-    const fonctions = Array.isArray(fonctionsRes.data) ? fonctionsRes.data : [];
+      const person    = personRes.data || {};
+      const grades    = Array.isArray(gradesRes.data)    ? gradesRes.data    : [];
+      const fonctions = Array.isArray(fonctionsRes.data) ? fonctionsRes.data : [];
 
-    // ── Logs de diagnostic ──────────────────────────────────────────────
-console.log("📋 getById :", JSON.stringify({
-  NomServiceFr:       person.NomServiceFr,
-  NomSousServiceFr:   person.NomSousServiceFr,
+      const { sousServiceService } = await import("../../services/AffectationsService.js");
+      const sousServRes  = await sousServiceService.getAll();
+      const sousServData = Array.isArray(sousServRes?.data) ? sousServRes.data : [];
+      const sousServTrouve = sousServData.find(
+        ss => ss.nomSousServiceFr === person.NomSousServiceFr
+      );
 
-  NomSousChef:        person.NomSousChef,
-  PrenomSousChef:     person.PrenomSousChef,
+      const gradeId    = person.WWGradeID ?? person.IDWWGrade ?? person.GradeID ?? person.WWGrade ?? person.IdWWGrade ?? person.IdGrade ?? null;
+      const fonctionId = person.FonctionID ?? person.IDFonction ?? person.IdFonction ?? null;
 
-  NomChefService:     person.NomChefService,
-  NomChefDepartement: person.NomChefDepartement,
+      const gradeTrouve =
+        grades.find(g => Number(g.IDWWGrade) === Number(gradeId)) ||
+        grades.find(g => Number(g.WWGradeID) === Number(gradeId)) ||
+        grades.find(g => Number(g.IdWWGrade) === Number(gradeId)) || null;
 
-  NomDepartementFr:   person.NomDepartementFr,
-  ServiceID:          person.ServiceID,
-  SousServiceID:      person.SousServiceID,
-}, null, 2));
+      const fonctionTrouvee =
+        fonctions.find(f => Number(f.IDFonction) === Number(fonctionId)) ||
+        fonctions.find(f => Number(f.IdFonction) === Number(fonctionId)) || null;
 
-    const { sousServiceService } = await import("../../services/AffectationsService.js");
-    const sousServRes  = await sousServiceService.getAll();
-    const sousServData = Array.isArray(sousServRes?.data) ? sousServRes.data : [];
-    const sousServTrouve = sousServData.find(
-      ss => ss.nomSousServiceFr === person.NomSousServiceFr
-    );
-    console.log(" sousservice trouvé :", JSON.stringify(sousServTrouve, null, 2));
-    // ────────────────────────────────────────────────────────────────────
+      const nomGrade    = person.NomWWGradeFr  ?? person.NomGradeFr        ?? person.LibelleGradeFr          ?? gradeTrouve?.NomWWGradeFr    ?? gradeTrouve?.NomGradeFr    ?? null;
+      const nomFonction = person.NomFonctionFr ?? person.LibelleFonctionFr ?? fonctionTrouvee?.NomFonctionFr  ?? fonctionTrouvee?.LibelleFonctionFr ?? null;
 
-    const gradeId    = person.WWGradeID ?? person.IDWWGrade ?? person.GradeID ?? person.WWGrade ?? person.IdWWGrade ?? person.IdGrade ?? null;
-    const fonctionId = person.FonctionID ?? person.IDFonction ?? person.IdFonction ?? null;
-
-    const gradeTrouve =
-      grades.find((g) => Number(g.IDWWGrade)  === Number(gradeId)) ||
-      grades.find((g) => Number(g.WWGradeID)  === Number(gradeId)) ||
-      grades.find((g) => Number(g.IdWWGrade)  === Number(gradeId)) || null;
-    const fonctionTrouvee =
-      fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
-      fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) || null;
-
-    const nomGrade    = person.NomWWGradeFr ?? person.NomGradeFr ?? person.LibelleGradeFr ?? gradeTrouve?.NomWWGradeFr ?? gradeTrouve?.NomGradeFr ?? null;
-    const nomFonction = person.NomFonctionFr ?? person.LibelleFonctionFr ?? fonctionTrouvee?.NomFonctionFr ?? fonctionTrouvee?.LibelleFonctionFr ?? null;
-
-    // setPersonData({ ...person, NomWWGradeFr: nomGrade, NomFonctionFr: nomFonction });
-    setPersonData({
-  ...person,
-
-  NomWWGradeFr: nomGrade,
-  NomFonctionFr: nomFonction,
-
-  NomSousChef:
-    person.NomSousChef ||
-    sousServTrouve?.nomSousChef ||
-    null,
-
-  PrenomSousChef:
-    person.PrenomSousChef ||
-    sousServTrouve?.prenomSousChef ||
-    null,
-});
-  } catch (e) {
-    setError(e?.message || "Erreur lors du chargement");
-  } finally {
-    setLoading(false);
-  }
-};
+      setPersonData({
+        ...person,
+        NomWWGradeFr:   nomGrade,
+        NomFonctionFr:  nomFonction,
+        NomSousChef:    person.NomSousChef    || sousServTrouve?.nomSousChef    || null,
+        PrenomSousChef: person.PrenomSousChef || sousServTrouve?.prenomSousChef || null,
+      });
+    } catch (e) {
+      setError(e?.message || "Erreur lors du chargement");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => { loadData(); }, [id]); // eslint-disable-line
 
-  const p = personData || {};
+  const p          = personData || {};
+  const isArchive  = p.SiArchive === "true" || p.SiArchive === true;
+  const hasSortie  = !!p.DateSortie;
 
   const initiales = p.NomPersonne && p.PrenomPersonne
     ? `${p.NomPersonne.charAt(0)}${p.PrenomPersonne.charAt(0)}`.toUpperCase()
@@ -181,21 +287,35 @@ console.log("📋 getById :", JSON.stringify({
     p.Etage != null ? `Ét. ${p.Etage}` : null,
   ].filter(Boolean).join(" — ") || null;
 
-  const dateEntree    = p.DateEntree ? dayjs(p.DateEntree).format("D MMMM YYYY") : null;
-  const dateSortie    = p.DateSortie ? dayjs(p.DateSortie).format("D MMMM YYYY") : "Non spécifiée";
-  const hasHierarchie = p.NomChefService || p.NomChefDepartement;
+  const dateEntree = p.DateEntree ? dayjs(p.DateEntree).format("D MMMM YYYY") : null;
+  const dateSortie = hasSortie    ? dayjs(p.DateSortie).format("D MMMM YYYY") : null;
+
+  const hasHierarchie = p.NomSousChef || p.NomChefService || p.NomChefDepartement;
+
+  const avatarBg    = isArchive ? "rgba(192,57,43,0.1)"   : "rgba(0,59,104,0.08)";
+  const avatarColor = isArchive ? "error.main"             : "primary.main";
+  const dotColor    = isArchive ? theme.palette.error.main : "#22c55e";
 
   return (
-    <Box sx={t.page}>
+    <Box sx={{ maxWidth: 720, mx: "auto", px: { xs: 1, sm: 2 }, py: 2 }}>
 
-      {/* Nav — iconXsm gère le fontSize des icônes boutons */}
+      {/* Nav */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2.5}>
-        <Button startIcon={<ArrowBackIcon sx={t.iconXsm} />} onClick={() => navigate(-1)} size="small" sx={t.backBtn}>
+        <Button
+          startIcon={<ArrowBackIcon sx={{ fontSize: "15px !important" }} />}
+          onClick={() => navigate(-1)}
+          size="small"
+          sx={{ fontWeight: 500, color: "secondary.main", fontSize: 13 }}
+        >
           Retour
         </Button>
         <Tooltip title="Actualiser">
-          <IconButton size="small" onClick={loadData} sx={t.refreshBtn}>
-            <RefreshIcon sx={t.iconXsm} />
+          <IconButton
+            size="small"
+            onClick={loadData}
+            sx={{ border: "0.5px solid", borderColor: "divider", borderRadius: 1.5, bgcolor: "background.paper" }}
+          >
+            <RefreshIcon sx={{ fontSize: "15px !important" }} />
           </IconButton>
         </Tooltip>
       </Stack>
@@ -206,104 +326,125 @@ console.log("📋 getById :", JSON.stringify({
           <Typography variant="body2" color="text.secondary">Chargement du profil...</Typography>
         </Stack>
       )}
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {!loading && !error && !personData && (
         <Alert severity="warning">Aucune donnée trouvée pour cet utilisateur.</Alert>
       )}
 
       {!loading && !error && personData && (
-        <Box sx={t.card}>
+        <Box sx={{
+          bgcolor: "background.paper",
+          border: "0.5px solid",
+          borderColor: "divider",
+          borderRadius: 3,
+          overflow: "hidden",
+        }}>
 
           {/* Hero */}
-          <Stack direction="row" alignItems="center" spacing={2} sx={t.hero}>
-            <Box sx={t.avatar}>{initiales}</Box>
+          <Stack direction="row" alignItems="flex-start" spacing={1.75} sx={{ px: 3, pt: 2.75, pb: 2.5 }}>
+            <Box sx={{ position: "relative", flexShrink: 0 }}>
+              <Box sx={{
+                width: 50, height: 50, borderRadius: "50%",
+                bgcolor: avatarBg, color: avatarColor,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 17, fontWeight: 500,
+              }}>
+                {initiales}
+              </Box>
+              <Box sx={{
+                position: "absolute", bottom: 0, right: 0,
+                width: 12, height: 12, borderRadius: "50%",
+                bgcolor: dotColor,
+                border: "2px solid", borderColor: "background.paper",
+              }} />
+            </Box>
 
-            <Box flex={1}>
-              <Typography sx={t.heroName}>
+            <Box flex={1} minWidth={0}>
+              <Typography sx={{ fontSize: 18, fontWeight: 500, color: "primary.main", mb: 0.4 }}>
                 {p.PrenomPersonne} {(p.NomPersonne || "").toUpperCase()}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={t.heroEmail}>
+              <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 1 }}>
                 {p.Email}
               </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={0.75}>
-                {p.NomWWGradeFr && (
-                  <Chip label={p.NomWWGradeFr} size="large" sx={{ ...t.chipGrade, bgcolor: `${theme.palette.primary.main}14`, color: "primary.main" }} />
-                )}
+              <Stack direction="row" gap={0.75} flexWrap="wrap">
                 {p.NomFonctionFr && (
-                  <Chip label={p.NomFonctionFr} size="large" sx={{ ...t.chipFonction, bgcolor: `${theme.palette.secondary.main}14`, color: "secondary.main" }} />
+                  <Chip label={p.NomFonctionFr} size="small" sx={{
+                    fontSize: 12, height: 24, fontWeight: 500,
+                    bgcolor: "rgba(2,178,175,0.1)", color: "secondary.main", borderRadius: "99px",
+                  }} />
                 )}
-                {p.SiTypePersonnel && (
-                  <Chip label="Personnel" size="large" variant="outlined" sx={t.chipOutlined} />
-                )}
-                {p.SiArchive === "true" && (
-                  <Chip label="Archivé" size="large" color="error" sx={{ height: 22 }} />
+                {isArchive && (
+                  <Chip label="Archivé" size="small" sx={{
+                    fontSize: 12, height: 24, fontWeight: 500,
+                    bgcolor: "rgba(192,57,43,0.1)", color: "error.main", borderRadius: "99px",
+                  }} />
                 )}
               </Stack>
             </Box>
 
-            <Box sx={t.idBox}>
-              <Typography sx={t.idLabel}>IDPersonneService</Typography>
-              <Typography sx={t.idValue}>{id}</Typography>
+            <Box sx={{ textAlign: "right", flexShrink: 0 }}>
+              <Typography sx={{ fontSize: 10, color: "text.disabled", mb: 0.3 }}>IDPersonneService</Typography>
+              <Typography sx={{ fontSize: 18, fontWeight: 500, color: "primary.main" }}>{id}</Typography>
             </Box>
           </Stack>
 
-          {/* Contact — iconSm gère le fontSize des icônes InfoRow */}
-          <Box sx={t.section}>
+          {/* Contact */}
+          <Box sx={{ px: 3 }}>
             <SectionLabel>Contact</SectionLabel>
-            <InfoRow icon={<EmailIcon sx={t.iconSm} />} label="E-mail"    value={p.Email  || "-"} accent />
-            <InfoRow icon={<PhoneIcon sx={t.iconSm} />} label="Téléphone" value={p.TelPro || "-"} />
+            <InfoRow icon={<EmailIcon />} label="E-mail"    value={p.Email  || "—"} accent />
+            <InfoRow icon={<PhoneIcon />} label="Téléphone" value={p.TelPro || "—"} last />
           </Box>
 
           {/* Affectation */}
-          <Box sx={t.section}>
+          <Box sx={{ px: 3 }}>
             <SectionLabel>Affectation</SectionLabel>
-            <InfoRow icon={<BusinessIcon      sx={t.iconSm} />} label="Service"        value={p.NomServiceFr     || "-"} />
-            <InfoRow icon={<AccountTreeIcon   sx={t.iconSm} />} label="Département"    value={p.NomDepartementFr || "-"} />
-            <InfoRow icon={<EmojiEventsIcon   sx={t.iconSm} />} label="Grade"          value={p.NomWWGradeFr     || "-"} />
-            <InfoRow icon={<WorkIcon          sx={t.iconSm} />} label="Fonction"       value={p.NomFonctionFr    || "-"} />
-            <InfoRow icon={<CalendarMonthIcon sx={t.iconSm} />} label="Date d'entrée"  value={dateEntree || "-"} />
-            <InfoRow icon={<CalendarTodayIcon sx={t.iconSm} />} label="Date de sortie" value={dateSortie} muted={!p.DateSortie} />
-            <InfoRow icon={<LocationOnIcon    sx={t.iconSm} />} label="Adresse"        value={adresse || "-"} />
+            <InfoRow icon={<BusinessIcon />}      label="Service"        value={p.NomServiceFr     || "—"} />
+            <InfoRow icon={<AccountTreeIcon />}   label="Département"    value={p.NomDepartementFr || "—"} />
+            <InfoRow icon={<EmojiEventsIcon />}   label="Grade"          value={p.NomWWGradeFr     || "—"} />
+            <InfoRow icon={<WorkIcon />}           label="Fonction"       value={p.NomFonctionFr    || "—"} />
+            <InfoRow icon={<CalendarMonthIcon />} label="Date d'entrée"  value={dateEntree         || "—"} />
+            <InfoRow
+              icon={<EventBusyIcon />}
+              label="Date de sortie"
+              value={dateSortie || "Non spécifiée"}
+              danger={hasSortie}
+              muted={!hasSortie}
+            />
+            <InfoRow icon={<LocationOnIcon />}    label="Adresse"        value={adresse            || "—"} last />
           </Box>
 
           {/* Hiérarchie */}
-{/* Hiérarchie */}
-{hasHierarchie && (
-  <Box sx={t.sectionLast}>
-    <SectionLabel>Hiérarchie</SectionLabel>
-
-    <Stack direction="row" spacing={1.25} flexWrap="wrap">
-
-      {/* N+1 */}
-      {p.NomSousChef && (
-        <HierarchyCard
-          role="Sous-chef"
-          nom={p.NomSousChef}
-          prenom={p.PrenomSousChef}
-        />
-      )}
-
-      {/* N+2 */}
-      {p.NomChefService && (
-        <HierarchyCard
-          role={p.NomSousChef ? "Chef de service" : "Chef de service"}
-          nom={p.NomChefService}
-          prenom={p.PrenomChefService}
-        />
-      )}
-
-      {/* N+3 */}
-      {p.NomChefDepartement && (
-        <HierarchyCard
-          role="Chef de département"
-          nom={p.NomChefDepartement}
-          prenom={p.PrenomChefDepartement}
-        />
-      )}
-
-    </Stack>
-  </Box>
-)}
+          {hasHierarchie && (
+            <Box sx={{ px: 3, pb: 2.75 }}>
+              <SectionLabel>Hiérarchie</SectionLabel>
+              <Stack direction="row" spacing={1.25} sx={{ mt: 0.5 }} flexWrap="wrap">
+                {p.NomSousChef && (
+                  <HierarchyCard
+                    role="Sous-chef"
+                    nom={p.NomSousChef}
+                    prenom={p.PrenomSousChef}
+                    variant="souschef"
+                  />
+                )}
+                {p.NomChefService && (
+                  <HierarchyCard
+                    role="Chef de service"
+                    nom={p.NomChefService}
+                    prenom={p.PrenomChefService}
+                    variant="chef"
+                  />
+                )}
+                {p.NomChefDepartement && (
+                  <HierarchyCard
+                    role="Chef de département"
+                    nom={p.NomChefDepartement}
+                    prenom={p.PrenomChefDepartement}
+                    variant="dept"
+                  />
+                )}
+              </Stack>
+            </Box>
+          )}
 
         </Box>
       )}

@@ -19,6 +19,8 @@ import "dayjs/locale/fr";
 import { XMLParser } from "fast-xml-parser";
 import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import PersonnelLoader from "../../components/Loading/PersonnelLoaderComponent.jsx";
 import PropTypes from "prop-types";
 
@@ -185,27 +187,40 @@ export default function PersonnelArchivesListPage() {
   // ── Colonnes DataGrid ───────────────────────────────────────────────────────
   const columns = useMemo(
     () => [
-      { field: "IDPersonneService", headerName: "ID", width: 80 },
-      {
-        field: "actions",
-        headerName: "Actions",
-        width: 120,
-        sortable: false,
-        filterable: false,
-        disableExport: true,
-        hideable: false,
-        renderCell: (params) => (
-          <Stack direction="row" alignItems="center">
-            <RestoreActionComponent
-              IDPersonneService={params.row.IDPersonneService}
-              nomPersonne={params.row.NomPersonne}
-              prenomPersonne={params.row.PrenomPersonne}
-              email={params.row.Email}
-              refreshData={refreshData}
-            />
-          </Stack>
-        ),
-      },
+ {
+  field: "actions",
+  headerName: "Actions",
+  width: 170,
+  sortable: false,
+  filterable: false,
+  disableExport: true,
+  hideable: false,
+  renderCell: (params) => (
+    <Stack direction="row" alignItems="center" spacing={0.5}>
+
+      <Tooltip title="Voir la fiche">
+        <IconButton
+          size="small"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/personnels/${params.row.IDPersonneService}`);
+          }}
+        >
+          <VisibilityIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+
+      <RestoreActionComponent
+        IDPersonneService={params.row.IDPersonneService}
+        nomPersonne={params.row.NomPersonne}
+        prenomPersonne={params.row.PrenomPersonne}
+        email={params.row.Email}
+        refreshData={refreshData}
+      />
+    </Stack>
+  ),
+},
       { field: "NomPersonne",      headerName: "NOM",            width: 180, hideable: false },
       { field: "PrenomPersonne",   headerName: "PRÉNOM",         width: 180, hideable: false },
       { field: "Email",            headerName: "E-MAIL",         width: 260, hideable: false },

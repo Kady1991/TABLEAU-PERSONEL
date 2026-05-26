@@ -167,15 +167,23 @@ export default function AlertSuccessComponent({
   const nomComplet = `${nom.toUpperCase()} ${prenom}`.trim();
 
   const chips = [
-    { label: "Nouveau membre", bg: "#E1F5EE", color: "#085041", delay: "1.35s" },
-    service     && { label: service,     bg: "#E6F1FB", color: "#0C447C", delay: "1.48s" },
-    departement && { label: departement, bg: "#EEEDFE", color: "#3C3489", delay: "1.61s" },
+    // { label: "Nouveau membre", bg: "#E1F5EE", color: "#085041", delay: "1.35s" },
+    IDPersonneService && { label: "ID : " + IDPersonneService, bg: "#E1F5EE", color: "#085041", delay: "1.35s" },
+    service     && { label:"Service : " + service,     bg: "#E6F1FB", color: "#0C447C", delay: "1.48s" },
+    departement && { label: "Département : " + departement, bg: "#EEEDFE", color: "#3C3489", delay: "1.61s" },
   ].filter(Boolean);
 
-  const handleVoirFiche = () => {
-    if (IDPersonneService) navigate(`/personnels/${IDPersonneService}`);
+ const handleVoirFiche = (e) => {
+  e.stopPropagation();
+
+  if (!IDPersonneService) return;
+
+  navigate(`/personnels/${IDPersonneService}`);
+
+  setTimeout(() => {
     onClose();
-  };
+  }, 100);
+};
 
   return (
     <div className="asc-overlay" onClick={onClose}>

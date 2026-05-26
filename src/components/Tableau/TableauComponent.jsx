@@ -84,7 +84,9 @@ function TableauComponent({
         PersonnelService.getFonctions(),
       ]);
 
-      const data = Array.isArray(personnelsRes?.data) ? personnelsRes.data : [];
+      const data = Array.isArray(personnelsRes?.data)
+  ? personnelsRes.data.filter((p) => !isArchived(p?.SiArchive))
+  : [];
       const grades = Array.isArray(gradesRes?.data) ? gradesRes.data : [];
       const fonctions = Array.isArray(fonctionsRes?.data)
         ? fonctionsRes.data
@@ -147,17 +149,14 @@ function TableauComponent({
     fetchData();
   }, [fetchData]);
 
-  const markRowArchived = useCallback((id) => {
-    setRows((prev) =>
-      sortRows(
-        prev.map((row) =>
-          String(row?.IDPersonneService) === String(id)
-            ? { ...row, SiArchive: true }
-            : row
-        )
-      )
-    );
-  }, [sortRows]);
+const markRowArchived = useCallback((id) => {
+  setRows((prev) =>
+    prev.filter(
+      (row) =>
+        String(row?.IDPersonneService) !== String(id)
+    )
+  );
+}, []);
 
   const markRowRestored = useCallback((id) => {
     setRows((prev) =>
