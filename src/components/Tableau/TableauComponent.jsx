@@ -19,6 +19,8 @@ import RestoreActionComponent from "../../components/Forms/RestoreActionComponen
 import AjoutFormComponent from "../../components/Forms/Ajout/AjoutFormComponent.jsx";
 import PersonnelService from "../../services/PersonnelService.js";
 import PersonnelLoader from "../../components/Loading/PersonnelLoaderComponent.jsx";
+import AlertArchiveSuccessComponent from "../../components/Alert/AlertArchiveSuccessComponent.jsx";
+import AlertRestoreSuccessComponent from "../../components/Alert/AlertRestoreSuccessComponent.jsx";
 import PropTypes from "prop-types";
 
 const isArchived = (v) =>
@@ -33,39 +35,40 @@ function TableauComponent({
 }) {
   const navigate = useNavigate();
 
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [openAdd, setOpenAdd] = useState(false);
-  const [toast, setToast] = useState({
-    open: false,
-    type: "info",
-    text: "",
-  });
+  const [rows,        setRows]        = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState("");
+  const [openAdd,     setOpenAdd]     = useState(false);
+  const [archiveInfo, setArchiveInfo] = useState(null);
+  const [restoreInfo, setRestoreInfo] = useState(null);
+  const [toast,       setToast]       = useState({ open: false, type: "info", text: "" });
 
   const sortRows = useCallback((list) => {
     return [...list].sort((a, b) => {
       const aArchived = isArchived(a?.SiArchive) ? 1 : 0;
       const bArchived = isArchived(b?.SiArchive) ? 1 : 0;
-
-      if (aArchived !== bArchived) {
-        return aArchived - bArchived;
-      }
-
-      if (aArchived === 0) {
-        return Number(b?.IDPersonneService ?? 0) - Number(a?.IDPersonneService ?? 0);
-      }
-
+      if (aArchived !== bArchived) return aArchived - bArchived;
+      if (aArchived === 0) return Number(b?.IDPersonneService ?? 0) - Number(a?.IDPersonneService ?? 0);
       return Number(a?.IDPersonneService ?? 0) - Number(b?.IDPersonneService ?? 0);
     });
   }, []);
 
-  const showToast = useCallback((payload) => {
-    setToast({
-      open: true,
-      type: payload?.type || "info",
-      text: payload?.text || "",
-    });
+  const handleArchiveSuccess = useCallback((payload) => {
+    if (payload?.type === "error") {
+      setToast({ open: true, type: "error", text: payload.text });
+      return;
+    }
+    setRestoreInfo(null);
+    setArchiveInfo(payload);
+  }, []);
+
+  const handleRestoreSuccess = useCallback((payload) => {
+    if (payload?.type === "error") {
+      setToast({ open: true, type: "error", text: payload.text });
+      return;
+    }
+    setArchiveInfo(null);
+    setRestoreInfo(payload);
   }, []);
 
   const closeToast = (_, reason) => {
@@ -85,45 +88,35 @@ function TableauComponent({
       ]);
 
       const data = Array.isArray(personnelsRes?.data)
-  ? personnelsRes.data.filter((p) => !isArchived(p?.SiArchive))
-  : [];
-      const grades = Array.isArray(gradesRes?.data) ? gradesRes.data : [];
-      const fonctions = Array.isArray(fonctionsRes?.data)
-        ? fonctionsRes.data
+        ? personnelsRes.data.filter((p) => !isArchived(p?.SiArchive))
         : [];
+      const grades    = Array.isArray(gradesRes?.data)    ? gradesRes.data    : [];
+      const fonctions = Array.isArray(fonctionsRes?.data) ? fonctionsRes.data : [];
 
       const enriched = data.map((p) => {
-        const gradeId =
-          p.WWGradeID ?? p.IDWWGrade ?? p.GradeID ?? p.WWGrade ?? p.IdWWGrade ?? p.IdGrade ?? null;
-
-        const fonctionId =
-          p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? null;
+        const gradeId    = p.WWGradeID ?? p.IDWWGrade ?? p.GradeID ?? p.WWGrade ?? p.IdWWGrade ?? p.IdGrade ?? null;
+        const fonctionId = p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? null;
 
         const gradeTrouve =
-          grades.find((g) => Number(g.IDWWGrade) === Number(gradeId)) ||
-          grades.find((g) => Number(g.WWGradeID) === Number(gradeId)) ||
-          grades.find((g) => Number(g.IdWWGrade) === Number(gradeId)) ||
-          null;
+          grades.find((g) => Number(g.IDWWGrade)  === Number(gradeId)) ||
+          grades.find((g) => Number(g.WWGradeID)  === Number(gradeId)) ||
+          grades.find((g) => Number(g.IdWWGrade)  === Number(gradeId)) || null;
 
         const fonctionTrouvee =
           fonctions.find((f) => Number(f.IDFonction) === Number(fonctionId)) ||
-          fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) ||
-          null;
+          fonctions.find((f) => Number(f.IdFonction) === Number(fonctionId)) || null;
 
         return {
           ...p,
           NomWWGradeFr:
             p.NomWWGradeFr ?? p.NomGradeFr ?? p.LibelleGradeFr ?? p.GradeLibelle ??
             gradeTrouve?.NomWWGradeFr ?? gradeTrouve?.NomGradeFr ?? gradeTrouve?.LibelleGradeFr ?? "-",
-
           NomWWGradeNl:
             p.NomWWGradeNl ?? p.NomGradeNl ?? p.LibelleGradeNl ??
             gradeTrouve?.NomWWGradeNl ?? gradeTrouve?.NomGradeNl ?? gradeTrouve?.LibelleGradeNl ?? "-",
-
           NomFonctionFr:
             p.NomFonctionFr ?? p.LibelleFonctionFr ??
             fonctionTrouvee?.NomFonctionFr ?? fonctionTrouvee?.LibelleFonctionFr ?? "-",
-
           NomFonctionNl:
             p.NomFonctionNl ?? p.LibelleFonctionNl ??
             fonctionTrouvee?.NomFonctionNl ?? fonctionTrouvee?.LibelleFonctionNl ?? "-",
@@ -145,28 +138,19 @@ function TableauComponent({
     }
   }, [rowsPreview, sortRows]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-const markRowArchived = useCallback((id) => {
-  setRows((prev) =>
-    prev.filter(
-      (row) =>
-        String(row?.IDPersonneService) !== String(id)
-    )
-  );
-}, []);
+  const markRowArchived = useCallback((id) => {
+    setRows((prev) => prev.filter((row) => String(row?.IDPersonneService) !== String(id)));
+  }, []);
 
   const markRowRestored = useCallback((id) => {
     setRows((prev) =>
-      sortRows(
-        prev.map((row) =>
-          String(row?.IDPersonneService) === String(id)
-            ? { ...row, SiArchive: false }
-            : row
-        )
-      )
+      sortRows(prev.map((row) =>
+        String(row?.IDPersonneService) === String(id)
+          ? { ...row, SiArchive: false }
+          : row
+      ))
     );
   }, [sortRows]);
 
@@ -216,8 +200,7 @@ const markRowArchived = useCallback((id) => {
                 nomPersonne={params.row.NomPersonne}
                 prenomPersonne={params.row.PrenomPersonne}
                 email={params.row.Email}
-                refreshData={fetchData}
-                onRestoreSuccess={showToast}
+                onRestoreSuccess={handleRestoreSuccess}
                 onRestoreLocal={markRowRestored}
               />
             ) : (
@@ -226,55 +209,47 @@ const markRowArchived = useCallback((id) => {
                 nomPersonne={params.row.NomPersonne}
                 prenomPersonne={params.row.PrenomPersonne}
                 email={params.row.Email}
-                refreshData={fetchData}
-                onArchiveSuccess={showToast}
+                onArchiveSuccess={handleArchiveSuccess}
                 onArchiveLocal={markRowArchived}
               />
             )}
           </Stack>
         ),
       },
-      { field: "NomPersonne",            headerName: "NOM",                    width: 180, hideable: false },
-      { field: "PrenomPersonne",         headerName: "PRENOM",                 width: 180, hideable: false },
-      { field: "SiFrancaisString",       headerName: "RÔLE",                   width: 120, hideable: false },
-      { field: "Email",                  headerName: "E-mail",                 width: 220, hideable: false },
-      { field: "DateEntree",             headerName: "ENTREE SERVICE",         width: 150, hideable: false },
-      { field: "NomFonctionFr",          headerName: "FONCTION",               width: 200 },
-      { field: "NomFonctionNl",          headerName: "FONCTION(nl)",           width: 200 },
-      { field: "NomWWGradeNl",           headerName: "GRADE(nl)",              width: 200 },
-      { field: "NomWWGradeFr",           headerName: "GRADE",                  width: 200 },
-      { field: "NomServiceNl",           headerName: "AFFECTATION(nl)",        width: 250 },
-      { field: "NomServiceFr",           headerName: "AFFECTATION",            width: 250 },
-      { field: "NomRueNl",               headerName: "LOCALISATION(nl)",       width: 200 },
-      { field: "NomRueFr",               headerName: "LOCALISATION",           width: 200 },
-      { field: "Numero",                 headerName: "N°",                     width: 80  },
-      { field: "NomChefService",         headerName: "NOM CHEF DU SERVICE",    width: 220 },
-      { field: "PrenomChefService",      headerName: "PRENOM CHEF DU SERVICE", width: 220 },
-      { field: "EmailChefService",       headerName: "E-MAIL CHEF SERVICE",    width: 240 },
-      { field: "NomDepartementNl",       headerName: "DEPARTEMENT(nl)",        width: 220 },
-      { field: "NomDepartementFr",       headerName: "DEPARTEMENTS",           width: 220 },
-      { field: "NomChefDepartement",     headerName: "NOM CHEF DEPARTEMENT",   width: 220 },
-      { field: "PrenomChefDepartement",  headerName: "PRENOM CHEF DEPARTEMENT",width: 220 },
-      { field: "EmailChefDepartement",   headerName: "E-MAIL CHEF DEPARTEMENT",width: 240 },
-      { field: "P+C:UENSION",            headerName: "P+C:UENSION",            width: 150 },
-      { field: "TelPro",                 headerName: "TEL",                    width: 130 },
-      { field: "Batiment",               headerName: "Batiment",               width: 100 },
-      { field: "Etage",                  headerName: "Etage",                  width: 80  },
-      { field: "BatimentNl",             headerName: "Batiment(nl)",           width: 130 },
+      { field: "NomPersonne",            headerName: "NOM",                     width: 180, hideable: false },
+      { field: "PrenomPersonne",         headerName: "PRENOM",                  width: 180, hideable: false },
+      { field: "SiFrancaisString",       headerName: "RÔLE",                    width: 120, hideable: false },
+      { field: "Email",                  headerName: "E-mail",                  width: 220, hideable: false },
+      { field: "DateEntree",             headerName: "ENTREE SERVICE",          width: 150, hideable: false },
+      { field: "NomFonctionFr",          headerName: "FONCTION",                width: 200 },
+      { field: "NomFonctionNl",          headerName: "FONCTION(nl)",            width: 200 },
+      { field: "NomWWGradeNl",           headerName: "GRADE(nl)",               width: 200 },
+      { field: "NomWWGradeFr",           headerName: "GRADE",                   width: 200 },
+      { field: "NomServiceNl",           headerName: "AFFECTATION(nl)",         width: 250 },
+      { field: "NomServiceFr",           headerName: "AFFECTATION",             width: 250 },
+      { field: "NomRueNl",               headerName: "LOCALISATION(nl)",        width: 200 },
+      { field: "NomRueFr",               headerName: "LOCALISATION",            width: 200 },
+      { field: "Numero",                 headerName: "N°",                      width: 80  },
+      { field: "NomChefService",         headerName: "NOM CHEF DU SERVICE",     width: 220 },
+      { field: "PrenomChefService",      headerName: "PRENOM CHEF DU SERVICE",  width: 220 },
+      { field: "EmailChefService",       headerName: "E-MAIL CHEF SERVICE",     width: 240 },
+      { field: "NomDepartementNl",       headerName: "DEPARTEMENT(nl)",         width: 220 },
+      { field: "NomDepartementFr",       headerName: "DEPARTEMENTS",            width: 220 },
+      { field: "NomChefDepartement",     headerName: "NOM CHEF DEPARTEMENT",    width: 220 },
+      { field: "PrenomChefDepartement",  headerName: "PRENOM CHEF DEPARTEMENT", width: 220 },
+      { field: "EmailChefDepartement",   headerName: "E-MAIL CHEF DEPARTEMENT", width: 240 },
+      { field: "P+C:UENSION",            headerName: "P+C:UENSION",             width: 150 },
+      { field: "TelPro",                 headerName: "TEL",                     width: 130 },
+      { field: "Batiment",               headerName: "Batiment",                width: 100 },
+      { field: "Etage",                  headerName: "Etage",                   width: 80  },
+      { field: "BatimentNl",             headerName: "Batiment(nl)",            width: 130 },
     ],
-    [navigate, fetchData, showToast, markRowArchived, markRowRestored]
+    [navigate, fetchData, handleArchiveSuccess, handleRestoreSuccess, markRowArchived, markRowRestored]
   );
 
   return (
     <>
-      <Box
-        sx={{
-          height: "90%",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ height: "90%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <AjoutFormComponent
           open={openAdd}
           onClose={() => setOpenAdd(false)}
@@ -286,11 +261,7 @@ const markRowArchived = useCallback((id) => {
           <Stack direction="row" justifyContent="space-between" mb={2}>
             <Stack direction="row" spacing={1}>
               {showAddButton && (
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={() => setOpenAdd(true)}
-                >
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenAdd(true)}>
                   Nouveau Membre
                 </Button>
               )}
@@ -298,17 +269,26 @@ const markRowArchived = useCallback((id) => {
           </Stack>
         )}
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
 
-        {/* ── Loader personnalisé ── */}
+        {/* ── Bannière archivage réussi ── */}
+        <AlertArchiveSuccessComponent
+          info={archiveInfo}
+          onClose={() => setArchiveInfo(null)}
+        />
+
+        {/* ── Bannière restauration réussie ── */}
+        <AlertRestoreSuccessComponent
+          info={restoreInfo}
+          onClose={() => setRestoreInfo(null)}
+        />
+
         {loading ? (
           <PersonnelLoader />
         ) : (
           <Box
             sx={{
-              flex: 1,
-              minHeight: 0,
-              width: "100%",
+              flex: 1, minHeight: 0, width: "100%",
               bgcolor: "background.paper",
               height: compact ? height : "calc(100vh - 190px)",
               overflow: "hidden",
@@ -333,20 +313,13 @@ const markRowArchived = useCallback((id) => {
               hideFooter={compact}
               slots={compact ? {} : { toolbar: GridToolbar }}
               slotProps={
-                compact
-                  ? {}
-                  : {
-                      toolbar: {
-                        showQuickFilter: true,
-                        csvOptions: {
-                          fileName: "export_personnel",
-                          delimiter: ";",
-                          utf8WithBom: true,
-                          allColumns: true,
-                        },
-                        printOptions: { disableToolbarButton: true },
-                      },
-                    }
+                compact ? {} : {
+                  toolbar: {
+                    showQuickFilter: true,
+                    csvOptions: { fileName: "export_personnel", delimiter: ";", utf8WithBom: true, allColumns: true },
+                    printOptions: { disableToolbarButton: true },
+                  },
+                }
               }
               sx={{
                 height: "100%",
@@ -356,25 +329,14 @@ const markRowArchived = useCallback((id) => {
                 "& .row-archived:hover": { background: "#fdecea !important" },
               }}
               initialState={{
-                pagination: {
-                  paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 },
-                },
+                pagination: { paginationModel: { pageSize: compact ? rowsPreview || 5 : 25 } },
                 columns: {
                   columnVisibilityModel: {
-                    NomFonctionNl: false,
-                    NomWWGradeNl: false,
-                    NomServiceNl: false,
-                    NomDepartementNl: false,
-                    NomRueFr: false,
-                    NomRueNl: false,
-                    Numero: false,
-                    Batiment: false,
-                    BatimentNl: false,
-                    Etage: false,
-                    PrenomChefService: false,
-                    EmailChefService: false,
-                    PrenomChefDepartement: false,
-                    EmailChefDepartement: false,
+                    NomFonctionNl: false, NomWWGradeNl: false, NomServiceNl: false,
+                    NomDepartementNl: false, NomRueFr: false, NomRueNl: false,
+                    Numero: false, Batiment: false, BatimentNl: false, Etage: false,
+                    PrenomChefService: false, EmailChefService: false,
+                    PrenomChefDepartement: false, EmailChefDepartement: false,
                     "P+C:UENSION": false,
                   },
                 },
@@ -383,7 +345,7 @@ const markRowArchived = useCallback((id) => {
           </Box>
         )}
       </Box>
-
+      {/* Snackbar — erreurs uniquement */}
       <Snackbar
         open={toast.open}
         autoHideDuration={3500}
@@ -397,12 +359,11 @@ const markRowArchived = useCallback((id) => {
     </>
   );
 }
-
 TableauComponent.propTypes = {
-  compact: PropTypes.bool,
-  height: PropTypes.number,
-  rowsPreview: PropTypes.number,
-  showHeader: PropTypes.bool,
+  compact:       PropTypes.bool,
+  height:        PropTypes.number,
+  rowsPreview:   PropTypes.number,
+  showHeader:    PropTypes.bool,
   showAddButton: PropTypes.bool,
 };
 

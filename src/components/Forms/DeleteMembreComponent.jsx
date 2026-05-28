@@ -49,29 +49,29 @@ function DeleteMembreComponent({
       return;
     }
 
-    const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
+    const formattedDate        = dayjs(selectedDate).format("YYYY-MM-DD");
+    const formattedDateDisplay = dayjs(selectedDate).format("DD/MM/YYYY");
     setLoading(true);
 
     try {
       await PersonnelService.archive(IDPersonneService, formattedDate);
 
-      // 1. Ferme la modale en premier
       setOpen(false);
       setSelectedDate(null);
 
-      // 2. Notification
       onArchiveSuccess?.({
-        type: "success",
-        text: `${prenomPersonne || ""} ${nomPersonne || ""} a été archivé(e) avec succès.`,
+        prenom: prenomPersonne || "",
+        nom:    nomPersonne    || "",
+        date:   formattedDateDisplay,
+        id:     IDPersonneService,
       });
 
-      // 3. Nettoyage caches
       PersonnelService.clearCaches?.();
       sessionStorage.removeItem("personnels_archives_cache_v2_dates");
 
-      // 4. Mise à jour locale après que le dialog soit complètement fermé
-     // 4. Mise à jour locale immédiate
-onArchiveLocal?.(IDPersonneService);
+      setTimeout(() => {
+        onArchiveLocal?.(IDPersonneService);
+      }, 150);
 
     } catch (error) {
       console.error("Erreur archivage :", error?.response?.data || error?.message);
@@ -99,8 +99,14 @@ onArchiveLocal?.(IDPersonneService);
         onClose={handleClose}
         fullWidth
         maxWidth="xs"
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
+        sx={{
+          "& .MuiDialog-paper": {
+            overflow: "visible",
+          },
+          "& .MuiDialogContent-root": {
+            overflow: "visible",
+          },
+        }}
       >
         <DialogTitle>Archiver la personne</DialogTitle>
 
@@ -128,8 +134,6 @@ onArchiveLocal?.(IDPersonneService);
                   textField: {
                     fullWidth: true,
                     size: "small",
-                    onClick: (e) => e.stopPropagation(),
-                    onMouseDown: (e) => e.stopPropagation(),
                   },
                 }}
               />
@@ -138,7 +142,9 @@ onArchiveLocal?.(IDPersonneService);
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="inherit" disabled={loading}>Annuler</Button>
+          <Button onClick={handleClose} color="inherit" disabled={loading}>
+            Annuler
+          </Button>
           <Button type="button" onClick={handleConfirm} variant="contained" disabled={loading}>
             {loading ? "Archivage..." : "Archiver"}
           </Button>
@@ -153,7 +159,6 @@ DeleteMembreComponent.propTypes = {
   nomPersonne:       PropTypes.string,
   prenomPersonne:    PropTypes.string,
   email:             PropTypes.string,
-  refreshData:       PropTypes.func,
   onArchiveSuccess:  PropTypes.func,
   onArchiveLocal:    PropTypes.func,
 };

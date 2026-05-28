@@ -38,7 +38,7 @@ import { DatePicker }         from "@mui/x-date-pickers/DatePicker";
 import { departementService, serviceService } from "../../../services/AffectationsService";
 import PersonnelService       from "../../../services/PersonnelService";
 import ServiceTreeSelect      from "../ServiceTreeSelect";
-import AlertSuccessComponent  from "../../Alert/AlertSuccessComponent";
+import AlertSuccessComponent  from "../../Alert/AlertAjoutSuccessComponent";
 import { useTheme }           from "@mui/material/styles";
 
 // ── buildFlatOptions ──────────────────────────────────────────────────────────

@@ -142,7 +142,7 @@ function spawnConfetti(containerId) {
 }
 
 // ── Composant ─────────────────────────────────────────────────────────────────
-export default function AlertSuccessComponent({
+export default function AlertAjoutSuccessComponent({
   open,
   onClose,
   nom               = "",
@@ -239,7 +239,7 @@ export default function AlertSuccessComponent({
   );
 }
 
-AlertSuccessComponent.propTypes = {
+AlertAjoutSuccessComponent.propTypes = {
   open:              PropTypes.bool.isRequired,
   onClose:           PropTypes.func.isRequired,
   nom:               PropTypes.string,

@@ -19,6 +19,7 @@ import "dayjs/locale/fr";
 import { XMLParser } from "fast-xml-parser";
 import PersonnelService from "../../services/PersonnelService.js";
 import RestoreActionComponent from "../../components/Forms/RestoreActionComponent.jsx";
+import AlertRestoreSuccessComponent from "../../components/Alert/AlertRestoreSuccessComponent.jsx";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PersonnelLoader from "../../components/Loading/PersonnelLoaderComponent.jsx";
@@ -49,7 +50,6 @@ KpiCard.propTypes = {
   color: PropTypes.string,
 };
 
-// ── Fetch dates XML ───────────────────────────────────────────────────────────
 const fetchPersonDatesXml = async (id) => {
   try {
     const res = await PersonnelService.getPersonXmlByIdProd(id);
@@ -66,7 +66,6 @@ const fetchPersonDatesXml = async (id) => {
   }
 };
 
-// ── KPI Card ──────────────────────────────────────────────────────────────────
 function KpiCard({ label, value, sub, color }) {
   return (
     <Card variant="outlined" sx={{ borderRadius: "12px", height: "100%" }}>
@@ -95,16 +94,15 @@ function KpiCard({ label, value, sub, color }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 export default function PersonnelArchivesListPage() {
   const navigate = useNavigate();
 
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [rows,         setRows]         = useState([]);
+  const [loading,      setLoading]      = useState(true);
   const [loadingDates, setLoadingDates] = useState(false);
-  const [error, setError] = useState("");
+  const [error,        setError]        = useState("");
+  const [restoreInfo,  setRestoreInfo]  = useState(null); // ← bannière restore
 
-  // ── Chargement ──────────────────────────────────────────────────────────────
   const load = useCallback(async ({ force = false } = {}) => {
     try {
       setLoading(true);
@@ -164,7 +162,17 @@ export default function PersonnelArchivesListPage() {
     await load({ force: true });
   }, [load]);
 
-  // ── KPIs ────────────────────────────────────────────────────────────────────
+  // Retire la ligne localement après restauration
+  const markRowRestored = useCallback((id) => {
+    setRows((prev) => prev.filter((row) => String(row?.IDPersonneService) !== String(id)));
+  }, []);
+
+  // Gère succès/erreur restauration
+  const handleRestoreSuccess = useCallback((payload) => {
+    if (payload?.type === "error") return;
+    setRestoreInfo(payload);
+  }, []);
+
   const thisYear = dayjs().year();
 
   const departsThisYear = useMemo(
@@ -184,43 +192,43 @@ export default function PersonnelArchivesListPage() {
     [rows]
   );
 
-  // ── Colonnes DataGrid ───────────────────────────────────────────────────────
   const columns = useMemo(
     () => [
- {
-  field: "actions",
-  headerName: "Actions",
-  width: 170,
-  sortable: false,
-  filterable: false,
-  disableExport: true,
-  hideable: false,
-  renderCell: (params) => (
-    <Stack direction="row" alignItems="center" spacing={0.5}>
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 170,
+        sortable: false,
+        filterable: false,
+        disableExport: true,
+        hideable: false,
+        renderCell: (params) => (
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            <Tooltip title="Voir la fiche">
+              <IconButton
+                size="small"
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/personnels/${params.row.IDPersonneService}`);
+                }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-      <Tooltip title="Voir la fiche">
-        <IconButton
-          size="small"
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/personnels/${params.row.IDPersonneService}`);
-          }}
-        >
-          <VisibilityIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-
-      <RestoreActionComponent
-        IDPersonneService={params.row.IDPersonneService}
-        nomPersonne={params.row.NomPersonne}
-        prenomPersonne={params.row.PrenomPersonne}
-        email={params.row.Email}
-        refreshData={refreshData}
-      />
-    </Stack>
-  ),
-},
+            <RestoreActionComponent
+              IDPersonneService={params.row.IDPersonneService}
+              nomPersonne={params.row.NomPersonne}
+              prenomPersonne={params.row.PrenomPersonne}
+              email={params.row.Email}
+              refreshData={refreshData}
+              onRestoreSuccess={handleRestoreSuccess}
+              onRestoreLocal={markRowRestored}
+            />
+          </Stack>
+        ),
+      },
       { field: "NomPersonne",      headerName: "NOM",            width: 180, hideable: false },
       { field: "PrenomPersonne",   headerName: "PRÉNOM",         width: 180, hideable: false },
       { field: "Email",            headerName: "E-MAIL",         width: 260, hideable: false },
@@ -238,17 +246,15 @@ export default function PersonnelArchivesListPage() {
         width: 160,
         renderCell: (params) => safeFormat(params.value) || "-",
       },
-      { field: "NomFonctionFr", headerName: "FONCTION",    width: 220 },
-      { field: "NomWWGradeFr",  headerName: "GRADE",       width: 200 },
+      { field: "NomFonctionFr", headerName: "FONCTION",     width: 220 },
+      { field: "NomWWGradeFr",  headerName: "GRADE",        width: 200 },
       { field: "NomRueFr",      headerName: "LOCALISATION", width: 200 },
-      { field: "TelPro",        headerName: "TÉL",         width: 130 },
+      { field: "TelPro",        headerName: "TÉL",          width: 130 },
     ],
-    [refreshData]
+    [navigate, refreshData, handleRestoreSuccess, markRowRestored]
   );
 
   if (error) return <Alert severity="error">{error}</Alert>;
-
-  // ── Loader principal ─────────────────────────────────────────────────────────
   if (loading) return <PersonnelLoader />;
 
   return (
@@ -256,9 +262,7 @@ export default function PersonnelArchivesListPage() {
 
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h1">
-          Personnels archivés
-        </Typography>
+        <Typography variant="h1">Personnels archivés</Typography>
         <Tooltip title="Retour à la liste" arrow>
           <Button
             variant="outlined"
@@ -266,11 +270,8 @@ export default function PersonnelArchivesListPage() {
             startIcon={<KeyboardReturnIcon />}
             onClick={() => navigate("/personnels")}
             sx={{
-              borderRadius: "10px",
-              fontWeight: 600,
-              textTransform: "none",
-              color: PRIMARY,
-              borderColor: "rgba(0,59,104,0.25)",
+              borderRadius: "10px", fontWeight: 600, textTransform: "none",
+              color: PRIMARY, borderColor: "rgba(0,59,104,0.25)",
             }}
           >
             Retour
@@ -281,36 +282,21 @@ export default function PersonnelArchivesListPage() {
       {/* KPIs */}
       <Grid container spacing={1.5} mb={3}>
         <Grid item xs={12} sm={4}>
-          <KpiCard
-            label="Total archivés"
-            value={rows.length}
-            sub="membres archivés"
-            color={PRIMARY}
-          />
+          <KpiCard label="Total archivés" value={rows.length} sub="membres archivés" color={PRIMARY} />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <KpiCard
-            label="Cette année"
-            value={departsThisYear}
-            sub={`départs en ${thisYear}`}
-            color={RED}
-          />
+          <KpiCard label="Cette année" value={departsThisYear} sub={`départs en ${thisYear}`} color={RED} />
         </Grid>
         <Grid item xs={12} sm={4}>
           <KpiCard
             label="Dernière archive"
             value={
-              loadingDates
-                ? "…"
-                : lastArchived
-                ? `${lastArchived.NomPersonne ?? ""} ${lastArchived.PrenomPersonne ?? ""}`.trim()
-                : "-"
+              loadingDates ? "…"
+              : lastArchived
+              ? `${lastArchived.NomPersonne ?? ""} ${lastArchived.PrenomPersonne ?? ""}`.trim()
+              : "-"
             }
-            sub={
-              lastArchived
-                ? safeFormat(lastArchived.DateSortie || lastArchived.DateEntree)
-                : ""
-            }
+            sub={lastArchived ? safeFormat(lastArchived.DateSortie || lastArchived.DateEntree) : ""}
             color={TEAL}
           />
         </Grid>
@@ -319,36 +305,18 @@ export default function PersonnelArchivesListPage() {
       {/* Bannière chargement dates */}
       {loadingDates && (
         <Stack
-          direction="row"
-          alignItems="center"
-          spacing={1}
-          mb={1.5}
-          px={2}
-          py={0.8}
-          sx={{
-            background: "#e0f7f7",
-            borderRadius: "10px",
-            border: "1px solid rgba(2,178,175,0.2)",
-          }}
+          direction="row" alignItems="center" spacing={1}
+          mb={1.5} px={2} py={0.8}
+          sx={{ background: "#e0f7f7", borderRadius: "10px", border: "1px solid rgba(2,178,175,0.2)" }}
         >
-          {/* Petits points pulsants à la place du CircularProgress */}
           <Stack direction="row" spacing="4px" alignItems="center">
             {[0, 1, 2].map((i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  bgcolor: TEAL,
-                  "@keyframes blink": {
-                    "0%,100%": { opacity: 0.3 },
-                    "50%":     { opacity: 1 },
-                  },
-                  animation: "blink 1.2s ease-in-out infinite",
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              />
+              <Box key={i} sx={{
+                width: 5, height: 5, borderRadius: "50%", bgcolor: TEAL,
+                "@keyframes blink": { "0%,100%": { opacity: 0.3 }, "50%": { opacity: 1 } },
+                animation: "blink 1.2s ease-in-out infinite",
+                animationDelay: `${i * 0.2}s`,
+              }} />
             ))}
           </Stack>
           <Typography sx={{ fontSize: 12, color: "#007a78" }}>
@@ -357,16 +325,20 @@ export default function PersonnelArchivesListPage() {
         </Stack>
       )}
 
+      {/* ── Bannière restauration réussie ── */}
+      <AlertRestoreSuccessComponent
+        info={restoreInfo}
+        onClose={() => setRestoreInfo(null)}
+      />
+
       {/* DataGrid */}
-      <Box
-        sx={{
-          height: "calc(100vh - 320px)",
-          bgcolor: "background.paper",
-          borderRadius: "12px",
-          border: "1px solid rgba(0,0,0,0.08)",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{
+        height: "calc(100vh - 320px)",
+        bgcolor: "background.paper",
+        borderRadius: "12px",
+        border: "1px solid rgba(0,0,0,0.08)",
+        overflow: "hidden",
+      }}>
         <DataGrid
           rows={rows}
           columns={columns}
@@ -378,18 +350,11 @@ export default function PersonnelArchivesListPage() {
           slotProps={{
             toolbar: {
               showQuickFilter: true,
-              csvOptions: {
-                fileName: "export_archives",
-                delimiter: ";",
-                utf8WithBom: true,
-                allColumns: true,
-              },
+              csvOptions: { fileName: "export_archives", delimiter: ";", utf8WithBom: true, allColumns: true },
               printOptions: { disableToolbarButton: true },
             },
           }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
+          initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
           pageSizeOptions={[10, 25, 50, 100]}
           sx={{
             border: "none",
