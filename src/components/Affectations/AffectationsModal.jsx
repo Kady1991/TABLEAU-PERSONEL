@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -236,6 +236,7 @@ function AffectationsModal({
     open,
     type,
     editData,
+    isEdit,
     defaultDepartementId,
     defaultServiceId,
     defaultParentSousServiceId,
