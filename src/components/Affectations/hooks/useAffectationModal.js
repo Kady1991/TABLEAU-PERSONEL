@@ -19,6 +19,7 @@ export function useAffectationModal(selection) {
       defaultServiceId: null,
       defaultParentSousServiceId: null,
     };
+   
 
     if (type === "service") ids.defaultDepartementId = parentId;
     if (type === "sousservice" && parentType === "service")
@@ -50,16 +51,30 @@ export function useAffectationModal(selection) {
       showParentSousService: false,
     });
 
-  const openForEdit = (row, gridType) =>
-    setModal({
-      open: true,
-      type: gridType,
-      editData: row,
-      defaultDepartementId: null,
-      defaultServiceId: null,
-      defaultParentSousServiceId: null,
-      showParentSousService: gridType === "sousservice",
-    });
+  // const openForEdit = (row, gridType) =>
+  //   setModal({
+  //     open: true,
+  //     type: gridType,
+  //     editData: row,
+  //     defaultDepartementId: null,
+  //     defaultServiceId: null,
+  //     defaultParentSousServiceId: null,
+  //     showParentSousService: gridType === "sousservice",
+  //   });
+
+const openForEdit = (row, gridType) => {
+  console.log("ROW EDIT :", row);
+
+  setModal({
+    open: true,
+    type: gridType,
+    editData: row,
+    defaultDepartementId: null,
+    defaultServiceId: null,
+    defaultParentSousServiceId: null,
+    showParentSousService: gridType === "sousservice",
+  });
+};
 
   const close = () => setModal((m) => ({ ...m, open: false }));
 

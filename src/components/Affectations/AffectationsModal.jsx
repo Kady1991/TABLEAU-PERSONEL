@@ -186,9 +186,19 @@ function AffectationsModal({
               fonction: "—",
             });
           }
-          if (type === "service" && editData?.chefServiceId) {
+
+          // if (type === "service" && editData?.chefServiceId) {
+          //   setChefSvc({
+          //     idPersonne: editData.chefServiceId,
+          //     nomPersonne: editData.nomChefService,
+          //     prenomPersonne: editData.prenomChefService,
+          //     fonction: "—",
+          //   });
+          // }
+
+          if (type === "service" && editData?.chefServiceID) {
             setChefSvc({
-              idPersonne: editData.chefServiceId,
+              idPersonne: editData.chefServiceID,
               nomPersonne: editData.nomChefService,
               prenomPersonne: editData.prenomChefService,
               fonction: "—",
