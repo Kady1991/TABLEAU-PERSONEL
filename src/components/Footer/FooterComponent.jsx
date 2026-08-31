@@ -54,9 +54,9 @@ export default function Footer() {
 
       {/* Mise à jour */}
       <Box sx={f.versionBox}>
-        <Box component="span" sx={f.text}>
+        {/* <Box component="span" sx={f.text}>
           Mise &agrave; jour 07/05/{year}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

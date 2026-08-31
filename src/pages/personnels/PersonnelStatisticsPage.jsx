@@ -36,6 +36,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
 import PersonnelService from "../../services/PersonnelService";
 import PersonnelLoader from "../../components/Loading/PersonnelLoaderComponent.jsx";
 import PropTypes from "prop-types";
@@ -56,14 +65,6 @@ const GLOBAL_STYLES = `
     from { opacity: 0; transform: scale(0.93); }
     to   { opacity: 1; transform: scale(1); }
   }
-  @keyframes barGrow {
-    from { transform: scaleX(0); transform-origin: left; }
-    to   { transform: scaleX(1); transform-origin: left; }
-  }
-  @keyframes countUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
   .anim-fade-slide-up {
     animation: fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
@@ -75,7 +76,6 @@ const GLOBAL_STYLES = `
   }
 `;
 
-// Injecte les styles une seule fois
 if (typeof document !== "undefined" && !document.getElementById("personnel-stats-styles")) {
   const style = document.createElement("style");
   style.id = "personnel-stats-styles";
@@ -101,7 +101,7 @@ function useAnimatedCount(target, duration = 700) {
   return display;
 }
 
-// ── Hook : observer intersection (déclenche l'animation à l'entrée dans le viewport) ──
+// ── Hook : observer intersection ──────────────────────────────────────────────
 function useInView(options = {}) {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
@@ -122,36 +122,81 @@ const clean = (s) => (s ? String(s).trim() : "");
 const isArchived = (v) =>
   v === true || v === 1 || String(v).toLowerCase() === "true";
 
-const BAR_BLUE = "#5594b1";
-const RED      = "#c0392b";
-
-// ── KPI Card animée ───────────────────────────────────────────────────────────
-function KpiCard({ label, value, sub, color, delay = 0 }) {
+// ── KPI Card animée (icône + tendance) ────────────────────────────────────────
+function KpiCard({ label, value, sub, colorKey, icon: Icon, trend, delay = 0 }) {
+  const theme = useTheme();
+  const color = colorKey === "red" ? theme.palette.error.main : theme.palette.primary.main;
   const animated = useAnimatedCount(typeof value === "number" ? value : 0);
+
+  const TrendIcon = trend > 0 ? TrendingUpIcon : trend < 0 ? TrendingDownIcon : TrendingFlatIcon;
+  const trendColor = trend > 0
+    ? theme.custom.stats.trendUp
+    : trend < 0
+      ? theme.custom.stats.trendDown
+      : theme.palette.text.secondary;
+
   return (
     <Card
       className="anim-scale-in"
-      sx={{ height: "100%", style: `animation-delay: ${delay}ms` }}
       style={{ animationDelay: `${delay}ms` }}
+      sx={{
+        height: "100%",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          bgcolor: color,
+        },
+      }}
     >
       <CardContent>
-        <Typography variant="subtitle2" gutterBottom>
-          {label}
-        </Typography>
-        <Typography
-          variant="h2"
-          sx={{
-            color,
-            transition: "color 0.3s ease",
-          }}
-        >
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+          <Typography variant="subtitle2" gutterBottom>
+            {label}
+          </Typography>
+          {Icon && (
+            <Box
+              sx={{
+                width: 34,
+                height: 34,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: theme.custom.stats.kpiIconBg,
+                color,
+                flexShrink: 0,
+              }}
+            >
+              <Icon fontSize="small" />
+            </Box>
+          )}
+        </Stack>
+
+        <Typography variant="h2" sx={{ color, transition: "color 0.3s ease" }}>
           {typeof value === "number" ? animated : value}
         </Typography>
-        {sub && (
-          <Typography variant="body2" sx={{ mt: 0.5 }}>
-            {sub}
-          </Typography>
-        )}
+
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 0.5 }}>
+          {sub && (
+            <Typography variant="body2" color="text.secondary">
+              {sub}
+            </Typography>
+          )}
+          {trend !== undefined && (
+            <Stack direction="row" alignItems="center" spacing={0.3} sx={{ color: trendColor }}>
+              <TrendIcon sx={{ fontSize: 15 }} />
+              <Typography variant="body2" sx={{ fontWeight: 700, color: trendColor }}>
+                {trend > 0 ? `+${trend}` : trend}
+              </Typography>
+            </Stack>
+          )}
+        </Stack>
       </CardContent>
     </Card>
   );
@@ -161,14 +206,19 @@ KpiCard.propTypes = {
   label: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   sub: PropTypes.string,
-  color: PropTypes.string,
+  colorKey: PropTypes.oneOf(["primary", "red"]),
+  icon: PropTypes.elementType,
+  trend: PropTypes.number,
   delay: PropTypes.number,
 };
 
 // ── Mini bar horizontale animée ───────────────────────────────────────────────
-function HBarRow({ label, present, depart, max, PRIMARY, TEAL, delay = 0 }) {
+function HBarRow({ label, present, depart, max, delay = 0 }) {
+  const theme = useTheme();
+  const { present: presentColor, depart: departColor } = theme.custom.stats.barColors;
   const [ref, inView] = useInView();
   const pct = (v) => Math.round((v / (max || 1)) * 100);
+
   return (
     <Stack
       ref={ref}
@@ -208,23 +258,23 @@ function HBarRow({ label, present, depart, max, PRIMARY, TEAL, delay = 0 }) {
         <Box
           sx={{
             width: inView ? `${pct(present)}%` : "0%",
-            bgcolor: BAR_BLUE,
+            bgcolor: presentColor,
             transition: `width 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + 80}ms`,
           }}
         />
         <Box
           sx={{
             width: inView ? `${pct(depart)}%` : "0%",
-            bgcolor: TEAL,
+            bgcolor: departColor,
             ml: "1px",
             transition: `width 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + 160}ms`,
           }}
         />
       </Box>
       <Typography variant="body2" sx={{ whiteSpace: "nowrap", width: 64, textAlign: "right" }}>
-        <span style={{ color: PRIMARY, fontWeight: 700 }}>{present}</span>
+        <span style={{ color: presentColor, fontWeight: 700 }}>{present}</span>
         {" / "}
-        <span style={{ color: TEAL, fontWeight: 700 }}>{depart}</span>
+        <span style={{ color: departColor, fontWeight: 700 }}>{depart}</span>
       </Typography>
     </Stack>
   );
@@ -235,38 +285,36 @@ HBarRow.propTypes = {
   present: PropTypes.number,
   depart: PropTypes.number,
   max: PropTypes.number,
-  PRIMARY: PropTypes.string,
-  TEAL: PropTypes.string,
   delay: PropTypes.number,
 };
 
-// ── Badge Chip ────────────────────────────────────────────────────────────────
-function Badge({ value, variant = "blue", PRIMARY }) {
-  const styles = {
-    blue: { background: "#e0ecf6", color: PRIMARY },
-    teal: { background: "#e0f7f7", color: "#007a78" },
-    red:  { background: "#fdecea", color: RED },
-    gray: { background: "#f0f4f8", color: "#5c6b7a" },
-  };
+// ── Badge Chip — s'appuie sur les MuiChip color overrides existants ──────────
+function Badge({ value, variant = "blue" }) {
+  const theme = useTheme();
+  if (variant === "gray") {
+    return (
+      <Chip
+        label={value}
+        size="small"
+        sx={{ ...theme.custom.stats.chipGray, fontWeight: 700 }}
+      />
+    );
+  }
+  // blue → colorPrimary, teal → colorSecondary, red → colorError (déjà définis dans theme.js)
+  const colorMap = { blue: "primary", teal: "secondary", red: "error" };
   return (
     <Chip
       label={value}
       size="small"
-      sx={{
-        height: 24,
-        fontSize: 13,
-        fontWeight: 700,
-        borderRadius: 1,
-        ...styles[variant],
-      }}
+      color={colorMap[variant]}
+      sx={{ fontWeight: 700 }}
     />
   );
 }
 
 Badge.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  variant: PropTypes.string,
-  PRIMARY: PropTypes.string,
+  variant: PropTypes.oneOf(["blue", "teal", "red", "gray"]),
 };
 
 // ── Légende commune ───────────────────────────────────────────────────────────
@@ -291,8 +339,38 @@ Legend.propTypes = {
   ),
 };
 
-// ── Ligne de tableau animée ───────────────────────────────────────────────────
-function AnimatedTableRow({ children, delay = 0, ...props }) {
+// ── En-tête de colonne triable ────────────────────────────────────────────────
+function SortableHeaderCell({ label, sortKey, sort, onSort, align = "left" }) {
+  const active = sort.key === sortKey;
+  return (
+    <TableCell
+      align={align}
+      onClick={() => onSort(sortKey)}
+      sx={{ cursor: "pointer", userSelect: "none", whiteSpace: "nowrap", "&:hover": { opacity: 0.75 } }}
+    >
+      <Stack direction="row" spacing={0.3} alignItems="center" justifyContent={align === "center" ? "center" : "flex-start"}>
+        <span>{label}</span>
+        {active && (
+          sort.dir === "asc"
+            ? <ArrowUpwardIcon sx={{ fontSize: 14 }} />
+            : <ArrowDownwardIcon sx={{ fontSize: 14 }} />
+        )}
+      </Stack>
+    </TableCell>
+  );
+}
+
+SortableHeaderCell.propTypes = {
+  label: PropTypes.string,
+  sortKey: PropTypes.string,
+  sort: PropTypes.shape({ key: PropTypes.string, dir: PropTypes.string }),
+  onSort: PropTypes.func,
+  align: PropTypes.string,
+};
+
+// ── Ligne de tableau animée (zebra intégré) ───────────────────────────────────
+function AnimatedTableRow({ children, delay = 0, index = 0, ...props }) {
+  const theme = useTheme();
   const [ref, inView] = useInView();
   return (
     <TableRow
@@ -301,6 +379,7 @@ function AnimatedTableRow({ children, delay = 0, ...props }) {
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(8px)",
         transition: `opacity 0.35s ease ${delay}ms, transform 0.35s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+        bgcolor: index % 2 === 1 ? theme.custom.stats.tableStripe : "transparent",
       }}
       hover
       {...props}
@@ -313,13 +392,26 @@ function AnimatedTableRow({ children, delay = 0, ...props }) {
 AnimatedTableRow.propTypes = {
   children: PropTypes.node,
   delay: PropTypes.number,
+  index: PropTypes.number,
+};
+
+// ── État vide ──────────────────────────────────────────────────────────────
+function EmptyState({ message }) {
+  return (
+    <Box className="anim-fade-in" sx={{ py: 5, textAlign: "center", color: "text.secondary" }}>
+      <Typography variant="body2">{message}</Typography>
+    </Box>
+  );
+}
+
+EmptyState.propTypes = {
+  message: PropTypes.string,
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function PersonnelStatisticsPage() {
-  const theme   = useTheme();
-  const PRIMARY = theme.palette.primary.main;
-  const TEAL    = theme.palette.secondary.main;
+  const theme = useTheme();
+  const { present: presentColor, depart: departColor } = theme.custom.stats.barColors;
 
   const [personnes,    setPersonnes]    = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -330,9 +422,10 @@ export default function PersonnelStatisticsPage() {
   const [anchorEl,     setAnchorEl]     = useState(null);
   const [tabIndex,     setTabIndex]     = useState(0);
   const [mounted,      setMounted]      = useState(false);
+  const [deptSort,     setDeptSort]     = useState({ key: "total", dir: "desc" });
+  const [svcSort,      setSvcSort]      = useState({ key: "total", dir: "desc" });
 
   useEffect(() => {
-    // Léger délai pour laisser le DOM se stabiliser avant les animations
     const t = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(t);
   }, []);
@@ -401,6 +494,18 @@ export default function PersonnelStatisticsPage() {
       .sort((a, b) => b.total - a.total);
   }, [filteredByPeriod, isDepart]);
 
+  const sortedByDept = useMemo(() => {
+    const arr = [...statsByDept];
+    arr.sort((a, b) => {
+      const av = deptSort.key === "dept" ? a.dept.toLowerCase() : a[deptSort.key];
+      const bv = deptSort.key === "dept" ? b.dept.toLowerCase() : b[deptSort.key];
+      if (av < bv) return deptSort.dir === "asc" ? -1 : 1;
+      if (av > bv) return deptSort.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return arr;
+  }, [statsByDept, deptSort]);
+
   const maxDept = Math.max(...statsByDept.map((d) => d.present + d.depart), 1);
 
   const statsBySvc = useMemo(() => {
@@ -417,6 +522,18 @@ export default function PersonnelStatisticsPage() {
       .sort((a, b) => b.total - a.total);
   }, [filtered, isDepart]);
 
+  const sortedBySvc = useMemo(() => {
+    const arr = [...statsBySvc];
+    arr.sort((a, b) => {
+      const av = ["svc", "dept"].includes(svcSort.key) ? a[svcSort.key].toLowerCase() : a[svcSort.key];
+      const bv = ["svc", "dept"].includes(svcSort.key) ? b[svcSort.key].toLowerCase() : b[svcSort.key];
+      if (av < bv) return svcSort.dir === "asc" ? -1 : 1;
+      if (av > bv) return svcSort.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return arr;
+  }, [statsBySvc, svcSort]);
+
   const monthlyData = useMemo(() => {
     const months = Array.from({ length: 12 }, (_, i) => ({
       mois: dayjs().month(i).format("MMM"),
@@ -429,6 +546,15 @@ export default function PersonnelStatisticsPage() {
     });
     return months;
   }, [personnes]);
+
+  const { trendEntrees, trendDeparts } = useMemo(() => {
+    const cur  = dayjs().month();
+    const prev = (cur + 11) % 12;
+    return {
+      trendEntrees: monthlyData[cur].Entrées - monthlyData[prev].Entrées,
+      trendDeparts: monthlyData[cur].Départs - monthlyData[prev].Départs,
+    };
+  }, [monthlyData]);
 
   const derniersMouvements = useMemo(() => {
     return [...personnes]
@@ -453,20 +579,30 @@ export default function PersonnelStatisticsPage() {
     { present: 0, depart: 0, total: 0 }
   );
 
-  const totalRowSx = { fontWeight: 700, bgcolor: "#f0f4f8", color: PRIMARY };
+  const totalRowSx = { fontWeight: 700, ...theme.custom.stats.totalRow };
+
+  const handleDeptSort = (key) => {
+    setDeptSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "desc" }));
+  };
+  const handleSvcSort = (key) => {
+    setSvcSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "desc" }));
+  };
+
+  const applyShortcut = (mode) => {
+    const now = dayjs();
+    if (mode === "mois")   { setStartDate(now.startOf("month")); setEndDate(now.endOf("day")); }
+    if (mode === "annee")  { setStartDate(now.startOf("year"));  setEndDate(now.endOf("day")); }
+    if (mode === "12mois") { setStartDate(now.subtract(12, "month").startOf("day")); setEndDate(now.endOf("day")); }
+    setPeriodMode("range");
+  };
 
   return (
     <Box>
-      {/* ── Titre animé ── */}
-      <Typography
-        variant="h1"
-        className="anim-fade-slide-up"
-        style={{ animationDelay: "0ms" }}
-      >
+      <Typography variant="h1" className="anim-fade-slide-up" style={{ animationDelay: "0ms" }}>
         Statistiques du personnel
       </Typography>
 
-      {/* ── Filtres animés ── */}
+      {/* ── Filtres ── */}
       <Stack
         direction="row"
         spacing={2}
@@ -478,11 +614,7 @@ export default function PersonnelStatisticsPage() {
       >
         <FormControl size="small" sx={{ minWidth: 200 }}>
           <InputLabel>Département</InputLabel>
-          <Select
-            value={selectedDept}
-            label="Département"
-            onChange={(e) => setSelectedDept(e.target.value)}
-          >
+          <Select value={selectedDept} label="Département" onChange={(e) => setSelectedDept(e.target.value)}>
             <MenuItem value="">Tous les départements</MenuItem>
             {departments.map((d) => <MenuItem key={d} value={d}>{d}</MenuItem>)}
           </Select>
@@ -491,6 +623,7 @@ export default function PersonnelStatisticsPage() {
         <Button
           variant="outlined"
           size="small"
+          startIcon={<EventOutlinedIcon fontSize="small" />}
           onClick={(e) => setAnchorEl(e.currentTarget)}
           sx={{ transition: "box-shadow 0.2s ease", "&:hover": { boxShadow: "0 2px 10px rgba(0,0,0,0.12)" } }}
         >
@@ -500,11 +633,7 @@ export default function PersonnelStatisticsPage() {
         </Button>
 
         {(selectedDept || periodMode !== "global") && (
-          <Button
-            size="small"
-            className="anim-fade-in"
-            onClick={() => { setSelectedDept(""); setPeriodMode("global"); }}
-          >
+          <Button size="small" className="anim-fade-in" onClick={() => { setSelectedDept(""); setPeriodMode("global"); }}>
             Réinitialiser
           </Button>
         )}
@@ -518,8 +647,15 @@ export default function PersonnelStatisticsPage() {
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         TransitionProps={{ timeout: 250 }}
       >
-        <Box sx={{ p: 2, width: 300 }}>
+        <Box sx={{ p: 2, width: 320 }}>
           <Typography variant="h4" gutterBottom>Filtrer par intervalle</Typography>
+
+          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1.5 }}>
+            <Chip label="Ce mois" size="small" onClick={() => applyShortcut("mois")} />
+            <Chip label="Cette année" size="small" onClick={() => applyShortcut("annee")} />
+            <Chip label="12 derniers mois" size="small" onClick={() => applyShortcut("12mois")} />
+          </Stack>
+
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Stack spacing={2}>
               <DesktopDatePicker
@@ -548,50 +684,67 @@ export default function PersonnelStatisticsPage() {
 
       {loading ? (
         <PersonnelLoader />
+      ) : personnes.length === 0 ? (
+        <Card className="anim-fade-in"><CardContent><EmptyState message="Aucune donnée de personnel disponible." /></CardContent></Card>
       ) : (
-        <Box
-          sx={{
-            opacity: mounted ? 1 : 0,
-            transition: "opacity 0.3s ease",
-          }}
-        >
+        <Box sx={{ opacity: mounted ? 1 : 0, transition: "opacity 0.3s ease" }}>
           {/* ── KPIs ── */}
           <Grid container spacing={2} mb={3}>
-            {[
-              { label: "Total présents", value: totalPresent, sub: "membres en poste",       color: PRIMARY, delay: 120 },
-              { label: "Total départs",  value: totalDepart,  sub: "archivés / sortis",       color: RED,     delay: 200 },
-              { label: "Départements",   value: departments.length, sub: `/ ${statsBySvc.length} services`, color: PRIMARY, delay: 280 },
-            ].map(({ label, value, sub, color, delay }) => (
-              <Grid item xs={6} sm={4} key={label}>
-                <KpiCard label={label} value={value} sub={sub} color={color} delay={delay} />
-              </Grid>
-            ))}
+            <Grid item xs={6} sm={4}>
+              <KpiCard
+                label="Total présents"
+                value={totalPresent}
+                sub="membres en poste"
+                colorKey="primary"
+                icon={PeopleAltOutlinedIcon}
+                trend={trendEntrees}
+                delay={120}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <KpiCard
+                label="Total départs"
+                value={totalDepart}
+                sub="archivés / sortis"
+                colorKey="red"
+                icon={LogoutOutlinedIcon}
+                trend={trendDeparts}
+                delay={200}
+              />
+            </Grid>
+            <Grid item xs={6} sm={4}>
+              <KpiCard
+                label="Départements"
+                value={departments.length}
+                sub={`/ ${statsBySvc.length} services`}
+                colorKey="primary"
+                icon={AccountTreeOutlinedIcon}
+                delay={280}
+              />
+            </Grid>
           </Grid>
 
           {/* ── Barres + Graphique ── */}
           <Grid container spacing={2} mb={2}>
             <Grid item xs={12} md={5}>
-              <Card
-                className="anim-fade-slide-up"
-                style={{ animationDelay: "320ms", height: "100%" }}
-              >
+              <Card className="anim-fade-slide-up" style={{ animationDelay: "320ms", height: "100%" }}>
                 <CardContent>
                   <Typography variant="h3" gutterBottom>
                     Présents &amp; Départs par département
                   </Typography>
                   <Legend items={[
-                    { label: "Présents", color: BAR_BLUE },
-                    { label: "Départs",  color: TEAL },
+                    { label: "Présents", color: presentColor },
+                    { label: "Départs",  color: departColor },
                   ]} />
-                  {statsByDept.map((row, i) => (
+                  {statsByDept.length === 0 ? (
+                    <EmptyState message="Aucune donnée pour ce filtre." />
+                  ) : statsByDept.map((row, i) => (
                     <HBarRow
                       key={row.dept}
                       label={row.dept}
                       present={row.present}
                       depart={row.depart}
                       max={maxDept}
-                      PRIMARY={PRIMARY}
-                      TEAL={TEAL}
                       delay={i * 50}
                     />
                   ))}
@@ -600,44 +753,37 @@ export default function PersonnelStatisticsPage() {
             </Grid>
 
             <Grid item xs={12} md={7}>
-              <Card
-                className="anim-fade-slide-up"
-                style={{ animationDelay: "400ms", height: "100%" }}
-              >
+              <Card className="anim-fade-slide-up" style={{ animationDelay: "400ms", height: "100%" }}>
                 <CardContent>
                   <Typography variant="h3" gutterBottom>
                     Évolution mensuelle
                   </Typography>
                   <Legend items={[
-                    { label: "Entrées", color: BAR_BLUE },
-                    { label: "Départs", color: TEAL },
+                    { label: "Entrées", color: presentColor },
+                    { label: "Départs", color: departColor },
                   ]} />
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={monthlyData} barCategoryGap="30%">
+                      <defs>
+                        <linearGradient id="gradEntrees" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={presentColor} stopOpacity={1} />
+                          <stop offset="100%" stopColor={presentColor} stopOpacity={0.55} />
+                        </linearGradient>
+                        <linearGradient id="gradDeparts" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={departColor} stopOpacity={1} />
+                          <stop offset="100%" stopColor={departColor} stopOpacity={0.55} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
-                      <XAxis
-                        dataKey="mois"
-                        tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
-                        axisLine={false}
-                        tickLine={false}
-                        allowDecimals={false}
-                      />
+                      <XAxis dataKey="mois" tick={{ fontSize: 12, fill: theme.palette.text.secondary }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 12, fill: theme.palette.text.secondary }} axisLine={false} tickLine={false} allowDecimals={false} />
                       <Tooltip
-                        contentStyle={{
-                          fontSize: 13,
-                          borderRadius: 8,
-                          border: "1px solid rgba(0,0,0,0.08)",
-                        }}
+                        contentStyle={{ fontSize: 13, borderRadius: theme.shape.borderRadius, border: "1px solid rgba(0,0,0,0.08)" }}
                         cursor={{ fill: "rgba(0,59,104,0.04)" }}
                         animationDuration={200}
                       />
-                      <Bar dataKey="Entrées" fill={BAR_BLUE} radius={[3, 3, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
-                      <Bar dataKey="Départs" fill={TEAL}     radius={[3, 3, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={150} />
+                      <Bar dataKey="Entrées" fill="url(#gradEntrees)" radius={[3, 3, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
+                      <Bar dataKey="Départs" fill="url(#gradDeparts)" radius={[3, 3, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={150} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -646,20 +792,13 @@ export default function PersonnelStatisticsPage() {
           </Grid>
 
           {/* ── Tableau détaillé ── */}
-          <Card
-            className="anim-fade-slide-up"
-            style={{ animationDelay: "480ms" }}
-          >
+          <Card className="anim-fade-slide-up" style={{ animationDelay: "480ms" }}>
             <CardContent>
               <Typography variant="h3" gutterBottom>
                 Détail complet
               </Typography>
 
-              <Tabs
-                value={tabIndex}
-                onChange={(_, v) => setTabIndex(v)}
-                sx={{ mb: 2 }}
-              >
+              <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)} sx={{ mb: 2 }}>
                 <Tab label="Par département" />
                 <Tab label="Par service" />
                 <Tab label="Derniers mouvements" />
@@ -667,120 +806,119 @@ export default function PersonnelStatisticsPage() {
 
               {/* ── Tab 0 : Par département ── */}
               {tabIndex === 0 && (
-                <Box
-                  key="tab-dept"
-                  className="anim-fade-in"
-                  sx={{ overflowX: "auto" }}
-                >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Département</TableCell>
-                        <TableCell align="center">Présents</TableCell>
-                        <TableCell align="center">Départs</TableCell>
-                        <TableCell align="center">Total</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {statsByDept.map((row, i) => (
-                        <AnimatedTableRow key={row.dept} delay={i * 35}>
-                          <TableCell>{row.dept}</TableCell>
-                          <TableCell align="center"><Badge value={row.present} variant="blue"  PRIMARY={PRIMARY} /></TableCell>
-                          <TableCell align="center"><Badge value={row.depart}  variant="teal"  PRIMARY={PRIMARY} /></TableCell>
-                          <TableCell align="center">{row.total}</TableCell>
-                        </AnimatedTableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell sx={totalRowSx}>TOTAL</TableCell>
-                        <TableCell sx={totalRowSx} align="center"><Badge value={totalDept.present} variant="blue" PRIMARY={PRIMARY} /></TableCell>
-                        <TableCell sx={totalRowSx} align="center"><Badge value={totalDept.depart}  variant="teal" PRIMARY={PRIMARY} /></TableCell>
-                        <TableCell sx={totalRowSx} align="center">{totalDept.total}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                <Box key="tab-dept" className="anim-fade-in" sx={{ overflowX: "auto" }}>
+                  {sortedByDept.length === 0 ? (
+                    <EmptyState message="Aucune donnée pour ce filtre." />
+                  ) : (
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <SortableHeaderCell label="Département" sortKey="dept" sort={deptSort} onSort={handleDeptSort} />
+                          <SortableHeaderCell label="Présents" sortKey="present" sort={deptSort} onSort={handleDeptSort} align="center" />
+                          <SortableHeaderCell label="Départs" sortKey="depart" sort={deptSort} onSort={handleDeptSort} align="center" />
+                          <SortableHeaderCell label="Total" sortKey="total" sort={deptSort} onSort={handleDeptSort} align="center" />
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {sortedByDept.map((row, i) => (
+                          <AnimatedTableRow key={row.dept} delay={i * 35} index={i}>
+                            <TableCell>{row.dept}</TableCell>
+                            <TableCell align="center"><Badge value={row.present} variant="blue" /></TableCell>
+                            <TableCell align="center"><Badge value={row.depart}  variant="teal" /></TableCell>
+                            <TableCell align="center">{row.total}</TableCell>
+                          </AnimatedTableRow>
+                        ))}
+                        <TableRow>
+                          <TableCell sx={totalRowSx}>TOTAL</TableCell>
+                          <TableCell sx={totalRowSx} align="center"><Badge value={totalDept.present} variant="blue" /></TableCell>
+                          <TableCell sx={totalRowSx} align="center"><Badge value={totalDept.depart}  variant="teal" /></TableCell>
+                          <TableCell sx={totalRowSx} align="center">{totalDept.total}</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  )}
                 </Box>
               )}
 
               {/* ── Tab 1 : Par service ── */}
               {tabIndex === 1 && (
-                <Box
-                  key="tab-svc"
-                  className="anim-fade-in"
-                  sx={{ overflowX: "auto" }}
-                >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Service</TableCell>
-                        <TableCell>Département</TableCell>
-                        <TableCell align="center">Présents</TableCell>
-                        <TableCell align="center">Départs</TableCell>
-                        <TableCell align="center">Total</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {statsBySvc.map((row, i) => (
-                        <AnimatedTableRow key={`${row.dept}-${row.svc}`} delay={i * 35}>
-                          <TableCell>{row.svc}</TableCell>
-                          <TableCell><Badge value={row.dept} variant="gray" PRIMARY={PRIMARY} /></TableCell>
-                          <TableCell align="center"><Badge value={row.present} variant="blue" PRIMARY={PRIMARY} /></TableCell>
-                          <TableCell align="center"><Badge value={row.depart}  variant="teal" PRIMARY={PRIMARY} /></TableCell>
-                          <TableCell align="center">{row.total}</TableCell>
-                        </AnimatedTableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell sx={totalRowSx}>TOTAL</TableCell>
-                        <TableCell sx={totalRowSx} />
-                        <TableCell sx={totalRowSx} align="center"><Badge value={totalSvc.present} variant="blue" PRIMARY={PRIMARY} /></TableCell>
-                        <TableCell sx={totalRowSx} align="center"><Badge value={totalSvc.depart}  variant="teal" PRIMARY={PRIMARY} /></TableCell>
-                        <TableCell sx={totalRowSx} align="center">{totalSvc.total}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                <Box key="tab-svc" className="anim-fade-in" sx={{ overflowX: "auto" }}>
+                  {sortedBySvc.length === 0 ? (
+                    <EmptyState message="Aucune donnée pour ce filtre." />
+                  ) : (
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <SortableHeaderCell label="Service" sortKey="svc" sort={svcSort} onSort={handleSvcSort} />
+                          <SortableHeaderCell label="Département" sortKey="dept" sort={svcSort} onSort={handleSvcSort} />
+                          <SortableHeaderCell label="Présents" sortKey="present" sort={svcSort} onSort={handleSvcSort} align="center" />
+                          <SortableHeaderCell label="Départs" sortKey="depart" sort={svcSort} onSort={handleSvcSort} align="center" />
+                          <SortableHeaderCell label="Total" sortKey="total" sort={svcSort} onSort={handleSvcSort} align="center" />
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {sortedBySvc.map((row, i) => (
+                          <AnimatedTableRow key={`${row.dept}-${row.svc}`} delay={i * 35} index={i}>
+                            <TableCell>{row.svc}</TableCell>
+                            <TableCell><Badge value={row.dept} variant="gray" /></TableCell>
+                            <TableCell align="center"><Badge value={row.present} variant="blue" /></TableCell>
+                            <TableCell align="center"><Badge value={row.depart}  variant="teal" /></TableCell>
+                            <TableCell align="center">{row.total}</TableCell>
+                          </AnimatedTableRow>
+                        ))}
+                        <TableRow>
+                          <TableCell sx={totalRowSx}>TOTAL</TableCell>
+                          <TableCell sx={totalRowSx} />
+                          <TableCell sx={totalRowSx} align="center"><Badge value={totalSvc.present} variant="blue" /></TableCell>
+                          <TableCell sx={totalRowSx} align="center"><Badge value={totalSvc.depart}  variant="teal" /></TableCell>
+                          <TableCell sx={totalRowSx} align="center">{totalSvc.total}</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  )}
                 </Box>
               )}
 
               {/* ── Tab 2 : Derniers mouvements ── */}
               {tabIndex === 2 && (
-                <Box
-                  key="tab-mvt"
-                  className="anim-fade-in"
-                  sx={{ overflowX: "auto" }}
-                >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Nom</TableCell>
-                        <TableCell>Service</TableCell>
-                        <TableCell>Département</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Mouvement</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {derniersMouvements.map((row, i) => (
-                        <AnimatedTableRow key={i} delay={i * 35}>
-                          <TableCell sx={{ fontWeight: 600 }}>{row.nom}</TableCell>
-                          <TableCell>{row.service}</TableCell>
-                          <TableCell>{row.dept}</TableCell>
-                          <TableCell>{row.date}</TableCell>
-                          <TableCell>
-                            <Stack direction="row" alignItems="center" spacing={0.5}>
-                              <Box sx={{
-                                width: 7, height: 7, borderRadius: 1,
-                                bgcolor: row.type === "entree" ? TEAL : RED,
-                              }} />
-                              <Badge
-                                value={row.type === "entree" ? "Entrée" : "Départ"}
-                                variant={row.type === "entree" ? "teal" : "red"}
-                                PRIMARY={PRIMARY}
-                              />
-                            </Stack>
-                          </TableCell>
-                        </AnimatedTableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                <Box key="tab-mvt" className="anim-fade-in" sx={{ overflowX: "auto" }}>
+                  {derniersMouvements.length === 0 ? (
+                    <EmptyState message="Aucun mouvement récent." />
+                  ) : (
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Nom</TableCell>
+                          <TableCell>Service</TableCell>
+                          <TableCell>Département</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Mouvement</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {derniersMouvements.map((row, i) => (
+                          <AnimatedTableRow key={i} delay={i * 35} index={i}>
+                            <TableCell sx={{ fontWeight: 600 }}>{row.nom}</TableCell>
+                            <TableCell>{row.service}</TableCell>
+                            <TableCell>{row.dept}</TableCell>
+                            <TableCell>{row.date}</TableCell>
+                            <TableCell>
+                              <Stack direction="row" alignItems="center" spacing={0.5}>
+                                <Box sx={{
+                                  width: 7, height: 7, borderRadius: 1,
+                                  bgcolor: row.type === "entree" ? departColor : theme.palette.error.main,
+                                }} />
+                                <Badge
+                                  value={row.type === "entree" ? "Entrée" : "Départ"}
+                                  variant={row.type === "entree" ? "teal" : "red"}
+                                />
+                              </Stack>
+                            </TableCell>
+                          </AnimatedTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
                 </Box>
               )}
             </CardContent>

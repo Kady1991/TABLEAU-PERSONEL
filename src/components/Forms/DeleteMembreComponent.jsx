@@ -59,19 +59,21 @@ function DeleteMembreComponent({
       setOpen(false);
       setSelectedDate(null);
 
+      PersonnelService.clearCaches?.();
+      sessionStorage.removeItem("personnels_archives_cache_v2_dates");
+
+      // Mise à jour locale IMMÉDIATE (synchrone) : évite la course avec
+      // un éventuel refreshData/re-render déclenché par onArchiveSuccess,
+      // qui écrasait l'état avant que le setTimeout précédent ne s'exécute
+      // (obligeant l'utilisateur à archiver deux fois).
+      onArchiveLocal?.(IDPersonneService);
+
       onArchiveSuccess?.({
         prenom: prenomPersonne || "",
         nom:    nomPersonne    || "",
         date:   formattedDateDisplay,
         id:     IDPersonneService,
       });
-
-      PersonnelService.clearCaches?.();
-      sessionStorage.removeItem("personnels_archives_cache_v2_dates");
-
-      setTimeout(() => {
-        onArchiveLocal?.(IDPersonneService);
-      }, 150);
 
     } catch (error) {
       console.error("Erreur archivage :", error?.response?.data || error?.message);

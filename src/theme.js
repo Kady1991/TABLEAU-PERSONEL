@@ -175,13 +175,29 @@ const theme = createTheme({
       hierRole: { fontSize: 10, color: "text.disabled", textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.3 },
       hierName: { fontSize: 13, fontWeight: 500, color: "text.primary" },
     },
+
+    // ── PersonnelStatisticsPage ─────────────────────────────────
+   stats: {
+      barColors: {
+        present: "#48b4b2",
+        depart:  RED,        // ← était ICON_TEAL, maintenant rouge
+      },
+      kpiIconBg:   "#e0ecf6",
+      chipGray:    { bgcolor: "#f0f4f8", color: GRAY },
+      tableStripe: "rgba(0,59,104,0.025)",
+      totalRow:    { bgcolor: "#f0f4f8", color: PRIMARY_BLUE },
+      trendUp:     "#1e8e5a",
+      trendDown:   RED,
+    },
   },
+
+  // ── Typographie ───────────────────────────────────────────────
 
   // ── Typographie ───────────────────────────────────────────────
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
-    h1: { fontSize: "28px", fontWeight: 800, color: PRIMARY_BLUE, letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: "24px" },
-    h2: { fontSize: "20px", fontWeight: 700, color: PRIMARY_BLUE, lineHeight: 1.3 },
+    h1: { fontSize: "25px", fontWeight: 600, color: PRIMARY_BLUE, letterSpacing: "-0.5px", lineHeight: 1, marginBottom: "24px" },
+    h2: { fontSize: "22px", fontWeight: 400, color: PRIMARY_BLUE, lineHeight: 1.3 },
     h3: { fontSize: "16px", fontWeight: 700, color: PRIMARY_BLUE, lineHeight: 1.4 },
     h4: { fontSize: "15px", fontWeight: 600, color: PRIMARY_BLUE, lineHeight: 1.4 },
     h5: { fontSize: "13px", fontWeight: 700, color: PRIMARY_BLUE, textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4 },
