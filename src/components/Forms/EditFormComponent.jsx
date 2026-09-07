@@ -334,23 +334,42 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const p = personRes?.data || {};
         const rawDate = p.DateEntreeDate || p.DateEntree || null;
         const parsedDate = rawDate ? dayjs(rawDate) : null;
-        
+
         // Grade
+
         const gradeIdDirect =
           p.WWGradeID ?? p.IDWWGrade ?? p.IdWWGrade ?? p.GradeID ?? "";
-        const gradeFound =
-          gradesData.find(
-            (g) =>
-              String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) ===
-              String(gradeIdDirect),
-          ) ||
-          gradesData.find(
-            (g) =>
-              clean(g.NomWWGradeFr) === clean(p.NomWWGradeFr) ||
-              clean(g.NomWWGradeNl) === clean(p.NomWWGradeNl) ||
-              clean(g.NomGradeFr) === clean(p.NomGradeFr),
-          ) ||
-          null;
+
+        // On ne cherche un grade par ID que si un ID existe réellement
+        let gradeFound = null;
+
+        if (gradeIdDirect !== "" && gradeIdDirect != null) {
+          gradeFound =
+            gradesData.find(
+              (g) =>
+                String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) ===
+                String(gradeIdDirect),
+            ) || null;
+        }
+
+        // Si aucun ID n'est fourni, on peut éventuellement rechercher par nom,
+        // MAIS uniquement si un nom de grade existe réellement.
+        if (!gradeFound) {
+          const gradeNameFr = clean(p.NomWWGradeFr);
+          const gradeNameNl = clean(p.NomWWGradeNl);
+          const gradeName = clean(p.NomGradeFr);
+
+          if (gradeNameFr || gradeNameNl || gradeName) {
+            gradeFound =
+              gradesData.find(
+                (g) =>
+                  (gradeNameFr && clean(g.NomWWGradeFr) === gradeNameFr) ||
+                  (gradeNameNl && clean(g.NomWWGradeNl) === gradeNameNl) ||
+                  (gradeName && clean(g.NomGradeFr) === gradeName),
+              ) || null;
+          }
+        }
+
         const finalGradeId =
           gradeFound?.IDWWGrade ??
           gradeFound?.WWGradeID ??
@@ -449,7 +468,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
 
         if (serviceOptFound) setSelectedServiceDetails(serviceOptFound);
-console.log("Personne ", p);
+        console.log("Personne ", p);
         setForm({
           IDPersonneService: p.IDPersonneService ?? IDPersonneService,
           PersonneID: p.PersonneID ?? null,
@@ -527,28 +546,39 @@ console.log("Personne ", p);
         CodeID: form.CodeID || null,
         SiFrancais: form.SiFrancais,
         SiTypePersonnel: form.SiTypePersonnel,
-        TypePersonnelID: form.SiTypePersonnel ? form.TypePersonnelID : null,
+        TypePersonnelID:
+  form.SiTypePersonnel && form.TypePersonnelID !== ""
+    ? Number(form.TypePersonnelID)
+    : null,
       };
+
+      console.log("========== EDIT ==========");
+      console.log("SiTypePersonnel :", form.SiTypePersonnel);
+      console.log("TypePersonnelID :", form.TypePersonnelID);
+      console.log("PAYLOAD :", payload);
+      console.log("==========================");
 
       await PersonnelService.update(form.IDPersonneService, payload);
       PersonnelService.clearCaches?.();
       showSnackbar("Modifications enregistrées !", "success");
       handleClose();
       if (typeof refreshData === "function") await refreshData();
-    } catch (e) {
-      console.error(
-        "Erreur sauvegarde Edit :",
-        e?.response?.data || e?.message,
-      );
+
+  } catch (e) {
+      console.error("ERREUR API :", e?.response?.data);
+      console.error("VALIDATION :", e?.response?.data?.errors);
+      console.error("STATUS :", e?.response?.status);
+
       showSnackbar(
         "Une erreur est survenue lors de l'enregistrement.",
         "error",
       );
+
     } finally {
       setSaving(false);
     }
-  };
 
+  }; // fermeture de handleSubmit
   // ─────────────────────────────────────────────────────────────
   // Render
   // ─────────────────────────────────────────────────────────────
