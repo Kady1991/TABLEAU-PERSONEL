@@ -54,11 +54,12 @@ const PersonnelService = {
   getFonctions: () => http.get("/api/infos/fonctions"),
   getFonction: (id) => http.get(`/api/infos/fonction?idFonction=${id}`),
 
-  clearCaches: () => {
-    localStorage.removeItem("personnels_cache");
-    localStorage.removeItem("personnels_archives_cache");
-    localStorage.removeItem("personnels_archives_cache_v2_dates");
-  },
+clearCaches: () => {
+  sessionStorage.removeItem("personnels_actifs_cache_v1");
+  sessionStorage.removeItem("Personnels_actifs_cache_v1");
+  sessionStorage.removeItem("home_personnels_actifs_cache_v1");
+  sessionStorage.removeItem("personnels_archives_cache_v2_dates");
+},
 };
 
 export default PersonnelService;
