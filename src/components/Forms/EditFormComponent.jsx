@@ -434,38 +434,61 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           ) ||
           null;
 
-        // Fonction
-        const fonctionIdDirect =
-          p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? "";
-        const fonctionFound =
-          fonctionsData.find(
-            (f) =>
-              String(f.IDFonction ?? f.IdFonction) === String(fonctionIdDirect),
-          ) ||
-          fonctionsData.find(
-            (f) =>
-              clean(f.NomFonctionFr) === clean(p.NomFonctionFr) ||
-              clean(f.NomFonctionNl) === clean(p.NomFonctionNl) ||
-              clean(f.LibelleFonctionFr) === clean(p.LibelleFonctionFr),
-          ) ||
-          null;
-        const finalFonctionId =
-          fonctionFound?.IDFonction ?? fonctionFound?.IdFonction ?? "";
+// Fonction
+const fonctionIdDirect =
+  p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? "";
 
-        // Code
-        const codeIdDirect = p.CodeID ?? p.IDCode ?? p.Idcode ?? "";
-        const codesSource = fonctionFound?.Codes || [];
-        const codeFound =
-          codesSource.find(
-            (c) => String(c.Idcode ?? c.IDCode) === String(codeIdDirect),
-          ) ||
-          codesSource.find(
-            (c) =>
-              clean(c.NomCode) === clean(p.NomCode) ||
-              clean(c.Code) === clean(p.Code),
-          ) ||
-          null;
-        const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
+let fonctionFound = null;
+
+// Recherche par ID uniquement si un ID existe réellement
+if (fonctionIdDirect !== "" && fonctionIdDirect != null) {
+  fonctionFound =
+    fonctionsData.find(
+      (f) =>
+        String(f.IDFonction ?? f.IdFonction) ===
+        String(fonctionIdDirect),
+    ) || null;
+}
+
+// Recherche par nom uniquement si un nom existe réellement
+if (!fonctionFound) {
+  const fonctionNameFr = clean(p.NomFonctionFr);
+  const fonctionNameNl = clean(p.NomFonctionNl);
+  const fonctionLibelleFr = clean(p.LibelleFonctionFr);
+
+  if (fonctionNameFr || fonctionNameNl || fonctionLibelleFr) {
+    fonctionFound =
+      fonctionsData.find(
+        (f) =>
+          (fonctionNameFr &&
+            clean(f.NomFonctionFr) === fonctionNameFr) ||
+          (fonctionNameNl &&
+            clean(f.NomFonctionNl) === fonctionNameNl) ||
+          (fonctionLibelleFr &&
+            clean(f.LibelleFonctionFr) === fonctionLibelleFr),
+      ) || null;
+  }
+}
+
+const finalFonctionId =
+  fonctionFound?.IDFonction ??
+  fonctionFound?.IdFonction ??
+  "";
+
+// Code
+const codeIdDirect = p.CodeID ?? p.IDCode ?? p.Idcode ?? "";
+const codesSource = fonctionFound?.Codes || [];
+const codeFound =
+  codesSource.find(
+    (c) => String(c.Idcode ?? c.IDCode) === String(codeIdDirect),
+  ) ||
+  codesSource.find(
+    (c) =>
+      clean(c.NomCode) === clean(p.NomCode) ||
+      clean(c.Code) === clean(p.Code),
+  ) ||
+  null;
+const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
 
         if (serviceOptFound) setSelectedServiceDetails(serviceOptFound);
         console.log("Personne ", p);
@@ -547,9 +570,9 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         SiFrancais: form.SiFrancais,
         SiTypePersonnel: form.SiTypePersonnel,
         TypePersonnelID:
-  form.SiTypePersonnel && form.TypePersonnelID !== ""
-    ? Number(form.TypePersonnelID)
-    : null,
+          form.SiTypePersonnel && form.TypePersonnelID !== ""
+            ? Number(form.TypePersonnelID)
+            : null,
       };
 
       console.log("========== EDIT ==========");
@@ -563,8 +586,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
       showSnackbar("Modifications enregistrées !", "success");
       handleClose();
       if (typeof refreshData === "function") await refreshData();
-
-  } catch (e) {
+    } catch (e) {
       console.error("ERREUR API :", e?.response?.data);
       console.error("VALIDATION :", e?.response?.data?.errors);
       console.error("STATUS :", e?.response?.status);
@@ -573,11 +595,9 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         "Une erreur est survenue lors de l'enregistrement.",
         "error",
       );
-
     } finally {
       setSaving(false);
     }
-
   }; // fermeture de handleSubmit
   // ─────────────────────────────────────────────────────────────
   // Render

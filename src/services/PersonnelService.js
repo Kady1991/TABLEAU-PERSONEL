@@ -7,7 +7,10 @@ const http = axios.create({
 });
 
 const PersonnelService = {
-  getAll: () => http.get("/api/personnes/liste"),
+  getAll: () =>
+  http.get("/api/personnes/liste", {
+    params: { _t: Date.now() },
+  }),
 
   getById: (id) => http.get(`/api/personnes/${id}`),
 

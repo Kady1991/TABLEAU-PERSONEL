@@ -52,16 +52,33 @@ KpiCard.propTypes = {
 
 const fetchPersonDatesXml = async (id) => {
   try {
-    const res = await PersonnelService.getPersonXmlByIdProd(id);
-    if (typeof res.data !== "string") return { DateEntree: "", DateSortie: "" };
+    const res = await PersonnelService.getPersonXmlById(id);
+
+    if (typeof res.data !== "string") {
+      console.log("XML invalide :", id, res.data);
+      return { DateEntree: "", DateSortie: "" };
+    }
+
     const parser = new XMLParser();
     const json = parser.parse(res.data);
     const view = json?.WhosWhoModelView ?? null;
+
+    console.log("DATES XML :", id, {
+      DateEntree: view?.DateEntree,
+      DateSortie: view?.DateSortie,
+    });
+
     return {
       DateEntree: view?.DateEntree ?? "",
       DateSortie: view?.DateSortie ?? "",
     };
-  } catch {
+  } catch (error) {
+    console.error(
+      "ERREUR récupération dates XML :",
+      id,
+      error?.response?.data || error?.message || error
+    );
+
     return { DateEntree: "", DateSortie: "" };
   }
 };
@@ -119,6 +136,20 @@ export default function PersonnelArchivesListPage() {
 
       const res = await PersonnelService.getAll();
       const all = Array.isArray(res.data) ? res.data : [];
+
+      console.log("=== GET ALL APRÈS ARCHIVAGE ===");
+console.table(
+  all
+    .filter((p) => isArchived(p?.SiArchive))
+    .map((p) => ({
+      ID: p.IDPersonneService,
+      Nom: p.NomPersonne,
+      Prenom: p.PrenomPersonne,
+      SiArchive: p.SiArchive,
+      DateEntree: p.DateEntree,
+      DateSortie: p.DateSortie,
+    }))
+);
       const archived = all
         .filter((p) => isArchived(p?.SiArchive))
         .sort((a, b) => Number(b.IDPersonneService) - Number(a.IDPersonneService));
@@ -184,13 +215,16 @@ export default function PersonnelArchivesListPage() {
     [rows, thisYear]
   );
 
-  const lastArchived = useMemo(
-    () =>
-      [...rows].sort(
-        (a, b) => Number(b.IDPersonneService) - Number(a.IDPersonneService)
+const lastArchived = useMemo(
+  () =>
+    [...rows]
+      .filter((r) => r?.DateSortie)
+      .sort(
+        (a, b) =>
+          dayjs(b.DateSortie).valueOf() - dayjs(a.DateSortie).valueOf()
       )[0] ?? null,
-    [rows]
-  );
+  [rows]
+);
 
   const columns = useMemo(
     () => [

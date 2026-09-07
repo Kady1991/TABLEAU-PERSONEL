@@ -53,27 +53,24 @@ function DeleteMembreComponent({
     const formattedDateDisplay = dayjs(selectedDate).format("DD/MM/YYYY");
     setLoading(true);
 
-    try {
-      await PersonnelService.archive(IDPersonneService, formattedDate);
+try {
+  await PersonnelService.archive(IDPersonneService, formattedDate);
 
-      setOpen(false);
-      setSelectedDate(null);
+  console.log("ARCHIVAGE API RÉUSSI :", IDPersonneService);
 
-      PersonnelService.clearCaches?.();
-      sessionStorage.removeItem("personnels_archives_cache_v2_dates");
+  setOpen(false);
+  setSelectedDate(null);
 
-      // Mise à jour locale IMMÉDIATE (synchrone) : évite la course avec
-      // un éventuel refreshData/re-render déclenché par onArchiveSuccess,
-      // qui écrasait l'état avant que le setTimeout précédent ne s'exécute
-      // (obligeant l'utilisateur à archiver deux fois).
-      onArchiveLocal?.(IDPersonneService);
+  PersonnelService.clearCaches?.();
 
-      onArchiveSuccess?.({
-        prenom: prenomPersonne || "",
-        nom:    nomPersonne    || "",
-        date:   formattedDateDisplay,
-        id:     IDPersonneService,
-      });
+  onArchiveLocal?.(IDPersonneService);
+
+  onArchiveSuccess?.({
+    prenom: prenomPersonne || "",
+    nom: nomPersonne || "",
+    date: formattedDateDisplay,
+    id: IDPersonneService,
+  });
 
     } catch (error) {
       console.error("Erreur archivage :", error?.response?.data || error?.message);
@@ -128,17 +125,18 @@ function DeleteMembreComponent({
             </Alert>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Date de sortie"
-                value={selectedDate}
-                onChange={(val) => setSelectedDate(val)}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                  },
-                }}
-              />
+<DatePicker
+  label="Date de sortie"
+  value={selectedDate}
+  onChange={(val) => setSelectedDate(val)}
+  closeOnSelect
+  slotProps={{
+    textField: {
+      fullWidth: true,
+      size: "small",
+    },
+  }}
+/>
             </LocalizationProvider>
           </Stack>
         </DialogContent>
