@@ -54,32 +54,22 @@ const buildFlatOptions = (servicesList) => {
   servicesList.forEach((s) => {
     const svcId = s.idService ?? s.IDService;
     const hasSousServices = s.sousServices && s.sousServices.length > 0;
-result.push({
-  id: `service-${svcId}`,
-  value: `service-${svcId}`,
-
-  realServiceId: svcId,
-
-  parentServiceId: null,
-  parentSousServiceId: null,
-
-  hasChildren: hasSousServices,
-
-  label: s.nomServiceFr ?? s.NomServiceFr ?? "",
-  type: "service",
-
-  nomChefDepartement: "",
-  prenomChefDepartement: "",
-
-  nomChefService:
-    s.nomChefService ?? s.NomChefService ?? "",
-
-  prenomChefService:
-    s.prenomChefService ?? s.PrenomChefService ?? "",
-
-  nomSousChef: "",
-  prenomSousChef: "",
-});
+    result.push({
+      id: `service-${svcId}`,
+      value: `service-${svcId}`,
+      realServiceId: svcId,
+      parentServiceId: null,
+      parentSousServiceId: null,
+      hasChildren: hasSousServices,
+      label: s.nomServiceFr ?? s.NomServiceFr ?? "",
+      type: "service",
+      nomChefDepartement: "",
+      prenomChefDepartement: "",
+      nomChefService: s.nomChefService ?? s.NomChefService ?? "",
+      prenomChefService: s.prenomChefService ?? s.PrenomChefService ?? "",
+      nomSousChef: "",
+      prenomSousChef: "",
+    });
     s.sousServices?.forEach((ss) => {
       const sousId = ss.idSousService ?? ss.IDSousService;
       const hasChildren = ss.children && ss.children.length > 0;
@@ -106,15 +96,20 @@ result.push({
           realServiceId: childId,
           parentServiceId: svcId,
           hasChildren: false,
-          label: "—— " + (child.nomSousServiceFr ?? child.NomSousServiceFr ?? ""),
+          label:
+            "—— " + (child.nomSousServiceFr ?? child.NomSousServiceFr ?? ""),
           type: "child",
-          nomChefDepartement: child.nomChefDepartement ?? ss.nomChefDepartement ?? "",
+          nomChefDepartement:
+            child.nomChefDepartement ?? ss.nomChefDepartement ?? "",
           prenomChefDepartement:
             child.prenomChefDepartement ?? ss.prenomChefDepartement ?? "",
           nomChefService:
             child.nomChefService ?? ss.nomChefService ?? s.nomChefService ?? "",
           prenomChefService:
-            child.prenomChefService ?? ss.prenomChefService ?? s.prenomChefService ?? "",
+            child.prenomChefService ??
+            ss.prenomChefService ??
+            s.prenomChefService ??
+            "",
           nomSousChef: child.nomSousChef ?? ss.nomSousChef ?? "",
           prenomSousChef: child.prenomSousChef ?? ss.prenomSousChef ?? "",
         });
@@ -134,7 +129,10 @@ const enrichWithChefDepartement = (flatOptions, infosFlat) => {
     if (childId && childId !== 0) key = childId;
     else if (sousId && sousId !== 0) key = sousId;
     else key = svcId;
-    if (!chefMap.has(key) && (row.NomChefDepartement || row.PrenomChefDepartement)) {
+    if (
+      !chefMap.has(key) &&
+      (row.NomChefDepartement || row.PrenomChefDepartement)
+    ) {
       chefMap.set(key, {
         nomChefDepartement: row.NomChefDepartement ?? "",
         prenomChefDepartement: row.PrenomChefDepartement ?? "",
@@ -154,8 +152,19 @@ const enrichWithChefDepartement = (flatOptions, infosFlat) => {
 function SectionTitle({ icon, label }) {
   const theme = useTheme();
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5, mt: 1 }}>
-      <Box sx={{ color: theme.palette.secondary.main, display: "flex", alignItems: "center" }}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      sx={{ mb: 1.5, mt: 1 }}
+    >
+      <Box
+        sx={{
+          color: theme.palette.secondary.main,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         {icon}
       </Box>
       <Typography
@@ -192,8 +201,8 @@ const initialForm = {
   DateEntreeDate: null,
   WWGradeID: "",
   AdresseID: "",
-  serviceValue: "",   // valeur interne ServiceTreeSelect (ex: "sous-42")
-  ServiceID: "",      // realServiceId envoyé à l'API
+  serviceValue: "", // valeur interne ServiceTreeSelect (ex: "sous-42")
+  ServiceID: "", // realServiceId envoyé à l'API
   SousServiceID: "",
   FonctionID: "",
   CodeID: "",
@@ -213,7 +222,11 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   const [open, setOpen] = useState(false);
   const [loadingInit, setLoadingInit] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const [grades, setGrades] = useState([]);
   const [addresses, setAddresses] = useState([]);
@@ -227,7 +240,8 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
     setSnackbar({ open: true, message, severity });
   const closeSnackbar = () => setSnackbar((prev) => ({ ...prev, open: false }));
 
-  const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }));
+  const setField = (name, value) =>
+    setForm((prev) => ({ ...prev, [name]: value }));
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -237,7 +251,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   };
 
   // ── Progression ─────────────────────────────────────────────
-  const requiredFields = ["NomPersonne", "PrenomPersonne", "Email", "DateEntreeDate", "AdresseID", "ServiceID"];
+  const requiredFields = [
+    "NomPersonne",
+    "PrenomPersonne",
+    "Email",
+    "DateEntreeDate",
+    "AdresseID",
+    "ServiceID",
+  ];
   const filledCount = requiredFields.filter((f) => {
     if (f === "DateEntreeDate") return !!form.DateEntreeDate;
     return !!form[f];
@@ -248,11 +269,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   const selectedFonction = useMemo(
     () =>
       fonctions.find(
-        (f) => String(f.IDFonction ?? f.IdFonction) === String(form.FonctionID)
+        (f) => String(f.IDFonction ?? f.IdFonction) === String(form.FonctionID),
       ) || null,
-    [fonctions, form.FonctionID]
+    [fonctions, form.FonctionID],
   );
-  const codesDisponibles = useMemo(() => selectedFonction?.Codes || [], [selectedFonction]);
+  const codesDisponibles = useMemo(
+    () => selectedFonction?.Codes || [],
+    [selectedFonction],
+  );
 
   // ── Preview ─────────────────────────────────────────────────
   const showPreview = form.NomPersonne && form.PrenomPersonne && form.Email;
@@ -273,15 +297,15 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           personRes,
           gradesRes,
           addrRes,
-          affectServicesRes,  // liste imbriquée → ServiceTreeSelect
-          infosServicesRes,   // liste plate → enrichWithChefDepartement
+          affectServicesRes, // liste imbriquée → ServiceTreeSelect
+          infosServicesRes, // liste plate → enrichWithChefDepartement
           fonctionsRes,
         ] = await Promise.all([
           PersonnelService.getById(IDPersonneService),
           PersonnelService.getGrades(),
           PersonnelService.getAdresses(),
-          serviceService.getAll(),          // ← même API qu'AjoutFormComponent
-          PersonnelService.getServices(),   // ← pour enrichWithChefDepartement
+          serviceService.getAll(), // ← même API qu'AjoutFormComponent
+          PersonnelService.getServices(), // ← pour enrichWithChefDepartement
           PersonnelService.getFonctions(),
         ]);
 
@@ -290,11 +314,16 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         // ── Listes de référence ──
         const gradesData = Array.isArray(gradesRes?.data) ? gradesRes.data : [];
         const addressesData = Array.isArray(addrRes?.data) ? addrRes.data : [];
-        const fonctionsData = Array.isArray(fonctionsRes?.data) ? fonctionsRes.data : [];
+        const fonctionsData = Array.isArray(fonctionsRes?.data)
+          ? fonctionsRes.data
+          : [];
 
         // ── Build servicesFlat (copie exacte de AjoutFormComponent) ──
         const flat = buildFlatOptions(affectServicesRes?.data || []);
-        const enriched = enrichWithChefDepartement(flat, infosServicesRes?.data || []);
+        const enriched = enrichWithChefDepartement(
+          flat,
+          infosServicesRes?.data || [],
+        );
 
         setGrades(gradesData);
         setAddresses(addressesData);
@@ -305,22 +334,28 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const p = personRes?.data || {};
         const rawDate = p.DateEntreeDate || p.DateEntree || null;
         const parsedDate = rawDate ? dayjs(rawDate) : null;
-
+        
         // Grade
-        const gradeIdDirect = p.WWGradeID ?? p.IDWWGrade ?? p.IdWWGrade ?? p.GradeID ?? "";
+        const gradeIdDirect =
+          p.WWGradeID ?? p.IDWWGrade ?? p.IdWWGrade ?? p.GradeID ?? "";
         const gradeFound =
-          gradesData.find((g) =>
-            String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) === String(gradeIdDirect)
+          gradesData.find(
+            (g) =>
+              String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) ===
+              String(gradeIdDirect),
           ) ||
           gradesData.find(
             (g) =>
               clean(g.NomWWGradeFr) === clean(p.NomWWGradeFr) ||
               clean(g.NomWWGradeNl) === clean(p.NomWWGradeNl) ||
-              clean(g.NomGradeFr) === clean(p.NomGradeFr)
+              clean(g.NomGradeFr) === clean(p.NomGradeFr),
           ) ||
           null;
         const finalGradeId =
-          gradeFound?.IDWWGrade ?? gradeFound?.WWGradeID ?? gradeFound?.IdWWGrade ?? "";
+          gradeFound?.IDWWGrade ??
+          gradeFound?.WWGradeID ??
+          gradeFound?.IdWWGrade ??
+          "";
 
         // Adresse
         const adresseIdDirect = p.AdresseID ?? p.IDAdresse ?? p.IdAdresse ?? "";
@@ -330,35 +365,39 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const personBatiment = clean(p.Batiment);
         const personEtage = clean(p.Etage);
         const personAdresseTexte = clean(
-          [p.NomRueFr, p.Numero, p.Batiment, p.Etage].filter(Boolean).join(" ")
+          [p.NomRueFr, p.Numero, p.Batiment, p.Etage].filter(Boolean).join(" "),
         );
         const addressFound =
-          addressesData.find((a) => String(a.IDAdresse) === String(adresseIdDirect)) ||
+          addressesData.find(
+            (a) => String(a.IDAdresse) === String(adresseIdDirect),
+          ) ||
           addressesData.find(
             (a) =>
               clean(a.AdresseComplete) === clean(p.AdresseComplete) ||
-              clean(a.AdresseComplete) === personAdresseTexte
+              clean(a.AdresseComplete) === personAdresseTexte,
           ) ||
           addressesData.find(
             (a) =>
-              clean(a.NomRueFr) === personNomRueFr && clean(a.Numero) === personNumero
+              clean(a.NomRueFr) === personNomRueFr &&
+              clean(a.Numero) === personNumero,
           ) ||
           addressesData.find(
             (a) =>
-              clean(a.NomRueNl) === personNomRueNl && clean(a.Numero) === personNumero
+              clean(a.NomRueNl) === personNomRueNl &&
+              clean(a.Numero) === personNumero,
           ) ||
           addressesData.find(
             (a) =>
               clean(a.NomRueFr) === personNomRueFr &&
               clean(a.Numero) === personNumero &&
-              clean(a.Batiment) === personBatiment
+              clean(a.Batiment) === personBatiment,
           ) ||
           addressesData.find(
             (a) =>
               clean(a.NomRueFr) === personNomRueFr &&
               clean(a.Numero) === personNumero &&
               clean(a.Batiment) === personBatiment &&
-              clean(a.Etage) === personEtage
+              clean(a.Etage) === personEtage,
           ) ||
           null;
         const finalAdresseId = addressFound?.IDAdresse ?? "";
@@ -367,26 +406,28 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const serviceIdDirect = p.ServiceID ?? p.IDService ?? p.IdService ?? "";
         const serviceOptFound =
           enriched.find(
-            (s) => String(s.realServiceId) === String(serviceIdDirect)
+            (s) => String(s.realServiceId) === String(serviceIdDirect),
           ) ||
           enriched.find(
             (s) =>
               clean(s.label.replace(/^[-— ]+/, "")) === clean(p.NomServiceFr) ||
-              clean(s.label.replace(/^[-— ]+/, "")) === clean(p.NomServiceNl)
+              clean(s.label.replace(/^[-— ]+/, "")) === clean(p.NomServiceNl),
           ) ||
           null;
 
         // Fonction
-        const fonctionIdDirect = p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? "";
+        const fonctionIdDirect =
+          p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? "";
         const fonctionFound =
-          fonctionsData.find((f) =>
-            String(f.IDFonction ?? f.IdFonction) === String(fonctionIdDirect)
+          fonctionsData.find(
+            (f) =>
+              String(f.IDFonction ?? f.IdFonction) === String(fonctionIdDirect),
           ) ||
           fonctionsData.find(
             (f) =>
               clean(f.NomFonctionFr) === clean(p.NomFonctionFr) ||
               clean(f.NomFonctionNl) === clean(p.NomFonctionNl) ||
-              clean(f.LibelleFonctionFr) === clean(p.LibelleFonctionFr)
+              clean(f.LibelleFonctionFr) === clean(p.LibelleFonctionFr),
           ) ||
           null;
         const finalFonctionId =
@@ -397,18 +438,18 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         const codesSource = fonctionFound?.Codes || [];
         const codeFound =
           codesSource.find(
-            (c) => String(c.Idcode ?? c.IDCode) === String(codeIdDirect)
+            (c) => String(c.Idcode ?? c.IDCode) === String(codeIdDirect),
           ) ||
           codesSource.find(
             (c) =>
               clean(c.NomCode) === clean(p.NomCode) ||
-              clean(c.Code) === clean(p.Code)
+              clean(c.Code) === clean(p.Code),
           ) ||
           null;
         const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
 
         if (serviceOptFound) setSelectedServiceDetails(serviceOptFound);
-
+console.log("Personne ", p);
         setForm({
           IDPersonneService: p.IDPersonneService ?? IDPersonneService,
           PersonneID: p.PersonneID ?? null,
@@ -416,7 +457,8 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           PrenomPersonne: p.PrenomPersonne || "",
           Email: p.Email || "",
           TelPro: p.TelPro || "",
-          DateEntreeDate: parsedDate && parsedDate.isValid() ? parsedDate : null,
+          DateEntreeDate:
+            parsedDate && parsedDate.isValid() ? parsedDate : null,
           WWGradeID: finalGradeId,
           AdresseID: finalAdresseId,
           serviceValue: serviceOptFound?.value ?? "",
@@ -428,14 +470,19 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           TypePersonnelID: p.TypePersonnelID ?? "",
         });
       } catch (e) {
-        console.error("Erreur chargement Edit :", e?.response?.data || e?.message);
+        console.error(
+          "Erreur chargement Edit :",
+          e?.response?.data || e?.message,
+        );
         showSnackbar("Erreur lors du chargement des données.", "error");
       } finally {
         if (mounted) setLoadingInit(false);
       }
     })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [open, IDPersonneService]);
 
   // ── Validation ──────────────────────────────────────────────
@@ -451,7 +498,10 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   // ── Submit ──────────────────────────────────────────────────
   const handleSubmit = async () => {
     const err = validate();
-    if (err) { showSnackbar(err, "error"); return; }
+    if (err) {
+      showSnackbar(err, "error");
+      return;
+    }
     if (!form.PersonneID) {
       showSnackbar("PersonneID manquant (impossible de sauvegarder).", "error");
       return;
@@ -471,7 +521,7 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
           : null,
         WWGradeID: form.WWGradeID || null,
         AdresseID: form.AdresseID,
-        ServiceID: form.ServiceID,       // realServiceId
+        ServiceID: form.ServiceID, // realServiceId
         SousServiceID: form.SousServiceID || null,
         FonctionID: form.FonctionID || null,
         CodeID: form.CodeID || null,
@@ -486,8 +536,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
       handleClose();
       if (typeof refreshData === "function") await refreshData();
     } catch (e) {
-      console.error("Erreur sauvegarde Edit :", e?.response?.data || e?.message);
-      showSnackbar("Une erreur est survenue lors de l'enregistrement.", "error");
+      console.error(
+        "Erreur sauvegarde Edit :",
+        e?.response?.data || e?.message,
+      );
+      showSnackbar(
+        "Une erreur est survenue lors de l'enregistrement.",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -499,30 +555,46 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
   return (
     <>
       {/* Bouton déclencheur */}
-      <IconButton size="small" title="Éditer" onClick={handleOpen} sx={{ ml: 0.5 }}>
+      <IconButton
+        size="small"
+        title="Éditer"
+        onClick={handleOpen}
+        sx={{ ml: 0.5 }}
+      >
         <RiFileEditFill style={{ fontSize: 18 }} />
       </IconButton>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-
         {/* ── Header ── */}
         <DialogTitle
-          sx={{ pb: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}
+          sx={{
+            pb: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Box
               sx={{
-                width: 36, height: 36, borderRadius: 2,
+                width: 36,
+                height: 36,
+                borderRadius: 2,
                 background: "#e0f7f7",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <RiFileEditFill style={{ fontSize: 18, color: TEAL }} />
             </Box>
             <Box>
-              <Typography variant="h6" fontWeight={600}>Éditer un membre</Typography>
+              <Typography variant="h6" fontWeight={600}>
+                Éditer un membre
+              </Typography>
               <Typography variant="body2" color="text.secondary">
-                {filledCount} / {requiredFields.length} champs obligatoires remplis
+                {filledCount} / {requiredFields.length} champs obligatoires
+                remplis
               </Typography>
             </Box>
           </Stack>
@@ -537,7 +609,9 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
             variant="determinate"
             value={progressPct}
             sx={{
-              height: 4, borderRadius: 99, bgcolor: "rgba(0,0,0,0.06)",
+              height: 4,
+              borderRadius: 99,
+              bgcolor: "rgba(0,0,0,0.06)",
               "& .MuiLinearProgress-bar": {
                 bgcolor: progressPct === 100 ? TEAL : PRIMARY,
                 borderRadius: 99,
@@ -554,55 +628,76 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
             </Stack>
           ) : (
             <Stack spacing={0} sx={{ p: 1 }}>
-
               {/* ══ Identité ══ */}
-              <SectionTitle icon={<PersonIcon sx={{ fontSize: 14 }} />} label="Identité" />
+              <SectionTitle
+                icon={<PersonIcon sx={{ fontSize: 14 }} />}
+                label="Identité"
+              />
               <Grid container spacing={2} mb={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Nom" required fullWidth size="small"
+                    label="Nom"
+                    required
+                    fullWidth
+                    size="small"
                     value={form.NomPersonne}
                     onChange={(e) => setField("NomPersonne", e.target.value)}
                     InputProps={{
-                      endAdornment: form.NomPersonne
-                        ? <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} />
-                        : null,
+                      endAdornment: form.NomPersonne ? (
+                        <CheckCircleOutlineIcon
+                          sx={{ fontSize: 16, color: TEAL }}
+                        />
+                      ) : null,
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Prénom" required fullWidth size="small"
+                    label="Prénom"
+                    required
+                    fullWidth
+                    size="small"
                     value={form.PrenomPersonne}
                     onChange={(e) => setField("PrenomPersonne", e.target.value)}
                     InputProps={{
-                      endAdornment: form.PrenomPersonne
-                        ? <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} />
-                        : null,
+                      endAdornment: form.PrenomPersonne ? (
+                        <CheckCircleOutlineIcon
+                          sx={{ fontSize: 16, color: TEAL }}
+                        />
+                      ) : null,
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Téléphone" fullWidth size="small"
+                    label="Téléphone"
+                    fullWidth
+                    size="small"
                     value={form.TelPro}
                     onChange={(e) => setField("TelPro", e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="E-mail" required fullWidth size="small"
+                    label="E-mail"
+                    required
+                    fullWidth
+                    size="small"
                     value={form.Email}
                     onChange={(e) => setField("Email", e.target.value)}
                     sx={{
                       "& .MuiInputBase-root": {
-                        bgcolor: form.Email ? "rgba(2,178,175,0.05)" : "action.hover",
+                        bgcolor: form.Email
+                          ? "rgba(2,178,175,0.05)"
+                          : "action.hover",
                       },
                     }}
                     InputProps={{
-                      endAdornment: form.Email
-                        ? <CheckCircleOutlineIcon sx={{ fontSize: 16, color: TEAL }} />
-                        : null,
+                      endAdornment: form.Email ? (
+                        <CheckCircleOutlineIcon
+                          sx={{ fontSize: 16, color: TEAL }}
+                        />
+                      ) : null,
                     }}
                   />
                 </Grid>
@@ -614,7 +709,6 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                 label="Affectation"
               />
               <Grid container spacing={2} mb={2}>
-
                 {/* Date */}
                 <Grid item xs={12} sm={6}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -623,7 +717,11 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                       value={form.DateEntreeDate}
                       onChange={(val) => setField("DateEntreeDate", val)}
                       slotProps={{
-                        textField: { required: true, fullWidth: true, size: "small" },
+                        textField: {
+                          required: true,
+                          fullWidth: true,
+                          size: "small",
+                        },
                       }}
                     />
                   </LocalizationProvider>
@@ -634,12 +732,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                   <Autocomplete
                     size="small"
                     options={grades}
-                    getOptionLabel={(o) => o?.NomWWGradeFr || o?.NomWWGradeNl || ""}
+                    getOptionLabel={(o) =>
+                      o?.NomWWGradeFr || o?.NomWWGradeNl || ""
+                    }
                     value={
                       grades.find(
                         (g) =>
                           String(g.IDWWGrade ?? g.WWGradeID ?? g.IdWWGrade) ===
-                          String(form.WWGradeID)
+                          String(form.WWGradeID),
                       ) || null
                     }
                     isOptionEqualToValue={(o, v) =>
@@ -647,14 +747,24 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                       String(v.IDWWGrade ?? v.WWGradeID ?? v.IdWWGrade)
                     }
                     onChange={(_, nv) =>
-                      setField("WWGradeID", nv ? (nv.IDWWGrade ?? nv.WWGradeID ?? nv.IdWWGrade) : "")
+                      setField(
+                        "WWGradeID",
+                        nv
+                          ? (nv.IDWWGrade ?? nv.WWGradeID ?? nv.IdWWGrade)
+                          : "",
+                      )
                     }
                     renderOption={(props, o) => (
-                      <li {...props} key={`grade-${o.IDWWGrade ?? o.WWGradeID ?? o.IdWWGrade}`}>
+                      <li
+                        {...props}
+                        key={`grade-${o.IDWWGrade ?? o.WWGradeID ?? o.IdWWGrade}`}
+                      >
                         {o?.NomWWGradeFr || o?.NomWWGradeNl || "Sans libellé"}
                       </li>
                     )}
-                    renderInput={(params) => <TextField {...params} label="Grade" fullWidth />}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Grade" fullWidth />
+                    )}
                   />
                 </Grid>
 
@@ -666,13 +776,15 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                     getOptionLabel={(o) => o?.AdresseComplete || ""}
                     value={
                       addresses.find(
-                        (a) => String(a.IDAdresse) === String(form.AdresseID)
+                        (a) => String(a.IDAdresse) === String(form.AdresseID),
                       ) || null
                     }
                     isOptionEqualToValue={(o, v) =>
                       String(o.IDAdresse) === String(v.IDAdresse)
                     }
-                    onChange={(_, nv) => setField("AdresseID", nv ? nv.IDAdresse : "")}
+                    onChange={(_, nv) =>
+                      setField("AdresseID", nv ? nv.IDAdresse : "")
+                    }
                     renderOption={(props, o) => (
                       <li {...props} key={`adresse-${o.IDAdresse}`}>
                         {o?.AdresseComplete || "Sans libellé"}
@@ -689,38 +801,39 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                   <ServiceTreeSelect
                     servicesFlat={servicesFlat}
                     value={
-                      servicesFlat.find((s) => s.value === form.serviceValue) || null
+                      servicesFlat.find((s) => s.value === form.serviceValue) ||
+                      null
                     }
-                 onChange={(nv) => {
-  if (!nv) {
-    setField("serviceValue", "");
-    setField("ServiceID", "");
-    setField("SousServiceID", "");
-    setSelectedServiceDetails(null);
-    return;
-  }
+                    onChange={(nv) => {
+                      if (!nv) {
+                        setField("serviceValue", "");
+                        setField("ServiceID", "");
+                        setField("SousServiceID", "");
+                        setSelectedServiceDetails(null);
+                        return;
+                      }
 
-  setField("serviceValue", nv.value);
+                      setField("serviceValue", nv.value);
 
-  // Service racine
-  const finalServiceId =
-    nv.type === "service"
-      ? nv.realServiceId
-      : nv.parentServiceId;
+                      // Service racine
+                      const finalServiceId =
+                        nv.type === "service"
+                          ? nv.realServiceId
+                          : nv.parentServiceId;
 
-  // Sous-service
-  const finalSousServiceId =
-    nv.type === "child"
-      ? nv.parentSousServiceId
-      : nv.type === "sousService"
-        ? nv.realServiceId
-        : null;
+                      // Sous-service
+                      const finalSousServiceId =
+                        nv.type === "child"
+                          ? nv.parentSousServiceId
+                          : nv.type === "sousService"
+                            ? nv.realServiceId
+                            : null;
 
-  setField("ServiceID", finalServiceId);
-  setField("SousServiceID", finalSousServiceId);
+                      setField("ServiceID", finalServiceId);
+                      setField("SousServiceID", finalSousServiceId);
 
-  setSelectedServiceDetails(nv);
-}}
+                      setSelectedServiceDetails(nv);
+                    }}
                     required
                   />
                 </Grid>
@@ -730,9 +843,14 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                   <Grid item xs={12}>
                     <Box
                       sx={{
-                        p: 1.5, borderRadius: 2, bgcolor: "action.hover",
-                        border: "1px solid", borderColor: "divider",
-                        display: "flex", gap: 3, flexWrap: "wrap",
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: "action.hover",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        display: "flex",
+                        gap: 3,
+                        flexWrap: "wrap",
                       }}
                     >
                       <Typography variant="body2">
@@ -758,17 +876,23 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
               </Grid>
 
               {/* ══ Fonction ══ */}
-              <SectionTitle icon={<WorkIcon sx={{ fontSize: 14 }} />} label="Fonction" />
+              <SectionTitle
+                icon={<WorkIcon sx={{ fontSize: 14 }} />}
+                label="Fonction"
+              />
               <Grid container spacing={2} mb={2}>
                 <Grid item xs={12} sm={6}>
                   <Autocomplete
                     size="small"
                     options={fonctions}
-                    getOptionLabel={(o) => o?.NomFonctionFr || o?.NomFonctionNl || ""}
+                    getOptionLabel={(o) =>
+                      o?.NomFonctionFr || o?.NomFonctionNl || ""
+                    }
                     value={
                       fonctions.find(
                         (f) =>
-                          String(f.IDFonction ?? f.IdFonction) === String(form.FonctionID)
+                          String(f.IDFonction ?? f.IdFonction) ===
+                          String(form.FonctionID),
                       ) || null
                     }
                     isOptionEqualToValue={(o, v) =>
@@ -776,11 +900,17 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                       String(v.IDFonction ?? v.IdFonction)
                     }
                     onChange={(_, nv) => {
-                      setField("FonctionID", nv ? (nv.IDFonction ?? nv.IdFonction) : "");
+                      setField(
+                        "FonctionID",
+                        nv ? (nv.IDFonction ?? nv.IdFonction) : "",
+                      );
                       setField("CodeID", "");
                     }}
                     renderOption={(props, o) => (
-                      <li {...props} key={`fonction-${o.IDFonction ?? o.IdFonction}`}>
+                      <li
+                        {...props}
+                        key={`fonction-${o.IDFonction ?? o.IdFonction}`}
+                      >
                         {o?.NomFonctionFr || o?.NomFonctionNl || "Sans libellé"}
                       </li>
                     )}
@@ -792,7 +922,11 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
 
                 <Grid item xs={12} sm={6}>
                   <Tooltip
-                    title={!selectedFonction ? "Sélectionnez d'abord une fonction" : ""}
+                    title={
+                      !selectedFonction
+                        ? "Sélectionnez d'abord une fonction"
+                        : ""
+                    }
                     placement="top"
                   >
                     <span>
@@ -804,11 +938,13 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                         value={
                           codesDisponibles.find(
                             (c) =>
-                              String(c.Idcode ?? c.IDCode) === String(form.CodeID)
+                              String(c.Idcode ?? c.IDCode) ===
+                              String(form.CodeID),
                           ) || null
                         }
                         isOptionEqualToValue={(o, v) =>
-                          String(o.Idcode ?? o.IDCode) === String(v.Idcode ?? v.IDCode)
+                          String(o.Idcode ?? o.IDCode) ===
+                          String(v.Idcode ?? v.IDCode)
                         }
                         onChange={(_, nv) =>
                           setField("CodeID", nv ? (nv.Idcode ?? nv.IDCode) : "")
@@ -839,11 +975,17 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
               </Grid>
 
               {/* ══ Paramètres ══ */}
-              <SectionTitle icon={<SettingsIcon sx={{ fontSize: 14 }} />} label="Paramètres" />
+              <SectionTitle
+                icon={<SettingsIcon sx={{ fontSize: 14 }} />}
+                label="Paramètres"
+              />
               <Grid container spacing={2} mb={1}>
                 <Grid item xs={12} sm={6}>
                   <FormControl>
-                    <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}
+                    >
                       Personnel
                     </Typography>
                     <RadioGroup
@@ -853,23 +995,44 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                         setField("SiTypePersonnel", e.target.value === "true")
                       }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="Oui" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="Non" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="Oui"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="Non"
+                      />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl>
-                    <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 0.5, fontWeight: 500, color: PRIMARY }}
+                    >
                       Langue
                     </Typography>
                     <RadioGroup
                       row
                       value={form.SiFrancais ? "true" : "false"}
-                      onChange={(e) => setField("SiFrancais", e.target.value === "true")}
+                      onChange={(e) =>
+                        setField("SiFrancais", e.target.value === "true")
+                      }
                     >
-                      <FormControlLabel value="true" control={<Radio size="small" />} label="FR" />
-                      <FormControlLabel value="false" control={<Radio size="small" />} label="NL" />
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio size="small" />}
+                        label="FR"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio size="small" />}
+                        label="NL"
+                      />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -879,15 +1042,22 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
               {showPreview && (
                 <Box
                   sx={{
-                    mt: 1, p: 1.5, borderRadius: 2,
-                    border: "1px solid", borderColor: TEAL,
+                    mt: 1,
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: TEAL,
                     bgcolor: "rgba(2,178,175,0.04)",
                   }}
                 >
                   <Typography
                     sx={{
-                      fontSize: 11, fontWeight: 600, color: TEAL,
-                      textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.8,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: TEAL,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      mb: 0.8,
                     }}
                   >
                     Aperçu du membre
@@ -895,17 +1065,26 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                   <Stack direction="row" alignItems="center" spacing={1.5}>
                     <Box
                       sx={{
-                        width: 36, height: 36, borderRadius: "50%",
-                        bgcolor: "#E6F1FB", color: PRIMARY,
-                        fontSize: 12, fontWeight: 700,
-                        display: "flex", alignItems: "center",
-                        justifyContent: "center", flexShrink: 0,
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        bgcolor: "#E6F1FB",
+                        color: PRIMARY,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
                       }}
                     >
                       {previewInitials}
                     </Box>
                     <Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: PRIMARY }}>
+                      <Typography
+                        variant="body1"
+                        sx={{ fontWeight: 600, color: PRIMARY }}
+                      >
                         {form.NomPersonne.toUpperCase()} {form.PrenomPersonne}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -916,7 +1095,6 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
                   </Stack>
                 </Box>
               )}
-
             </Stack>
           )}
         </DialogContent>
@@ -927,7 +1105,11 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
             <span style={{ color: "#d32f2f" }}>*</span> Champs obligatoires
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button onClick={handleClose} color="inherit" disabled={saving || loadingInit}>
+            <Button
+              onClick={handleClose}
+              color="inherit"
+              disabled={saving || loadingInit}
+            >
               Annuler
             </Button>
             <Button
@@ -948,7 +1130,11 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
         onClose={closeSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={closeSnackbar} severity={snackbar.severity} variant="filled">
+        <Alert
+          onClose={closeSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -957,7 +1143,8 @@ function EditFormComponent({ IDPersonneService, refreshData }) {
 }
 
 EditFormComponent.propTypes = {
-  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  IDPersonneService: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
   refreshData: PropTypes.func,
 };
 

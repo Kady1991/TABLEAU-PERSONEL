@@ -14,8 +14,8 @@ const PersonnelService = {
   create: (payload) => http.post("/api/personnes", payload),
 
   update: (id, payload) => {
-    console.log("ID:", id);
-    console.log("Payload:", payload);
+    //console.log("ID:", id);
+    //console.log("Payload:", payload);
     return http.put(`/api/personnes/edit/${id}`, payload);
   },
 

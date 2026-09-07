@@ -6,6 +6,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import App from "./App";
 import theme from "./theme";
+import { BaseName } from "./config.js";
 
 const routerFutureFlags = {
   v7_startTransition: true,
@@ -13,7 +14,7 @@ const routerFutureFlags = {
 };
 
 createRoot(document.getElementById("root")).render(
-  <BrowserRouter future={routerFutureFlags}>
+  <BrowserRouter basename={BaseName} future={routerFutureFlags}>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <App />
