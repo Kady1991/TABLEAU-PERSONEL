@@ -303,7 +303,7 @@ export default function DashboardLayout() {
         </Box>
 
         {/* Contenu */}
-        <Box sx={{ flex: 1, p: { xs: 1.5, sm: 3 }, overflow: "auto" }}>
+        <Box sx={{ flex: 1, p: { xs: 1.5, sm: 3 }, overflow: "hidden" }}>
           <Box sx={{ maxWidth: 1400, mx: "auto" }}>
             <Outlet />
           </Box>
