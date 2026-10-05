@@ -177,14 +177,14 @@ const theme = createTheme({
     },
 
     // ── PersonnelStatisticsPage ─────────────────────────────────
-   stats: {
+  stats: {
       barColors: {
         present: "#48b4b2",
         depart:  RED,        // ← était ICON_TEAL, maintenant rouge
       },
       kpiIconBg:   "#e0ecf6",
       chipGray:    { bgcolor: "#f0f4f8", color: GRAY },
-      tableStripe: "rgba(0,59,104,0.025)",
+      tableStripe: "rgba(14, 68, 109, 0.03)",
       totalRow:    { bgcolor: "#f0f4f8", color: PRIMARY_BLUE },
       trendUp:     "#1e8e5a",
       trendDown:   RED,

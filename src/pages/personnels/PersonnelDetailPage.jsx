@@ -125,8 +125,8 @@ InfoRow.defaultProps = {
 // HierarchyCard
 // ─────────────────────────────────────────────────────────────
 const hierColors = {
-  souschef: { bg: "#f0edfb", color: "#5a3fb5" },
-  chef:     { bg: "#e0f4f4", color: "#027b79" },
+  souschef: { bg: "#f0edfb", color: "#3f76b5" },
+  chef:     { bg: "#e0f4f4", color: "#02557b" },
   dept:     { bg: "#e0ecf6", color: "#003B68" },
 };
 

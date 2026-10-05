@@ -176,7 +176,7 @@ const FormServiceComponent = forwardRef(function FormServiceComponent(
   return (
     <div ref={ref} {...props} style={{ display: "inline-block" }}>
       <IconButton size="small" onClick={handleOpen}>
-        <MedicalServicesIcon fontSize="small" color="primary" />
+        <MedicalServicesIcon fontSize="small" sx={{ color: "#F5B800" }} />
       </IconButton>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">

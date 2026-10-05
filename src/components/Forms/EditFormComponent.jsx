@@ -611,7 +611,7 @@ const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
         onClick={handleOpen}
         sx={{ ml: 0.5 }}
       >
-        <RiFileEditFill style={{ fontSize: 18 }} />
+        <RiFileEditFill style={{ fontSize: 18, color: "#1b64ad" }} />
       </IconButton>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
