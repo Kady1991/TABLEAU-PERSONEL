@@ -38,15 +38,11 @@ import WorkIcon from "@mui/icons-material/Work";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-
 import { departementService, serviceService } from "../../../services/AffectationsService";
 import PersonnelService from "../../../services/PersonnelService";
-
 import ServiceTreeSelect from "../ServiceTreeSelect";
 import DateEntreeFieldComponent from "./DateEntreeFieldComponent";
-
 import AlertSuccessComponent from "../../Alert/AlertAjoutSuccessComponent";
-
 import { useTheme } from "@mui/material/styles";
 
 
@@ -654,8 +650,8 @@ const AjoutFormComponent = forwardRef(
 
           DateEntree: form.DateEntreeDate
             ? dayjs(form.DateEntreeDate).format(
-                "YYYY-MM-DD"
-              )
+              "YYYY-MM-DD"
+            )
             : null,
 
           ServiceID:
@@ -668,8 +664,8 @@ const AjoutFormComponent = forwardRef(
               ? selectedServiceDetails.parentSousServiceId
               : selectedServiceDetails?.type ===
                 "sousService"
-              ? selectedServiceDetails.realServiceId
-              : null,
+                ? selectedServiceDetails.realServiceId
+                : null,
 
           AdresseID: form.adresse
             ? Number(form.adresse)
@@ -892,7 +888,7 @@ const AjoutFormComponent = forwardRef(
           typeof err?.response?.data === "string"
             ? err.response.data
             : err?.message ||
-              "Erreur lors de l'envoi.";
+            "Erreur lors de l'envoi.";
 
         setError(msg);
 
@@ -1476,21 +1472,21 @@ const AjoutFormComponent = forwardRef(
                         {selectedServiceDetails
                           .nomSousChef && (
 
-                          <Typography variant="body2">
-                            <strong>
-                              Sous-chef :
-                            </strong>{" "}
-                            {
-                              selectedServiceDetails
-                                .nomSousChef
-                            }{" "}
-                            {
-                              selectedServiceDetails
-                                .prenomSousChef || ""
-                            }
-                          </Typography>
+                            <Typography variant="body2">
+                              <strong>
+                                Sous-chef :
+                              </strong>{" "}
+                              {
+                                selectedServiceDetails
+                                  .nomSousChef
+                              }{" "}
+                              {
+                                selectedServiceDetails
+                                  .prenomSousChef || ""
+                              }
+                            </Typography>
 
-                        )}
+                          )}
 
                       </Box>
 
