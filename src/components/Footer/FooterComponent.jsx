@@ -1,5 +1,4 @@
-import { Box, Stack, useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Typography } from "@mui/material";
 import logo from "../../assets/logo_white.png";
 
 const BUILDINGS = [
@@ -9,54 +8,62 @@ const BUILDINGS = [
 ];
 
 export default function Footer() {
-  const theme    = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const year     = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
-  // ── Mobile ───────────────────────────────────────────────────
-  if (isMobile) {
-    const m = theme.custom.footerMobile;
-    return (
-      <Box component="footer" sx={m.wrapper}>
-        <img src={logo} alt="Logo Uccle" style={m.logo} />
-        <Box component="span" sx={m.text}>
-          &copy; {year} Commune d&apos;Uccle
-        </Box>
-      </Box>
-    );
-  }
-
-  // ── Desktop ──────────────────────────────────────────────────
-  const f = theme.custom.footer;
   return (
-    <Box component="footer" sx={f.wrapper}>
-
-      {/* Skyline */}
-      <Box sx={f.skyline.wrapper}>
+    <Box
+      component="footer"
+      sx={{
+        position: "relative",
+        width: "100%",
+        height: { xs: 48, md: 50 },
+        bgcolor: "primary.main",
+        borderTop: "2.5px solid",
+        borderColor: "secondary.main",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        px: { xs: 2, md: 3 },
+        flexShrink: 0,
+        mt: "auto",
+      }}
+    >
+      {/* Skyline (desktop uniquement) */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "flex" },
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          alignItems: "flex-end",
+          pointerEvents: "none",
+          width: 340,
+        }}
+      >
         {BUILDINGS.map((b, i) => (
-          <Box key={i} sx={{ ...f.skyline.brick, width: b.w, height: b.h }} />
+          <Box
+            key={i}
+            sx={{ width: b.w, height: b.h, mr: "3px", flexShrink: 0, bgcolor: "common.white", opacity: 0.18 }}
+          />
         ))}
       </Box>
 
       {/* Logo */}
-      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0 }}>
-        <Box sx={f.logoBox}>
-          <img src={logo} alt="Logo Uccle" style={f.logo} />
-        </Box>
-      </Stack>
+      <Box
+        component="img"
+        src={logo}
+        alt="Logo Uccle"
+        sx={{ height: { xs: 28, md: 60 }, objectFit: "contain", flexShrink: 0 }}
+      />
 
       {/* Copyright */}
-      <Box sx={f.copyrightBox}>
-        <Box component="span" sx={f.text}>
-          &copy; {year} Commune d&apos;Uccle &middot; Tous droits r&eacute;serv&eacute;s
-        </Box>
-      </Box>
-
-      {/* Mise à jour */}
-      <Box sx={f.versionBox}>
-        {/* <Box component="span" sx={f.text}>
-          Mise &agrave; jour 07/05/{year}
-        </Box> */}
+      <Box sx={{ flex: 1, display: "flex", justifyContent: { xs: "flex-end", md: "center" } }}>
+        <Typography variant="caption" sx={{ color: "common.white", opacity: 0.75, whiteSpace: "nowrap" }}>
+          &copy; {year} Commune d&apos;Uccle
+          <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>
+            {" "}&middot; Tous droits r&eacute;serv&eacute;s
+          </Box>
+        </Typography>
       </Box>
     </Box>
   );

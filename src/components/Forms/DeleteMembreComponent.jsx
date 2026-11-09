@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { MdDeleteForever } from "react-icons/md";
 import {
   Alert,
+  Tooltip,
   Button,
   Dialog,
   DialogActions,
@@ -82,16 +83,19 @@ try {
 
   return (
     <>
-      <IconButton
-        size="small"
-        title={loading ? "Archivage..." : "Archiver"}
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={handleClick}
-        disabled={loading}
-        sx={{ ml: 0.5, color: "error.main" }}
-      >
-        <MdDeleteForever style={{ fontSize: 20 }} />
-      </IconButton>
+<Tooltip title={loading ? "Archivage..." : "Archiver"}>
+  <span>
+    <IconButton
+      size="small"
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={handleClick}
+      disabled={loading}
+      sx={{ ml: 0.5, color: "error.main" }}
+    >
+      <MdDeleteForever style={{ fontSize: 22 }} />
+    </IconButton>
+  </span>
+</Tooltip>
 
       <Dialog
         open={open}

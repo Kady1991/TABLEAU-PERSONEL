@@ -1,31 +1,46 @@
-import { Box } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import logo from "../../assets/logo_white.png";
 
+const CIRCLES = [
+  { size: 400, top: -100, right: -100, teal: false },
+  { size: 300, bottom: -80, left: -80, teal: false },
+  { size: 200, top: "50%", left: "50%", teal: true },
+];
+
 export default function LoadingScreen() {
-  const { custom: { loading: t } } = useTheme();
-
   return (
-    <Box sx={t.wrapper}>
-
+    <Box
+      sx={{
+        width: "100vw",
+        height: "100vh",
+        background: (theme) =>
+          `linear-gradient(160deg, ${theme.palette.primary.main} 60%, #02434f 100%)`,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        position: "relative",
+        gap: 4,
+      }}
+    >
       {/* ── Cercles décoratifs ── */}
-      {[
-        { size: 400, top: -100,  right: -100, teal: false },
-        { size: 300, bottom: -80, left: -80,  teal: false },
-        { size: 200, top: "50%", left: "50%", teal: true  },
-      ].map((c, i) => (
+      {CIRCLES.map((c, i) => (
         <Box
           key={i}
           sx={{
             position: "absolute",
-            width:  c.size,
+            width: c.size,
             height: c.size,
             borderRadius: "50%",
-            border: `1px solid ${c.teal ? t.circle.borderB : t.circle.borderA}`,
-            top:       c.top    ?? "auto",
-            bottom:    c.bottom ?? "auto",
-            left:      c.left   ?? "auto",
-            right:     c.right  ?? "auto",
+            border: "1px solid",
+            borderColor: c.teal ? "secondary.main" : "common.white",
+            opacity: c.teal ? 0.1 : 0.05,
+            top: c.top ?? "auto",
+            bottom: c.bottom ?? "auto",
+            left: c.left ?? "auto",
+            right: c.right ?? "auto",
             transform: c.teal ? "translate(-50%,-50%)" : "none",
             pointerEvents: "none",
           }}
@@ -39,62 +54,78 @@ export default function LoadingScreen() {
           src={logo}
           alt="Logo Uccle"
           sx={{
-            height: t.logo.height,
+            height: 140,
             width: "auto",
             objectFit: "contain",
             animation: "pulse 2s ease-in-out infinite",
             "@keyframes pulse": {
-              "0%,100%": { transform: "scale(1)",    opacity: 1    },
-              "50%":     { transform: "scale(1.05)", opacity: 0.85 },
+              "0%,100%": { transform: "scale(1)", opacity: 1 },
+              "50%": { transform: "scale(1.05)", opacity: 0.85 },
             },
           }}
         />
         <Box sx={{ textAlign: "center" }}>
-          <Box component="p" sx={{ ...t.title, m: 0 }}>
+          <Typography variant="h2" sx={{ color: "common.white" }}>
             Gestion du personnel
-          </Box>
-          <Box component="p" sx={{ ...t.subtitle, m: 0 }}>
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            sx={{ color: "common.white", opacity: 0.45, mt: 0.5 }}
+          >
             Administration communale d&apos;Uccle
-          </Box>
+          </Typography>
         </Box>
       </Box>
 
       {/* ── Barre + points ── */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5 }}>
-        <Box sx={t.barTrack}>
+        <Box
+          sx={{
+            width: 220,
+            height: 3,
+            borderRadius: 99,
+            overflow: "hidden",
+            bgcolor: (theme) => alpha(theme.palette.common.white, 0.1),
+          }}
+        >
           <Box
             sx={{
-              ...t.barFill,
+              height: "100%",
+              borderRadius: 99,
+              bgcolor: "secondary.main",
               animation: "load 2.4s ease-in-out infinite",
               "@keyframes load": {
-                "0%":   { width: "0%",  marginLeft: "0%"   },
-                "60%":  { width: "80%", marginLeft: "0%"   },
-                "100%": { width: "0%",  marginLeft: "100%" },
+                "0%": { width: "0%", marginLeft: "0%" },
+                "60%": { width: "80%", marginLeft: "0%" },
+                "100%": { width: "0%", marginLeft: "100%" },
               },
             }}
           />
         </Box>
 
-        <Box sx={t.dotsWrapper}>
+        <Box sx={{ display: "flex", gap: 0.8 }}>
           {[0, 0.2, 0.4].map((delay, i) => (
             <Box
               key={i}
               sx={{
-                ...t.dot,
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                bgcolor: "secondary.main",
                 animation: "bounce 1.2s ease-in-out infinite",
                 animationDelay: `${delay}s`,
                 "@keyframes bounce": {
                   "0%,80%,100%": { transform: "scale(0.6)", opacity: 0.4 },
-                  "40%":         { transform: "scale(1)",   opacity: 1   },
+                  "40%": { transform: "scale(1)", opacity: 1 },
                 },
               }}
             />
           ))}
         </Box>
 
-        <Box component="p" sx={{ ...t.label, m: 0 }}>
+        <Typography variant="overline" sx={{ color: "common.white", opacity: 0.3 }}>
           Chargement en cours...
-        </Box>
+        </Typography>
       </Box>
     </Box>
   );

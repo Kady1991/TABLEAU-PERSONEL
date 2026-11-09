@@ -34,7 +34,6 @@ function TableauComponent({
   showAddButton = true,
 }) {
   const navigate = useNavigate();
-
   const [rows,        setRows]        = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState("");
@@ -96,7 +95,6 @@ function TableauComponent({
       const enriched = data.map((p) => {
         const gradeId    = p.WWGradeID ?? p.IDWWGrade ?? p.GradeID ?? p.WWGrade ?? p.IdWWGrade ?? p.IdGrade ?? null;
         const fonctionId = p.FonctionID ?? p.IDFonction ?? p.IdFonction ?? null;
-
         const gradeTrouve =
           grades.find((g) => Number(g.IDWWGrade)  === Number(gradeId)) ||
           grades.find((g) => Number(g.WWGradeID)  === Number(gradeId)) ||

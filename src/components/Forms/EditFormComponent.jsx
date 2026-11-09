@@ -605,14 +605,11 @@ const finalCodeId = codeFound?.Idcode ?? codeFound?.IDCode ?? "";
   return (
     <>
       {/* Bouton déclencheur */}
-      <IconButton
-        size="small"
-        title="Éditer"
-        onClick={handleOpen}
-        sx={{ ml: 0.5 }}
-      >
-        <RiFileEditFill style={{ fontSize: 18, color: "#1b64ad" }} />
-      </IconButton>
+     <Tooltip title="Éditer">
+  <IconButton size="small" onClick={handleOpen} sx={{ ml: 0.5, color: PRIMARY }}>
+    <RiFileEditFill style={{ fontSize: 20, color: "#1b64ad" }} />
+  </IconButton>
+</Tooltip>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
         {/* ── Header ── */}

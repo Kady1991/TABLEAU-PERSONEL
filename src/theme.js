@@ -1,637 +1,72 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, alpha } from "@mui/material/styles";
 
-const PRIMARY_BLUE = "#003B68";
-const ICON_TEAL = "#02B2AF";
-const RED = "#c0392b";
-const BORDER = "rgba(0,0,0,0.08)";
-const BORDER_LIGHT = "rgba(0,0,0,0.05)";
-const GRAY = "#5c6b7a";
+// ═══════════════════════════════════════════════════════════════
+// 1. PALETTE UNIQUE : toutes les couleurs de l'app, une seule fois.
+// ═══════════════════════════════════════════════════════════════
+const C = {
+  blue: "#053a63",
+  blueSoft: "#e0ecf6",
+  teal: "#02B2AF",
+  tealMid: "#48b4b2",
+  tealSoft: "#e0f7f7",
+  tealDark: "#007a78",
+  red: "#c0392b",
+  redMid: "#ee6a6a",
+  redSoft: "#fdecea",
+  orange: "#f57c00",
+  orangeSoft: "#fff3e0",
+  orangeDark: "#e65100",
+  green: "#10b160",
+  white: "#ffffff",
+  text: "#374151",
+  textMuted: "#5c6b7a",
+  textFaint: "#7b93a8",
+  line: "rgba(0,0,0,0.08)",
+  surface: "#F4F7FA",
+  background: "#f6f7fb",
+};
 
 const theme = createTheme({
+  // ═════════════════════════════════════════════════════════════
+  // 2. COULEURS PAR NOM
+  // ═════════════════════════════════════════════════════════════
   palette: {
     mode: "light",
-    primary: { main: PRIMARY_BLUE, contrastText: "#ffffff" },
-    secondary: { main: ICON_TEAL },
-    error: { main: RED },
-    background: { default: "#f6f7fb", paper: "#ffffff" },
+    primary: { main: C.blue, light: C.blueSoft, contrastText: C.white },
+    secondary: { main: C.teal, light: C.tealSoft, dark: C.tealDark },
+    error: { main: C.red, light: C.redSoft },
+    warning: { main: C.orange, light: C.orangeSoft, dark: C.orangeDark },
+    success: { main: C.green },
+    text: { primary: C.text, secondary: C.textMuted, disabled: C.textFaint },
+    divider: C.line,
+    background: { default: C.background, paper: C.white },
   },
 
   shape: { borderRadius: 12 },
 
-  custom: {
-    // ── LoadingScreen ──────────────────────────────────────────
-    loading: {
-      wrapper: {
-        width: "100vw",
-        height: "100vh",
-        background: `linear-gradient(160deg, ${PRIMARY_BLUE} 60%, #02434f 100%)`,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        position: "relative",
-        gap: 4,
-      },
-      circle: {
-        borderA: "rgba(255,255,255,0.05)",
-        borderB: "rgba(2,178,175,0.1)",
-      },
-      logo: { height: 140 },
-      title: {
-        fontSize: 22,
-        fontWeight: 700,
-        color: "#ffffff",
-        lineHeight: 1.2,
-      },
-      subtitle: { fontSize: 13, color: "rgba(255,255,255,0.45)", mt: 0.5 },
-      label: {
-        fontSize: 11,
-        color: "rgba(255,255,255,0.3)",
-        letterSpacing: "0.08em",
-        textTransform: "uppercase",
-      },
-      barTrack: {
-        width: 220,
-        height: 3,
-        bgcolor: "rgba(255,255,255,0.1)",
-        borderRadius: 99,
-        overflow: "hidden",
-      },
-      barFill: { height: "100%", bgcolor: ICON_TEAL, borderRadius: 99 },
-      dot: { width: 6, height: 6, borderRadius: "50%", bgcolor: ICON_TEAL },
-      dotsWrapper: { display: "flex", gap: 0.8 },
-
-      loadingWrapper: {
-        height: "calc(100vh - 100px)",
-      },
-
-      loadingProgress: {
-        color: "primary.main",
-      },
-    },
-
-    // ── Footer desktop ─────────────────────────────────────────
-    footer: {
-      wrapper: {
-        position: "relative",
-        width: "100%",
-        height: 50,
-        bgcolor: PRIMARY_BLUE,
-        borderTop: `2.5px solid ${ICON_TEAL}`,
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        px: 3,
-        flexShrink: 0,
-        mt: "auto",
-      },
-      skyline: {
-        wrapper: {
-          position: "absolute",
-          bottom: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "flex-end",
-          pointerEvents: "none",
-          width: 340,
-        },
-        brick: { flexShrink: 0, mr: "3px", bgcolor: "rgba(255,255,255,0.18)" },
-      },
-      logo: { width: 60, height: 60, objectFit: "contain" },
-      logoBox: {
-        width: 60,
-        height: 60,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      text: {
-        fontSize: 12,
-        color: "rgba(255,255,255,0.73)",
-        whiteSpace: "nowrap",
-      },
-      copyrightBox: { flex: 1, display: "flex", justifyContent: "center" },
-      versionBox: { flexShrink: 0, textAlign: "right", zIndex: 1 },
-    },
-
-    // ── Footer mobile ──────────────────────────────────────────
-    footerMobile: {
-      wrapper: {
-        width: "100%",
-        height: 48,
-        bgcolor: "#2f5157",
-        borderTop: `2px solid ${ICON_TEAL}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        px: 2,
-        flexShrink: 0,
-      },
-      logo: { height: 28, objectFit: "contain" },
-      text: { fontSize: 11, color: "rgba(255,255,255,0.5)" },
-    },
-
-    // ── Sidebar / Topbar ───────────────────────────────────────
-    sidebarBg: PRIMARY_BLUE,
-    topbarBg: PRIMARY_BLUE,
-
-    // ── PersonnelArchivesListPage ──────────────────────────────
-    archives: {
-      page: { fontFamily: "Roboto, Arial, sans-serif" },
-      kpiCard: { borderRadius: "12px", height: "100%" },
-      kpiContent: { p: "1rem 1.25rem !important" },
-      kpiLabel: { fontSize: 12, fontWeight: 600, color: GRAY, mb: 0.5 },
-      kpiValueLong: {
-        fontSize: 16,
-        fontWeight: 700,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-      },
-      kpiValueShort: { fontSize: 24, fontWeight: 700 },
-      kpiSub: { fontSize: 11, color: GRAY, mt: 0.5 },
-      loadingBanner: {
-        sx: {
-          background: "#e0f7f7",
-          borderRadius: "10px",
-          border: `1px solid rgba(2,178,175,0.2)`,
-        },
-      },
-      loadingBannerText: { fontSize: 12, color: "#007a78" },
-      loadingBannerSpinner: { color: ICON_TEAL },
-      gridWrapper: {
-        height: "calc(100vh - 320px)",
-        bgcolor: "background.paper",
-        borderRadius: "12px",
-        border: `1px solid ${BORDER}`,
-        overflow: "hidden",
-      },
-      gridSx: {
-        border: "none",
-        "& .MuiDataGrid-cell": { display: "flex", alignItems: "center" },
-        "& .MuiDataGrid-columnHeaders": { borderBottom: `1px solid #d7e1ef` },
-        "& .MuiDataGrid-row": { borderBottom: `1px solid #d7e1ef` },
-      },
-      backButton: {
-        borderRadius: "10px",
-        fontWeight: 600,
-        textTransform: "none",
-        color: PRIMARY_BLUE,
-        borderColor: "rgba(0,59,104,0.25)",
-      },
-    },
-
-    // ── PersonnelDetailPage ────────────────────────────────────
-    detail: {
-      pageWrapper: {
-        width: "100%",
-        height: "100vh",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        bgcolor: "background.default",
-      },
-
-      contentWrapper: {
-        width: "100%",
-        maxWidth: 720,
-        mx: "auto",
-        flex: 1,
-        minHeight: 0,
-        overflow: "hidden",
-      },
-
-      cardContainer: {
-        width: "100%",
-        maxHeight: "calc(100vh - 85px)",
-        overflow: "hidden",
-      },
-
-      heroBanner: {
-        bgcolor: "primary.main",
-        color: "primary.contrastText",
-        px: { xs: 2, sm: 3 },
-        py: 2.5,
-      },
-
-      heroNameBanner: {
-        fontSize: { xs: 18, sm: 22 },
-        fontWeight: 600,
-        lineHeight: 1.2,
-        color: "inherit",
-      },
-
-      heroEmailBanner: {
-        fontSize: 12,
-        mt: 0.5,
-        color: "rgba(255,255,255,0.75)",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-      },
-
-      avatarHero: {
-        width: 64,
-        height: 64,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        fontSize: 20,
-        fontWeight: 600,
-        bgcolor: "background.paper",
-        color: "primary.main",
-      },
-
-      page: {
-        width: "100%",
-        maxWidth: 900,
-        mx: "auto",
-        px: { xs: 1.5, sm: 2.5 },
-        py: 2,
-      },
-
-      // Navigation
-
-      navigation: {
-        direction: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 1.5,
-      },
-
-      backBtn: {
-        minWidth: 0,
-        px: 1,
-        fontSize: 13,
-        fontWeight: 500,
-        color: "primary.main",
-        textTransform: "none",
-      },
-
-      backIcon: {
-        fontSize: 18,
-        color: "primary.main",
-      },
-
-      refreshBtn: {
-        width: 34,
-        height: 34,
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 2,
-        bgcolor: "background.paper",
-        "&:hover": {
-          bgcolor: "action.hover",
-        },
-      },
-
-      iconSm: {
-        fontSize: 18,
-        color: "primary.main",
-      },
-
-      iconXsm: {
-        fontSize: 17,
-        color: "primary.main",
-      },
-
-      // Carte principale
-      card: {
-        width: "100%",
-        bgcolor: "background.paper",
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 3,
-        boxShadow: "0 4px 18px rgba(0,0,0,0.07)",
-        overflow: "hidden",
-        maxHeight: "calc(100vh - 85px)",
-      },
-
-      // En-tête profil
-      hero: {
-        px: 3,
-        py: 2,
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        bgcolor: "background.paper",
-      },
-
-      avatar: {
-        width: 64,
-        height: 64,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        fontSize: 20,
-        fontWeight: 600,
-      },
-
-      heroName: {
-        fontSize: { xs: 17, sm: 20 },
-        fontWeight: 600,
-        lineHeight: 1.25,
-        mb: 0.4,
-      },
-
-      heroEmail: {
-        fontSize: 12,
-        mb: 1,
-      },
-
-      chipGrade: {
-        height: 24,
-        fontSize: 11,
-        fontWeight: 500,
-      },
-
-      chipFonction: {
-        height: 25,
-        fontSize: 11,
-        fontWeight: 500,
-        borderRadius: 1.5,
-      },
-      chipFonctionHero: {
-        height: 25,
-        fontSize: 11,
-        fontWeight: 500,
-        borderRadius: 1.5,
-        bgcolor: "rgba(255,255,255,0.15)",
-        color: "inherit",
-        border: "1px solid rgba(255,255,255,0.25)",
-      },
-
-      chipArchiveHero: {
-        height: 25,
-        fontSize: 11,
-        fontWeight: 500,
-        borderRadius: 1.5,
-        bgcolor: "error.main",
-        color: "common.white",
-      },
-
-      heroIdBox: {
-        textAlign: "right",
-        flexShrink: 0,
-        display: { xs: "none", sm: "block" },
-      },
-
-      heroIdLabel: {
-        fontSize: 9,
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-        color: "rgba(255,255,255,0.6)",
-      },
-
-      heroIdValue: {
-        fontSize: 15,
-        fontWeight: 600,
-        color: "common.white",
-      },
-      sectionCompact: {
-        px: 2,
-        pt: 1,
-        pb: 1,
-      
-      },
-
-      hierarchySection: {
-        px: 3,
-        pt: 2,
-        pb: 2.5,
-      },
-
-      errorAlert: {
-        mb: 2,
-      },
-      chipOutlined: {
-        height: 25,
-        fontSize: 11,
-        fontWeight: 500,
-        borderRadius: 1.5,
-      },
-
-      idBox: {
-        textAlign: "right",
-        flexShrink: 0,
-        pl: 2,
-      },
-
-      idLabel: {
-        fontSize: 9,
-        color: "text.disabled",
-        textTransform: "uppercase",
-        letterSpacing: "0.06em",
-        mb: 0.3,
-      },
-
-      idValue: {
-        fontSize: 14,
-        fontWeight: 600,
-        color: "primary.main",
-      },
-
-      // Sections
-      section: {
-        px: 3,
-        pt: 2,
-        pb: 1.5,
-        borderBottom: "1px solid",
-        borderColor: "divider",
-      },
-
-      sectionLast: {
-        px: 3,
-        pt: 2,
-        pb: 2.5,
-      },
-
-      sectionLabel: {
-        fontSize: 10,
-        fontWeight: 600,
-        color: "primary.main",
-        textTransform: "uppercase",
-        letterSpacing: "0.1em",
-        mb: 1.2,
-      },
-
-      // Informations
-      infoRow: {
-        minHeight: 38,
-        py: 0.4,
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        "&:last-child": {
-          borderBottom: "none",
-        },
-      },
-
-      infoIconBox: {
-        width: 32,
-        height: 32,
-        borderRadius: 1.5,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        bgcolor: "rgba(0,59,104,0.07)",
-        "& svg": {
-          fontSize: 16,
-        },
-      },
-
-      infoLabel: {
-        width: 125,
-        flexShrink: 0,
-        fontSize: 12,
-        color: "text.secondary",
-        ml: 1.5,
-      },
-
-      infoValue: {
-        flex: 1,
-        minWidth: 0,
-        fontSize: 13,
-        color: "text.primary",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-      },
-
-      infoValueAccent: {
-        color: "primary.main",
-        fontWeight: 500,
-      },
-
-      infoValueDanger: {
-        color: "error.main",
-        fontWeight: 500,
-      },
-
-      infoValueMuted: {
-        color: "text.disabled",
-        fontStyle: "italic",
-        fontWeight: 400,
-      },
-
-      // Hiérarchie
-      hierarchyWrapper: {
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "1fr",
-          sm: "repeat(3, 1fr)",
-        },
-        gap: 1.5,
-      },
-
-      hierarchyCard: {
-        flex: 1,
-        minWidth: 0,
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 2,
-        px: 1.5,
-        py: 1.25,
-        bgcolor: "background.paper",
-        transition: "border-color 0.2s, box-shadow 0.2s",
-        "&:hover": {
-          borderColor: "primary.main",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        },
-      },
-
-      hierarchyAvatar: {
-        width: 36,
-        height: 36,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        bgcolor: "rgba(0,59,104,0.07)",
-        color: "primary.main",
-        fontSize: 11,
-        fontWeight: 600,
-      },
-
-      hierarchyRole: {
-        fontSize: 9,
-        color: "text.disabled",
-        textTransform: "uppercase",
-        letterSpacing: "0.07em",
-        mb: 0.3,
-      },
-
-      hierarchyName: {
-        fontSize: 13,
-        fontWeight: 500,
-        color: "text.primary",
-      },
-
-      // Chargement
-      loading: {
-        height: "calc(100vh - 100px)",
-      },
-
-      loadingIcon: {
-        color: "primary.main",
-      },
-    },
-
-    // ── PersonnelStatisticsPage ─────────────────────────────────
-    stats: {
-      barColors: {
-        present: "#48b4b2",
-        depart: RED, // ← était ICON_TEAL, maintenant rouge
-      },
-      kpiIconBg: "#e0ecf6",
-      chipGray: { bgcolor: "#f0f4f8", color: GRAY },
-      tableStripe: "rgba(14, 68, 109, 0.03)",
-      totalRow: { bgcolor: "#f0f4f8", color: PRIMARY_BLUE },
-      trendUp: "#1e8e5a",
-      trendDown: RED,
-    },
-  },
-
-  // ── Typographie ───────────────────────────────────────────────
-
-  // ── Typographie ───────────────────────────────────────────────
+  // ═════════════════════════════════════════════════════════════
+  // 3. TYPOGRAPHIE : 1 style par rôle
+  //    h1 titre de page · h2 grand titre · h3 titre de carte
+  //    h4 sous-titre de carte · h5 intitulé en majuscules
+  //    h6 petit label grisé · subtitle1/2 · body1/2 · caption · overline
+  // ═════════════════════════════════════════════════════════════
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
     h1: {
       fontSize: "25px",
       fontWeight: 600,
-      color: PRIMARY_BLUE,
+      color: C.blue,
       letterSpacing: "-0.5px",
       lineHeight: 1,
       marginBottom: "24px",
     },
-    h2: {
-      fontSize: "22px",
-      fontWeight: 400,
-      color: PRIMARY_BLUE,
-      lineHeight: 1.3,
-    },
-    h3: {
-      fontSize: "16px",
-      fontWeight: 700,
-      color: PRIMARY_BLUE,
-      lineHeight: 1.4,
-    },
-    h4: {
-      fontSize: "15px",
-      fontWeight: 600,
-      color: PRIMARY_BLUE,
-      lineHeight: 1.4,
-    },
+    h2: { fontSize: "22px", fontWeight: 600, color: C.blue, lineHeight: 1.2 },
+    h3: { fontSize: "16px", fontWeight: 700, color: C.blue, lineHeight: 1.4 },
+    h4: { fontSize: "15px", fontWeight: 600, color: C.blue, lineHeight: 1.4 },
     h5: {
       fontSize: "13px",
       fontWeight: 700,
-      color: PRIMARY_BLUE,
+      color: C.blue,
       textTransform: "uppercase",
       letterSpacing: "0.05em",
       lineHeight: 1.4,
@@ -639,30 +74,20 @@ const theme = createTheme({
     h6: {
       fontSize: "11px",
       fontWeight: 600,
-      color: GRAY,
+      color: C.textMuted,
       textTransform: "uppercase",
       letterSpacing: "0.08em",
       lineHeight: 1.4,
     },
-    subtitle1: {
-      fontSize: "14px",
-      fontWeight: 600,
-      color: PRIMARY_BLUE,
-      lineHeight: 1.4,
-    },
-    subtitle2: {
-      fontSize: "13px",
-      fontWeight: 500,
-      color: GRAY,
-      lineHeight: 1.4,
-    },
-    body1: { fontSize: "14px", color: "#374151", lineHeight: 1.6 },
-    body2: { fontSize: "13px", color: GRAY, lineHeight: 1.5 },
-    caption: { fontSize: "11px", color: "#7b93a8", lineHeight: 1.4 },
+    subtitle1: { fontSize: "14px", fontWeight: 600, color: C.blue, lineHeight: 1.4 },
+    subtitle2: { fontSize: "13px", fontWeight: 500, color: C.textMuted, lineHeight: 1.4 },
+    body1: { fontSize: "14px", color: C.text, lineHeight: 1.6 },
+    body2: { fontSize: "13px", color: C.textMuted, lineHeight: 1.5 },
+    caption: { fontSize: "11px", color: C.textFaint, lineHeight: 1.4 },
     overline: {
       fontSize: "10px",
       fontWeight: 600,
-      color: "#7b93a8",
+      color: C.textFaint,
       textTransform: "uppercase",
       letterSpacing: "0.09em",
       lineHeight: 1.4,
@@ -670,133 +95,538 @@ const theme = createTheme({
     button: { fontSize: "13px", fontWeight: 600, textTransform: "none" },
   },
 
+  // ═════════════════════════════════════════════════════════════
+  // 4. COMPOSANTS : style par défaut de chaque composant MUI
+  // ═════════════════════════════════════════════════════════════
   components: {
-    MuiInputLabel: {
-      styleOverrides: {
-        root: { fontSize: 13, fontWeight: 600, color: PRIMARY_BLUE },
-        asterisk: {
-          color: "#d32f2f",
-          order: -1,
-          marginRight: 4,
-          marginLeft: 0,
-          fontWeight: 800,
-        },
-      },
-    },
-    MuiFormLabel: {
-      styleOverrides: {
-        root: { fontSize: 13, fontWeight: 600, color: PRIMARY_BLUE },
-      },
-    },
+    // ── Formulaires ──────────────────────────────────────────
     MuiTextField: { defaultProps: { size: "small" } },
     MuiFormControl: { defaultProps: { size: "small" } },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: { fontSize: 13, fontWeight: 600, color: C.blue },
+        asterisk: ({ theme }) => ({
+          color: theme.palette.error.main,
+          fontWeight: 800,
+        }),
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        asterisk: { order: -1, marginRight: 4, marginLeft: 0 },
+      },
+    },
+
+    // ── Navigation ───────────────────────────────────────────
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: PRIMARY_BLUE,
-          color: "#ffffff",
+          backgroundColor: C.blue,
+          color: C.white,
           backgroundImage: "none",
-          "& .MuiSvgIcon-root": { color: "#ffffff" },
+          "& .MuiSvgIcon-root": { color: C.white },
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
-        paper: {
-          backgroundColor: "#ffffff",
-          color: PRIMARY_BLUE,
-          borderRight: `1px solid ${BORDER}`,
-        },
+        paper: ({ theme }) => ({
+          color: C.blue,
+          borderRight: `1px solid ${theme.palette.divider}`,
+        }),
       },
     },
     MuiListItemText: {
-      styleOverrides: { primary: { fontWeight: 600, color: PRIMARY_BLUE } },
+      styleOverrides: { primary: { fontWeight: 600, color: C.blue } },
     },
     MuiListItemIcon: {
-      styleOverrides: { root: { color: ICON_TEAL, minWidth: 36 } },
+      styleOverrides: { root: { color: C.teal, minWidth: 36 } },
     },
-    MuiSvgIcon: { styleOverrides: { root: { color: ICON_TEAL } } },
+
+    // ── Icônes : turquoise par défaut (color="inherit" / "primary" pour changer)
+    MuiSvgIcon: { defaultProps: { color: "secondary" } },
+
+    // ── Cartes ───────────────────────────────────────────────
     MuiCard: {
       defaultProps: { variant: "outlined" },
-      styleOverrides: {
-        root: {
-          backgroundColor: "#ffffff",
-          border: `1px solid ${BORDER}`,
-          borderRadius: 12,
-          overflow: "hidden",
-        },
-      },
+      styleOverrides: { root: { overflow: "hidden" } },
     },
     MuiCardContent: {
       styleOverrides: {
-        root: { padding: "16px", "&:last-child": { paddingBottom: "16px" } },
+        root: { padding: 16, "&:last-child": { paddingBottom: 16 } },
       },
     },
     MuiCardHeader: {
+      defaultProps: { titleTypographyProps: { variant: "h4" } },
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           padding: "10px 16px",
-          borderBottom: `1px solid rgba(0,0,0,0.07)`,
-        },
-        title: { fontSize: "15px", fontWeight: 600, color: PRIMARY_BLUE },
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }),
         action: { margin: 0, alignSelf: "center" },
       },
     },
+
+    // ── Chips ────────────────────────────────────────────────
     MuiChip: {
       styleOverrides: {
-        root: {
-          height: 22,
-          fontSize: 12,
-          fontWeight: 600,
-          borderRadius: "99px",
-        },
-        colorSuccess: { backgroundColor: "#e0f7f7", color: "#007a78" },
-        colorError: { backgroundColor: "#fdecea", color: RED },
-        colorPrimary: { backgroundColor: "#e0ecf6", color: PRIMARY_BLUE },
-        colorSecondary: { backgroundColor: "#e0f7f7", color: "#007a78" },
+        root: { height: 22, fontSize: 12, fontWeight: 600, borderRadius: 99 },
+        colorPrimary: ({ theme }) => ({
+          backgroundColor: theme.palette.primary.light,
+          color: theme.palette.primary.main,
+        }),
+        colorSecondary: ({ theme }) => ({
+          backgroundColor: theme.palette.secondary.light,
+          color: theme.palette.secondary.dark,
+        }),
+        colorSuccess: ({ theme }) => ({
+          backgroundColor: theme.palette.secondary.light,
+          color: theme.palette.secondary.dark,
+        }),
+        colorError: ({ theme }) => ({
+          backgroundColor: theme.palette.error.light,
+          color: theme.palette.error.main,
+        }),
+        colorWarning: ({ theme }) => ({
+          backgroundColor: theme.palette.warning.light,
+          color: theme.palette.warning.dark,
+        }),
       },
     },
+
+    // ── Avatars ──────────────────────────────────────────────
+    MuiAvatar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.primary.light,
+          color: theme.palette.primary.main,
+          fontWeight: 600,
+        }),
+      },
+    },
+
+    // ── Boutons ──────────────────────────────────────────────
     MuiButton: {
       defaultProps: { disableElevation: true },
+      styleOverrides: { root: { borderRadius: 10 } },
+    },
+
+    // ── Tooltips ─────────────────────────────────────────────
+    MuiTooltip: {
       styleOverrides: {
-        root: { textTransform: "none", borderRadius: 10, fontWeight: 600 },
+        tooltip: { backgroundColor: C.blue, fontSize: 12, fontWeight: 500 },
+        arrow: { color: C.blue },
       },
     },
+
+    // ── Dialogues ────────────────────────────────────────────
+    MuiDialogTitle: {
+      styleOverrides: { root: { fontWeight: 800, color: C.blue } },
+    },
+
+    // ── Tableaux classiques ──────────────────────────────────
     MuiTableHead: {
-      styleOverrides: { root: { backgroundColor: "rgba(0,59,104,0.03)" } },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: alpha(theme.palette.primary.main, 0.03),
+        }),
+      },
     },
     MuiTableRow: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           "&.MuiTableRow-hover:hover, &:hover": {
-            backgroundColor: "rgba(0,59,104,0.03)",
+            backgroundColor: alpha(theme.palette.primary.main, 0.03),
           },
           "&:last-child td": { borderBottom: "none" },
-        },
+        }),
       },
     },
     MuiTableCell: {
       styleOverrides: {
-        head: {
+        head: ({ theme }) => ({
           fontSize: 11,
           fontWeight: 700,
-          color: PRIMARY_BLUE,
+          color: C.blue,
           textTransform: "uppercase",
           letterSpacing: "0.05em",
           paddingTop: 8,
           paddingBottom: 8,
-          borderBottomColor: BORDER,
-        },
-        body: {
+          borderBottomColor: theme.palette.divider,
+        }),
+        body: ({ theme }) => ({
           fontSize: 13,
           paddingTop: 8,
           paddingBottom: 8,
-          borderBottomColor: BORDER_LIGHT,
+          borderBottomColor: theme.palette.divider,
+        }),
+      },
+    },
+
+    // ── DataGrid (liste du personnel, archives…) ─────────────
+    MuiDataGrid: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          border: "none",
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: C.surface,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            color: theme.palette.text.primary,
+          },
+          "& .MuiDataGrid-cell": { display: "flex", alignItems: "center" },
+          "& .MuiDataGrid-row": {
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiDataGrid-row.Mui-selected": {
+            backgroundColor: alpha(theme.palette.secondary.main, 0.06),
+          },
+        }),
+      },
+    },
+  },
+
+  // ═════════════════════════════════════════════════════════════
+  // 5. CUSTOM : ce qui n'existe pas dans MUI
+  // ═════════════════════════════════════════════════════════════
+  custom: {
+    // Couleurs des graphiques
+    chart: {
+      actif: C.blue,
+      actifSoft: C.tealMid,
+      entree: C.teal,
+      depart: C.orange,
+      archive: C.red,
+      archiveSoft: C.redMid,
+    },
+
+    // Rond coloré + icône blanche
+
+        // Page d'accueil
+    home: {
+      quickTile: (color) => ({
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        p: 1.5,
+        borderRadius: 2,
+        backgroundColor: alpha(color, 0.2),
+        cursor: "pointer",
+        transition: "transform 0.15s",
+        "&:hover": { transform: "translateY(-2px)" },
+      }),
+    },
+    iconCircle: (size, color) => ({
+      width: size,
+      height: size,
+      borderRadius: "50%",
+      backgroundColor: color,
+      color: C.white,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+      "& .MuiSvgIcon-root": { color: "inherit" },
+    }),
+
+    // ── Page « Personnels archivés » ─────────────────────────
+    archives: {
+      header: {
+        wrapper: {
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 1.5,
+          mb: 2.5,
+        },
+        title: { mb: 0.5 },
+        backButton: {
+          height: 44,
+          px: 2.25,
+          color: "primary.main",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        },
+      },
+
+      
+      statsRow: { flexWrap: "wrap", gap: 2, mb: 2.5 },
+      statCard: {
+        root: {
+          flex: "1 1 260px",
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "12px",
+          px: 2.25,
+          py: 1.75,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1.5,
+          minWidth: 0,
+        },
+        body: { minWidth: 0 },
+        label: { fontSize: 13, color: "text.secondary" },
+        value: (clickable) => ({
+          m: 0,
+          p: 0,
+          border: 0,
+          background: "none",
+          textAlign: "left",
+          maxWidth: "100%",
+          fontFamily: "inherit",
+          fontSize: clickable ? 18 : 28,
+          fontWeight: 700,
+          lineHeight: 1.2,
+          color: "error.main",
+          cursor: clickable ? "pointer" : "default",
+          "&:hover": clickable ? { textDecoration: "underline" } : undefined,
+        }),
+        sub: { fontSize: 12, color: "text.secondary", textAlign: "right" },
+      },
+
+      loadingBanner: {
+        wrapper: {
+          mb: 1.5,
+          px: 2,
+          py: 0.8,
+          bgcolor: "secondary.light",
+          borderRadius: "10px",
+          border: "1px solid",
+          borderColor: (theme) => alpha(theme.palette.secondary.main, 0.2),
+        },
+        dot: (index) => ({
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          bgcolor: "error.main",
+          "@keyframes blink": {
+            "0%,100%": { opacity: 0.3 },
+            "50%": { opacity: 1 },
+          },
+          animation: "blink 1.2s ease-in-out infinite",
+          animationDelay: `${index * 0.2}s`,
+        }),
+        text: { fontSize: 12, color: "success.main" },
+      },
+
+      bulkBar: {
+        wrapper: {
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1.5,
+          px: 2.25,
+          py: 1.25,
+          bgcolor: "secondary.light",
+          borderBottom: "1px solid",
+          borderColor: (theme) => alpha(theme.palette.secondary.main, 0.3),
+        },
+        label: { fontSize: 14, fontWeight: 600, color: "primary.main" },
+        buttons: { flexWrap: "wrap", gap: 1 },
+        exportButton: {
+          height: 44,
+          color: "primary.main",
+          borderColor: "primary.main",
+          bgcolor: "background.paper",
+        },
+        clearButton: {
+          height: 44,
+          color: "primary.main",
+          textDecoration: "underline",
+        },
+      },
+
+      gridWrapper: { height: "calc(100vh - 360px)", bgcolor: "background.paper", minHeight: 520 },
+
+      viewButton: {
+        borderRadius: "8px",
+        color: "primary.main",
+        borderColor: "divider",
+      },
+
+      toolbar: {
+        container: {
+          flexDirection: "column",
+          alignItems: "stretch",
+          gap: 1.5,
+          p: 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        },
+        topRow: { flexWrap: "wrap", alignItems: "center", gap: 1.5 },
+        search: { flex: "1 1 280px" },
+        searchInput: { height: 44, borderRadius: "10px", fontSize: 14 },
+        searchIcon: { color: "text.secondary" },
+        buttons: { flexWrap: "wrap", gap: 1 },
+        button: {
+          height: 44,
+          px: 1.75,
+          color: "primary.main",
+          border: "1px solid",
+          borderColor: "divider",
+        },
+        filterRow: { flexWrap: "wrap", alignItems: "center", gap: 1.25 },
+        filterLabel: { fontSize: 13, fontWeight: 600, color: "text.secondary" },
+        select: {
+          minWidth: 170,
+          height: 44,
+          borderRadius: "10px",
+          fontSize: 14,
+          bgcolor: "background.paper",
+        },
+        resetButton: {
+          height: 44,
+          color: "success.main",
+          textDecoration: "underline",
         },
       },
     },
-    MuiDialogTitle: {
-      styleOverrides: { root: { fontWeight: 800, color: PRIMARY_BLUE } },
+
+
+        // ── Page « Détail personnel » ────────────────────────────
+    detail: {
+      pageWrapper: { width: "100%" },
+      contentWrapper: { maxWidth: 860, mx: "auto" },
+      navigation: { mb: 2 },
+      backIcon: { color: "inherit" },
+      backBtn: { color: "primary.main", borderRadius: "8px" },
+      refreshBtn: {
+        color: "primary.main",
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
+      },
+      loadingWrapper: { py: 8 },
+      loadingProgress: { color: "secondary.main" },
+      errorAlert: { mb: 2 },
+
+      card: {
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: "12px",
+        overflow: "hidden",
+      },
+
+      // Bandeau du haut
+      heroBanner: { bgcolor: "primary.main", p: 3 },
+      avatarHero: {
+        width: 64,
+        height: 64,
+        borderRadius: "50%",
+        bgcolor: "secondary.main",
+        color: "common.white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 22,
+        fontWeight: 700,
+        flexShrink: 0,
+      },
+      heroNameBanner: {
+        fontSize: 22,
+        fontWeight: 700,
+        color: "common.white",
+        lineHeight: 1.2,
+      },
+      heroEmailBanner: { fontSize: 13, color: "rgba(255,255,255,0.75)", mt: 0.5 },
+      chipFonctionHero: { bgcolor: "secondary.main", color: "common.white" },
+      chipArchiveHero: { bgcolor: "error.light", color: "error.main" },
+      heroIdBox: {
+        textAlign: "right",
+        px: 1.5,
+        py: 0.75,
+        borderRadius: "10px",
+        bgcolor: "rgba(255,255,255,0.12)",
+      },
+      heroIdLabel: {
+        fontSize: 10,
+        fontWeight: 600,
+        letterSpacing: "0.09em",
+        color: "rgba(255,255,255,0.65)",
+      },
+      heroIdValue: { fontSize: 18, fontWeight: 700, color: "common.white" },
+
+      // Sections
+      sectionCompact: {
+        px: 3,
+        py: 2,
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      },
+      sectionLabel: {
+        fontSize: 11,
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        mb: 1,
+      },
+      infoRow: {
+        py: 1,
+        borderBottom: "1px dashed",
+        borderColor: "divider",
+        "&:last-child": { borderBottom: "none" },
+      },
+      infoIconBox: {
+        width: 32,
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        "& .MuiSvgIcon-root": { fontSize: 20 },
+      },
+      infoLabel: { width: 140, flexShrink: 0, fontSize: 13, color: "text.secondary" },
+      infoValue: { fontSize: 14, fontWeight: 500, color: "text.primary", minWidth: 0 },
+      infoValueAccent: { fontSize: 14, fontWeight: 600, color: "primary.main", minWidth: 0 },
+      infoValueDanger: { fontSize: 14, fontWeight: 600, color: "error.main", minWidth: 0 },
+      infoValueMuted: {
+        fontSize: 14,
+        fontStyle: "italic",
+        color: "text.disabled",
+        minWidth: 0,
+      },
+
+      // Hiérarchie
+      hierarchySection: { px: 3, py: 2 },
+      hierarchyWrapper: {
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+        gap: 1.5,
+      },
+      hierarchyCard: {
+        gap: 1.5,
+        p: 1.5,
+        borderRadius: "10px",
+        bgcolor: "background.default",
+        border: "1px solid",
+        borderColor: "divider",
+      },
+      hierarchyAvatar: {
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        bgcolor: "primary.light",
+        color: "primary.main",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 13,
+        fontWeight: 700,
+        flexShrink: 0,
+      },
+      hierarchyRole: {
+        fontSize: 10,
+        fontWeight: 600,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        color: "text.disabled",
+      },
+      hierarchyName: { fontSize: 14, fontWeight: 600, color: "primary.main" },
     },
   },
 });
